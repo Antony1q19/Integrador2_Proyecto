@@ -1,14 +1,17 @@
 // features/postulantes/components/EvaluacionesTab.tsx
 "use client";
 
-import { useState } from "react";
-import { Evaluacion } from "../types/postulante.types";
+import { useMemo, useState } from "react";
+import { CompetenciasEvaluacion, Evaluacion } from "../types/postulante.types";
+import { COMPETENCIAS, calcularPuntajeTotal, calcularResultado } from "../utils/evaluacion";
 
-const ETIQUETAS_TIPO: Record<Evaluacion["tipo"], string> = {
-  ENTREVISTA_RRHH: "Entrevista RRHH",
-  PRUEBA_TECNICA: "Prueba técnica",
-  ENTREVISTA_SUPERVISOR: "Entrevista con supervisor",
-  PSICOLOGICA: "Evaluación psicológica",
+const COMPETENCIAS_INICIALES: CompetenciasEvaluacion = {
+  comunicacionEfectiva: 3,
+  orientacionCliente: 3,
+  responsabilidad: 3,
+  adaptabilidadFlexibilidad: 3,
+  toleranciaPresion: 3,
+  dinamismoEnergia: 3,
 };
 
 interface EvaluacionesTabProps {
@@ -17,26 +20,75 @@ interface EvaluacionesTabProps {
   onRegistrar: (evaluacion: Omit<Evaluacion, "id">) => Promise<void>;
 }
 
+function ResultadoBadge({ resultado }: { resultado: Evaluacion["resultado"] }) {
+  const esApto = resultado === "APTO";
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${
+        esApto ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"
+      }`}
+    >
+      <span className="h-1.5 w-1.5 rounded-full bg-current" />
+      {esApto ? "Apto" : "No apto"}
+    </span>
+  );
+}
+
+function RequisitoBadge({ ok, etiqueta }: { ok: boolean; etiqueta: string }) {
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium ${
+        ok ? "bg-slate-50 text-slate-600" : "bg-red-50 text-red-600"
+      }`}
+    >
+      {ok ? "✓" : "✕"} {etiqueta}
+    </span>
+  );
+}
+
 export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: EvaluacionesTabProps) {
   const [mostrarForm, setMostrarForm] = useState(false);
   const [form, setForm] = useState({
-    tipo: "ENTREVISTA_RRHH" as Evaluacion["tipo"],
     evaluador: "",
     fecha: new Date().toISOString().slice(0, 10),
-    puntaje: 70,
+    competencias: COMPETENCIAS_INICIALES,
+    carneSanidad: false,
+    antecedentesPenales: false,
     comentarios: "",
   });
 
+  const puntajePreview = useMemo(() => calcularPuntajeTotal(form.competencias), [form.competencias]);
+  const resultadoPreview = useMemo(
+    () => calcularResultado(form.competencias, form.carneSanidad, form.antecedentesPenales),
+    [form.competencias, form.carneSanidad, form.antecedentesPenales]
+  );
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onRegistrar(form);
-    setForm({ ...form, evaluador: "", comentarios: "" });
+    await onRegistrar({
+      evaluador: form.evaluador,
+      fecha: form.fecha,
+      competencias: form.competencias,
+      puntajeTotal: puntajePreview,
+      resultado: resultadoPreview,
+      carneSanidad: form.carneSanidad,
+      antecedentesPenales: form.antecedentesPenales,
+      comentarios: form.comentarios,
+    });
+    setForm({
+      evaluador: "",
+      fecha: new Date().toISOString().slice(0, 10),
+      competencias: COMPETENCIAS_INICIALES,
+      carneSanidad: false,
+      antecedentesPenales: false,
+      comentarios: "",
+    });
     setMostrarForm(false);
   };
 
   const promedio =
     evaluaciones.length > 0
-      ? Math.round(evaluaciones.reduce((acc, e) => acc + e.puntaje, 0) / evaluaciones.length)
+      ? Math.round(evaluaciones.reduce((acc, e) => acc + e.puntajeTotal, 0) / evaluaciones.length)
       : null;
 
   return (
@@ -59,54 +111,89 @@ export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: Evalua
       {mostrarForm && (
         <form
           onSubmit={handleSubmit}
-          className="grid grid-cols-1 gap-4 rounded-lg border border-gray-100 bg-slate-50/60 p-4 sm:grid-cols-2"
+          className="space-y-4 rounded-lg border border-gray-100 bg-slate-50/60 p-4"
         >
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-gray-500">Evaluador</label>
+              <input
+                required
+                value={form.evaluador}
+                onChange={(e) => setForm({ ...form, evaluador: e.target.value })}
+                className="w-full rounded-md border border-gray-200 px-3 py-1.5 text-sm focus:border-[#1D2B53] focus:outline-none focus:ring-1 focus:ring-[#1D2B53]"
+                placeholder="Nombre del evaluador"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-gray-500">Fecha</label>
+              <input
+                type="date"
+                required
+                value={form.fecha}
+                onChange={(e) => setForm({ ...form, fecha: e.target.value })}
+                className="w-full rounded-md border border-gray-200 px-3 py-1.5 text-sm focus:border-[#1D2B53] focus:outline-none focus:ring-1 focus:ring-[#1D2B53]"
+              />
+            </div>
+          </div>
+
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-500">Tipo</label>
-            <select
-              value={form.tipo}
-              onChange={(e) => setForm({ ...form, tipo: e.target.value as Evaluacion["tipo"] })}
-              className="w-full rounded-md border border-gray-200 px-3 py-1.5 text-sm focus:border-[#1D2B53] focus:outline-none focus:ring-1 focus:ring-[#1D2B53]"
-            >
-              {Object.entries(ETIQUETAS_TIPO).map(([valor, etiqueta]) => (
-                <option key={valor} value={valor}>{etiqueta}</option>
+            <p className="mb-2 text-xs font-medium text-gray-500">Competencias evaluadas (1 a 5)</p>
+            <div className="space-y-2">
+              {COMPETENCIAS.map(({ clave, etiqueta }) => (
+                <div key={clave} className="flex items-center justify-between gap-3">
+                  <span className="text-sm text-gray-700">{etiqueta}</span>
+                  <div className="flex shrink-0 gap-1">
+                    {[1, 2, 3, 4, 5].map((valor) => (
+                      <button
+                        key={valor}
+                        type="button"
+                        onClick={() =>
+                          setForm({
+                            ...form,
+                            competencias: { ...form.competencias, [clave]: valor },
+                          })
+                        }
+                        className={`h-7 w-7 rounded-md text-xs font-semibold transition-colors ${
+                          form.competencias[clave] === valor
+                            ? "bg-[#1D2B53] text-white"
+                            : "bg-white text-gray-500 border border-gray-200 hover:bg-gray-50"
+                        }`}
+                      >
+                        {valor}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               ))}
-            </select>
+            </div>
           </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-gray-500">Carné de sanidad</label>
+              <select
+                value={form.carneSanidad ? "si" : "no"}
+                onChange={(e) => setForm({ ...form, carneSanidad: e.target.value === "si" })}
+                className="w-full rounded-md border border-gray-200 px-3 py-1.5 text-sm focus:border-[#1D2B53] focus:outline-none focus:ring-1 focus:ring-[#1D2B53]"
+              >
+                <option value="no">No cuenta</option>
+                <option value="si">Sí cuenta</option>
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-gray-500">Antecedentes penales</label>
+              <select
+                value={form.antecedentesPenales ? "si" : "no"}
+                onChange={(e) => setForm({ ...form, antecedentesPenales: e.target.value === "si" })}
+                className="w-full rounded-md border border-gray-200 px-3 py-1.5 text-sm focus:border-[#1D2B53] focus:outline-none focus:ring-1 focus:ring-[#1D2B53]"
+              >
+                <option value="no">No registra</option>
+                <option value="si">Sí registra</option>
+              </select>
+            </div>
+          </div>
+
           <div>
-            <label className="mb-1 block text-xs font-medium text-gray-500">Evaluador</label>
-            <input
-              required
-              value={form.evaluador}
-              onChange={(e) => setForm({ ...form, evaluador: e.target.value })}
-              className="w-full rounded-md border border-gray-200 px-3 py-1.5 text-sm focus:border-[#1D2B53] focus:outline-none focus:ring-1 focus:ring-[#1D2B53]"
-              placeholder="Nombre del evaluador"
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-gray-500">Fecha</label>
-            <input
-              type="date"
-              required
-              value={form.fecha}
-              onChange={(e) => setForm({ ...form, fecha: e.target.value })}
-              className="w-full rounded-md border border-gray-200 px-3 py-1.5 text-sm focus:border-[#1D2B53] focus:outline-none focus:ring-1 focus:ring-[#1D2B53]"
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-gray-500">
-              Puntaje ({form.puntaje}/100)
-            </label>
-            <input
-              type="range"
-              min={0}
-              max={100}
-              value={form.puntaje}
-              onChange={(e) => setForm({ ...form, puntaje: Number(e.target.value) })}
-              className="w-full accent-[#1D2B53]"
-            />
-          </div>
-          <div className="sm:col-span-2">
             <label className="mb-1 block text-xs font-medium text-gray-500">Comentarios</label>
             <textarea
               value={form.comentarios}
@@ -116,15 +203,21 @@ export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: Evalua
               placeholder="Observaciones de la evaluación"
             />
           </div>
-          <div className="sm:col-span-2">
-            <button
-              type="submit"
-              disabled={guardando}
-              className="rounded-md bg-[#1D2B53] px-4 py-2 text-sm font-medium text-white hover:bg-[#16224A] disabled:opacity-50"
-            >
-              {guardando ? "Guardando…" : "Guardar evaluación"}
-            </button>
+
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-gray-100 bg-white px-3 py-2">
+            <span className="text-xs text-gray-500">
+              Resultado automático · Puntaje {puntajePreview}/100
+            </span>
+            <ResultadoBadge resultado={resultadoPreview} />
           </div>
+
+          <button
+            type="submit"
+            disabled={guardando}
+            className="rounded-md bg-[#1D2B53] px-4 py-2 text-sm font-medium text-white hover:bg-[#16224A] disabled:opacity-50"
+          >
+            {guardando ? "Guardando…" : "Guardar evaluación"}
+          </button>
         </form>
       )}
 
@@ -138,31 +231,38 @@ export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: Evalua
             <li key={ev.id} className="rounded-lg border border-gray-100 p-4">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-800">{ETIQUETAS_TIPO[ev.tipo]}</p>
                   <p className="font-mono text-[11px] text-gray-400">
                     {ev.evaluador} · {new Date(ev.fecha).toLocaleDateString("es-PE")}
                   </p>
+                  <p className="mt-0.5 text-sm font-medium text-gray-800">{ev.puntajeTotal}/100</p>
                 </div>
-                <span
-                  className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-                    ev.puntaje >= 80
-                      ? "bg-emerald-50 text-emerald-700"
-                      : ev.puntaje >= 60
-                      ? "bg-amber-50 text-amber-700"
-                      : "bg-red-50 text-red-700"
-                  }`}
-                >
-                  {ev.puntaje}/100
-                </span>
+                <ResultadoBadge resultado={ev.resultado} />
               </div>
-              <div className="mt-2 h-1.5 w-full rounded-full bg-gray-100">
-                <div
-                  className="h-1.5 rounded-full bg-[#1D2B53]"
-                  style={{ width: `${ev.puntaje}%` }}
-                />
+
+              <div className="mt-3 space-y-1.5">
+                {COMPETENCIAS.map(({ clave, etiqueta }) => (
+                  <div key={clave} className="flex items-center gap-2">
+                    <span className="w-44 shrink-0 text-xs text-gray-500">{etiqueta}</span>
+                    <div className="h-1.5 w-full rounded-full bg-gray-100">
+                      <div
+                        className="h-1.5 rounded-full bg-[#1D2B53]"
+                        style={{ width: `${(ev.competencias[clave] / 5) * 100}%` }}
+                      />
+                    </div>
+                    <span className="w-4 shrink-0 text-right text-xs text-gray-400">
+                      {ev.competencias[clave]}
+                    </span>
+                  </div>
+                ))}
               </div>
+
+              <div className="mt-3 flex flex-wrap gap-2">
+                <RequisitoBadge ok={ev.carneSanidad} etiqueta="Carné de sanidad" />
+                <RequisitoBadge ok={!ev.antecedentesPenales} etiqueta="Sin antecedentes penales" />
+              </div>
+
               {ev.comentarios && (
-                <p className="mt-2 text-sm text-gray-600">{ev.comentarios}</p>
+                <p className="mt-3 text-sm text-gray-600">{ev.comentarios}</p>
               )}
             </li>
           ))}

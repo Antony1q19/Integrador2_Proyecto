@@ -30,8 +30,24 @@ export const mockPostulantes: Postulante[] = [
       { id: "d3", nombreArchivo: "Certificado_AWS.pdf", tipo: "CERTIFICADO", tamanioKb: 156, fechaCarga: "2026-07-05T14:10:00" },
     ],
     evaluaciones: [
-      { id: "e1", tipo: "ENTREVISTA_RRHH", evaluador: "Luis Fernández", fecha: "2026-07-03", puntaje: 82, comentarios: "Buena comunicación y disponibilidad inmediata." },
-      { id: "e2", tipo: "PRUEBA_TECNICA", evaluador: "Sistema automatizado", fecha: "2026-07-06", puntaje: 91, comentarios: "Destacó en resolución de problemas algorítmicos." },
+      {
+        id: "e1",
+        evaluador: "Luis Fernández",
+        fecha: "2026-07-03",
+        competencias: {
+          comunicacionEfectiva: 5,
+          orientacionCliente: 4,
+          responsabilidad: 5,
+          adaptabilidadFlexibilidad: 4,
+          toleranciaPresion: 4,
+          dinamismoEnergia: 5,
+        },
+        puntajeTotal: 90,
+        resultado: "APTO",
+        carneSanidad: true,
+        antecedentesPenales: false,
+        comentarios: "Buena comunicación y disponibilidad inmediata.",
+      },
     ],
     historialEstados: [
       { id: "h1", estado: "POSTULADO", fecha: "2026-07-02T09:15:00", usuarioResponsable: "Luis Fernández" },

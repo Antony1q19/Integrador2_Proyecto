@@ -45,12 +45,29 @@ export interface DocumentoPostulante {
   url?: string; // vendrá del backend/storage real
 }
 
+// Competencias evaluadas en la entrevista de RRHH (HU-08). Cada una se
+// califica en escala 1-5. Si se agrega/quita una competencia, el backend
+// Java deberá reflejar el mismo set de claves en su DTO.
+export interface CompetenciasEvaluacion {
+  comunicacionEfectiva: number; // 1-5
+  orientacionCliente: number; // 1-5
+  responsabilidad: number; // 1-5
+  adaptabilidadFlexibilidad: number; // 1-5
+  toleranciaPresion: number; // 1-5
+  dinamismoEnergia: number; // 1-5
+}
+
+export type ResultadoEvaluacion = "APTO" | "NO_APTO";
+
 export interface Evaluacion {
   id: string;
-  tipo: "ENTREVISTA_RRHH" | "PRUEBA_TECNICA" | "ENTREVISTA_SUPERVISOR" | "PSICOLOGICA";
   evaluador: string;
   fecha: string; // ISO date
-  puntaje: number; // 0-100
+  competencias: CompetenciasEvaluacion;
+  puntajeTotal: number; // 0-100, calculado a partir del promedio de competencias
+  resultado: ResultadoEvaluacion; // calculado automáticamente (ver features/postulantes/utils/evaluacion.ts)
+  carneSanidad: boolean; // cuenta con carné de sanidad vigente
+  antecedentesPenales: boolean; // registra antecedentes penales
   comentarios: string;
 }
 
