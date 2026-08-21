@@ -1,0 +1,48 @@
+import { Empresa } from "@/features/empresas/types/empresa";
+
+export const empresasMock: Empresa[] = [
+    {
+        id: 1,
+        razonSocial: "Consultora Andina S.A.C.",
+        ruc: "20481234567",
+        contactoNombre: "María Gutiérrez",
+        contactoEmail: "mgutierrez@andina.com",
+        contactoTelefono: "+51 987 654 321",
+        sector: "Tecnología",
+        fechaRegistro: "2025-01-10",
+        anunciosActivos: 3,
+    },
+    {
+        id: 2,
+        razonSocial: "Grupo Logístico Pacífico E.I.R.L.",
+        ruc: "20512398745",
+        contactoNombre: "Jorge Ramírez",
+        contactoEmail: "jramirez@pacifico.pe",
+        contactoTelefono: "+51 912 345 678",
+        sector: "Logística",
+        fechaRegistro: "2025-02-03",
+        anunciosActivos: 1,
+    },
+    {
+        id: 3,
+        razonSocial: "Financiera Horizonte S.A.",
+        ruc: "20603214569",
+        contactoNombre: "Lucía Fernández",
+        contactoEmail: "lfernandez@horizonte.com",
+        contactoTelefono: "+51 998 112 233",
+        sector: "Finanzas",
+        fechaRegistro: "2025-03-21",
+        anunciosActivos: 0,
+    },
+    {
+        id: 4,
+        razonSocial: "Retail Sur Perú S.A.C.",
+        ruc: "20554789632",
+        contactoNombre: "Carlos Mendoza",
+        contactoEmail: "cmendoza@retailsur.pe",
+        contactoTelefono: "+51 945 678 901",
+        sector: "Retail",
+        fechaRegistro: "2025-04-15",
+        anunciosActivos: 5,
+    },
+];

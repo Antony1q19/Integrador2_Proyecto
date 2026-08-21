@@ -1,3 +1,10 @@
-export default function EmpresaDetallePage() {
-  return <div>Detalle de la Empresa</div>;
+import EmpresasFicha from "@/features/empresas/components/EmpresasFicha";
+
+export default function EmpresaDetallePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return <EmpresasFicha params={params} />;
 }
+
