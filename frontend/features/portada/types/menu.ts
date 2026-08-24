@@ -7,7 +7,8 @@ import {
     Users,
 } from "lucide-react";
 
-export type Role = "ADMIN" | "RRHH" | "RECLUTADOR";
+// 1. Cambiamos los tipos para que coincidan con mockAuth.ts
+export type Role = "Admin" | "RRHH" | "Supervisor";
 
 export interface MenuItem {
     name: string;
@@ -21,41 +22,36 @@ export const menuItems: MenuItem[] = [
         name: "Dashboard",
         href: "/dashboard",
         icon: LayoutDashboard,
-        roles: ["ADMIN", "RRHH", "RECLUTADOR"],
+        roles: ["Admin", "RRHH", "Supervisor"],
     },
-
     {
         name: "Comunicaciones",
         href: "/comunicaciones",
         icon: MessageCircle,
-        roles: ["ADMIN", "RRHH", "RECLUTADOR"],
+        roles: ["Admin", "RRHH", "Supervisor"],
     },
-
     {
         name: "Anuncios",
         href: "/anuncios",
         icon: Megaphone,
-        roles: ["ADMIN", "RRHH", "RECLUTADOR"],
+        roles: ["Admin", "RRHH", "Supervisor"],
     },
-
     {
         name: "Empresas",
         href: "/empresas",
         icon: Building2,
-        roles: ["ADMIN", "RRHH", "RECLUTADOR"],
+        roles: ["Admin", "RRHH", "Supervisor"],
     },
-
     {
         name: "Perfil",
         href: "/perfil",
         icon: UserCircle,
-        roles: ["ADMIN", "RRHH", "RECLUTADOR"],
+        roles: ["Admin", "RRHH", "Supervisor"],
     },
-
     {
         name: "Postulantes",
         href: "/postulantes",
         icon: Users,
-        roles: ["ADMIN", "RRHH", "RECLUTADOR"],
+        roles: ["Admin", "RRHH", "Supervisor"],
     },
 ];

@@ -1,0 +1,11 @@
+LO USUARIOS DE PRUEBA SON:
+
+1------
+CORREO:admin@test.com
+CONTRASEÑA:123456
+2------
+CORREO:rrhh@test.com
+CONTRASEÑA:123456
+3------
+CORREO:super@test.com
+CONTRASEÑA:123456
