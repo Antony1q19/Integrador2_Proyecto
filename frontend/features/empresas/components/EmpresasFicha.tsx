@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { empresasMock } from "@/features/empresas/data/mock_empresas";
+import AnunciosPorEmpresa from "@/features/anuncios/components/AnunciosPorEmpresa";
 
 export default async function EmpresasFicha({
     params, 
@@ -79,14 +80,12 @@ export default async function EmpresasFicha({
           </dl>
         </div>
 
-        {/* Anuncios asociados (placeholder por ahora) */}
+        {/* Anuncios asociados */}
         <div className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">
-            Anuncios Asociados ({empresa.anunciosActivos})
+            Anuncios Asociados
           </h2>
-          <p className="text-sm text-slate-400">
-            Aquí conectaremos el listado de anuncios cuando construyamos HU-10.
-          </p>
+          <AnunciosPorEmpresa empresaId={empresa.id} />
         </div>
       </div>
     </div>
