@@ -13,4 +13,5 @@ export interface Anuncio {
   empresaId: number;
   empresaRazonSocial: string; // desnormalizado para no tener que buscar la empresa cada vez que listamos
   fechaCreacion: string;
+  postulantesAsociadosIds: string[]; // IDs de Postulante asociados a este anuncio
 }

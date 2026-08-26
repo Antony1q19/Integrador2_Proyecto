@@ -2,6 +2,7 @@ import { Anuncio } from "@/features/anuncios/types/anuncio";
 
 export const anunciosMock: Anuncio[] = [
   {
+    postulantesAsociadosIds: ["1"],
     id: 1,
     cargo: "Desarrollador Full Stack Senior",
     descripcion:
@@ -18,6 +19,7 @@ export const anunciosMock: Anuncio[] = [
     fechaCreacion: "2026-08-01",
   },
   {
+    postulantesAsociadosIds: [],
     id: 2,
     cargo: "Analista de Logística",
     descripcion:
@@ -34,6 +36,7 @@ export const anunciosMock: Anuncio[] = [
     fechaCreacion: "2026-07-15",
   },
   {
+    postulantesAsociadosIds: [],
     id: 3,
     cargo: "Asesor Financiero",
     descripcion:
@@ -50,6 +53,7 @@ export const anunciosMock: Anuncio[] = [
     fechaCreacion: "2026-08-10",
   },
   {
+    postulantesAsociadosIds: [],
     id: 4,
     cargo: "Jefe de Tienda",
     descripcion:
