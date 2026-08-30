@@ -1,3 +1,5 @@
+import { PostulantesPipeline } from "@/features/postulantes/components/PostulantesPipeline";
+
 export default function PipelinePage() {
-  return <div>Pipeline</div>;
+  return <PostulantesPipeline />;
 }

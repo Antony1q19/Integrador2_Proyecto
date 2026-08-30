@@ -23,6 +23,17 @@ const LATENCIA_MOCK_MS = 400;
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+export async function fetchPostulantes(): Promise<Postulante[]> {
+  // ---- MODO MOCK (activo ahora) ----
+  await delay(LATENCIA_MOCK_MS);
+  return structuredClone(mockPostulantes);
+
+  // ---- MODO API (descomentar al integrar backend Java) ----
+  // const res = await fetch(`${API_URL}/postulantes`);
+  // if (!res.ok) throw new Error("Error al obtener los postulantes");
+  // return res.json();
+}
+
 export async function fetchPostulanteById(id: string): Promise<Postulante> {
   // ---- MODO MOCK (activo ahora) ----
   await delay(LATENCIA_MOCK_MS);
@@ -70,6 +81,10 @@ export async function addDocumento(
     tipo,
     tamanioKb: Math.round(archivo.size / 1024),
     fechaCarga: new Date().toISOString(),
+    // URL local solo para poder previsualizar/descargar en esta misma sesión
+    // del navegador; no persiste ni se sube a ningún lado. El backend Java
+    // reemplazará esto por la URL real del archivo almacenado.
+    url: URL.createObjectURL(archivo),
   };
   postulante.documentos.push(nuevoDocumento);
   return nuevoDocumento;
@@ -86,10 +101,41 @@ export async function addDocumento(
   // return res.json();
 }
 
+export async function replaceDocumento(
+  id: string,
+  documentoId: string,
+  archivo: File
+): Promise<DocumentoPostulante> {
+  await delay(LATENCIA_MOCK_MS);
+  const postulante = mockPostulantes.find((p) => p.id === id);
+  if (!postulante) throw new Error("Postulante no encontrado");
+  const documento = postulante.documentos.find((d) => d.id === documentoId);
+  if (!documento) throw new Error("Documento no encontrado");
+
+  if (documento.url) URL.revokeObjectURL(documento.url);
+  documento.nombreArchivo = archivo.name;
+  documento.tamanioKb = Math.round(archivo.size / 1024);
+  documento.fechaCarga = new Date().toISOString();
+  documento.url = URL.createObjectURL(archivo);
+  return documento;
+
+  // ---- MODO API ----
+  // const formData = new FormData();
+  // formData.append("archivo", archivo);
+  // const res = await fetch(`${API_URL}/postulantes/${id}/documentos/${documentoId}`, {
+  //   method: "PUT",
+  //   body: formData,
+  // });
+  // if (!res.ok) throw new Error("Error al reemplazar el documento");
+  // return res.json();
+}
+
 export async function deleteDocumento(id: string, documentoId: string): Promise<void> {
   await delay(LATENCIA_MOCK_MS);
   const postulante = mockPostulantes.find((p) => p.id === id);
   if (!postulante) throw new Error("Postulante no encontrado");
+  const documento = postulante.documentos.find((d) => d.id === documentoId);
+  if (documento?.url) URL.revokeObjectURL(documento.url);
   postulante.documentos = postulante.documentos.filter((d) => d.id !== documentoId);
 
   // ---- MODO API ----

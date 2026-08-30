@@ -13,6 +13,7 @@ import {
   fetchPostulanteById,
   updateDatosPersonales,
   addDocumento,
+  replaceDocumento,
   deleteDocumento,
   addEvaluacion,
   updateEstado,
@@ -24,6 +25,7 @@ interface UsePostulanteDetalleResult {
   error: string | null;
   guardarDatosPersonales: (datos: DatosPersonales) => Promise<void>;
   subirDocumento: (archivo: File, tipo: DocumentoPostulante["tipo"]) => Promise<void>;
+  reemplazarDocumento: (documentoId: string, archivo: File) => Promise<void>;
   eliminarDocumento: (documentoId: string) => Promise<void>;
   registrarEvaluacion: (evaluacion: Omit<Evaluacion, "id">) => Promise<void>;
   cambiarEstado: (estado: EstadoProceso, comentario?: string) => Promise<void>;
@@ -78,6 +80,18 @@ export function usePostulanteDetalle(id: string): UsePostulanteDetalleResult {
     }
   };
 
+  const reemplazarDocumento = async (documentoId: string, archivo: File) => {
+    const actualizado = await replaceDocumento(id, documentoId, archivo);
+    setPostulante((prev) =>
+      prev
+        ? {
+            ...prev,
+            documentos: prev.documentos.map((d) => (d.id === documentoId ? actualizado : d)),
+          }
+        : prev
+    );
+  };
+
   const eliminarDocumento = async (documentoId: string) => {
     await deleteDocumento(id, documentoId);
     setPostulante((prev) =>
@@ -117,6 +131,7 @@ export function usePostulanteDetalle(id: string): UsePostulanteDetalleResult {
     error,
     guardarDatosPersonales,
     subirDocumento,
+    reemplazarDocumento,
     eliminarDocumento,
     registrarEvaluacion,
     cambiarEstado,

@@ -2,57 +2,77 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useProgresoSimulado } from "./useProgresoSimulado";
+
+export function validarArchivo(
+  file: File,
+  formatosAceptados: string,
+  tamanioMaximoMb: number
+): string | null {
+  const extension = "." + file.name.split(".").pop()?.toLowerCase();
+  if (!formatosAceptados.includes(extension)) {
+    return `Formato no permitido. Usa: ${formatosAceptados}`;
+  }
+  if (file.size > tamanioMaximoMb * 1024 * 1024) {
+    return `El archivo supera ${tamanioMaximoMb} MB.`;
+  }
+  return null;
+}
 
 interface UploaderProps {
-  onFileSelected: (file: File) => void;
+  onFileSelected: (file: File) => Promise<void>;
   formatosAceptados?: string;
   tamanioMaximoMb?: number;
-  cargando?: boolean;
+  disabled?: boolean;
 }
 
 export function Uploader({
   onFileSelected,
   formatosAceptados = ".pdf,.jpg,.jpeg,.png",
   tamanioMaximoMb = 5,
-  cargando = false,
+  disabled = false,
 }: UploaderProps) {
   const [arrastrando, setArrastrando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { progreso, activo, ejecutar } = useProgresoSimulado();
 
-  const validarYEnviar = (file: File) => {
+  const validarYEnviar = async (file: File) => {
     setError(null);
-    const extension = "." + file.name.split(".").pop()?.toLowerCase();
-    if (!formatosAceptados.includes(extension)) {
-      setError(`Formato no permitido. Usa: ${formatosAceptados}`);
+    const mensajeError = validarArchivo(file, formatosAceptados, tamanioMaximoMb);
+    if (mensajeError) {
+      setError(mensajeError);
       return;
     }
-    if (file.size > tamanioMaximoMb * 1024 * 1024) {
-      setError(`El archivo supera ${tamanioMaximoMb} MB.`);
-      return;
+    try {
+      await ejecutar(() => onFileSelected(file));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "No se pudo subir el archivo.");
     }
-    onFileSelected(file);
   };
+
+  const bloqueado = disabled || activo;
 
   return (
     <div>
       <div
         onDragOver={(e) => {
           e.preventDefault();
-          setArrastrando(true);
+          if (!bloqueado) setArrastrando(true);
         }}
         onDragLeave={() => setArrastrando(false)}
         onDrop={(e) => {
           e.preventDefault();
           setArrastrando(false);
+          if (bloqueado) return;
           const file = e.dataTransfer.files?.[0];
           if (file) validarYEnviar(file);
         }}
-        onClick={() => inputRef.current?.click()}
+        onClick={() => !bloqueado && inputRef.current?.click()}
         className={[
           "flex cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed px-6 py-8 text-center transition-colors",
           arrastrando ? "border-[#1D2B53] bg-slate-50" : "border-gray-200 hover:border-gray-300",
-          cargando ? "pointer-events-none opacity-60" : "",
+          bloqueado ? "pointer-events-none opacity-60" : "",
         ].join(" ")}
       >
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="mb-2 text-gray-400">
@@ -65,7 +85,7 @@ export function Uploader({
           />
         </svg>
         <p className="text-sm text-gray-600">
-          {cargando ? "Subiendo archivo…" : "Arrastra un archivo o haz clic para seleccionarlo"}
+          {activo ? "Subiendo archivo…" : "Arrastra un archivo o haz clic para seleccionarlo"}
         </p>
         <p className="mt-1 text-xs text-gray-400">
           {formatosAceptados.replaceAll(".", "").toUpperCase()} · máx. {tamanioMaximoMb}MB
@@ -82,6 +102,19 @@ export function Uploader({
           }}
         />
       </div>
+
+      {activo && (
+        <div className="mt-2">
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+            <div
+              className="h-1.5 rounded-full bg-[#1D2B53] transition-all duration-150 ease-out"
+              style={{ width: `${progreso}%` }}
+            />
+          </div>
+          <p className="mt-1 text-right text-[11px] text-gray-400">{progreso}%</p>
+        </div>
+      )}
+
       {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
     </div>
   );

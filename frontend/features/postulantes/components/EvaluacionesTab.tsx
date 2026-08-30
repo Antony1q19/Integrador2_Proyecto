@@ -2,8 +2,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CompetenciasEvaluacion, Evaluacion } from "../types/postulante.types";
+import { CompetenciasEvaluacion, EstadoCarneSanidad, Evaluacion } from "../types/postulante.types";
 import { COMPETENCIAS, calcularPuntajeTotal, calcularResultado } from "../utils/evaluacion";
+
+const ETIQUETAS_CARNE_SANIDAD: Record<EstadoCarneSanidad, string> = {
+  NO_CUENTA: "No cuenta",
+  TRAMITE: "En trámite",
+  SI_CUENTA: "Sí cuenta",
+};
 
 const COMPETENCIAS_INICIALES: CompetenciasEvaluacion = {
   comunicacionEfectiva: 3,
@@ -34,14 +40,26 @@ function ResultadoBadge({ resultado }: { resultado: Evaluacion["resultado"] }) {
   );
 }
 
-function RequisitoBadge({ ok, etiqueta }: { ok: boolean; etiqueta: string }) {
+type EstadoRequisito = "ok" | "pendiente" | "no";
+
+const ESTILOS_REQUISITO: Record<EstadoRequisito, string> = {
+  ok: "bg-slate-50 text-slate-600",
+  pendiente: "bg-amber-50 text-amber-700",
+  no: "bg-red-50 text-red-600",
+};
+
+const ICONOS_REQUISITO: Record<EstadoRequisito, string> = {
+  ok: "✓",
+  pendiente: "…",
+  no: "✕",
+};
+
+function RequisitoBadge({ estado, etiqueta }: { estado: EstadoRequisito; etiqueta: string }) {
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium ${
-        ok ? "bg-slate-50 text-slate-600" : "bg-red-50 text-red-600"
-      }`}
+      className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium ${ESTILOS_REQUISITO[estado]}`}
     >
-      {ok ? "✓" : "✕"} {etiqueta}
+      {ICONOS_REQUISITO[estado]} {etiqueta}
     </span>
   );
 }
@@ -52,7 +70,7 @@ export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: Evalua
     evaluador: "",
     fecha: new Date().toISOString().slice(0, 10),
     competencias: COMPETENCIAS_INICIALES,
-    carneSanidad: false,
+    carneSanidad: "NO_CUENTA" as EstadoCarneSanidad,
     antecedentesPenales: false,
     comentarios: "",
   });
@@ -79,7 +97,7 @@ export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: Evalua
       evaluador: "",
       fecha: new Date().toISOString().slice(0, 10),
       competencias: COMPETENCIAS_INICIALES,
-      carneSanidad: false,
+      carneSanidad: "NO_CUENTA",
       antecedentesPenales: false,
       comentarios: "",
     });
@@ -172,12 +190,15 @@ export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: Evalua
             <div>
               <label className="mb-1 block text-xs font-medium text-gray-500">Carné de sanidad</label>
               <select
-                value={form.carneSanidad ? "si" : "no"}
-                onChange={(e) => setForm({ ...form, carneSanidad: e.target.value === "si" })}
+                value={form.carneSanidad}
+                onChange={(e) =>
+                  setForm({ ...form, carneSanidad: e.target.value as EstadoCarneSanidad })
+                }
                 className="w-full rounded-md border border-gray-200 px-3 py-1.5 text-sm focus:border-[#1D2B53] focus:outline-none focus:ring-1 focus:ring-[#1D2B53]"
               >
-                <option value="no">No cuenta</option>
-                <option value="si">Sí cuenta</option>
+                <option value="NO_CUENTA">{ETIQUETAS_CARNE_SANIDAD.NO_CUENTA}</option>
+                <option value="TRAMITE">{ETIQUETAS_CARNE_SANIDAD.TRAMITE}</option>
+                <option value="SI_CUENTA">{ETIQUETAS_CARNE_SANIDAD.SI_CUENTA}</option>
               </select>
             </div>
             <div>
@@ -257,8 +278,20 @@ export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: Evalua
               </div>
 
               <div className="mt-3 flex flex-wrap gap-2">
-                <RequisitoBadge ok={ev.carneSanidad} etiqueta="Carné de sanidad" />
-                <RequisitoBadge ok={!ev.antecedentesPenales} etiqueta="Sin antecedentes penales" />
+                <RequisitoBadge
+                  estado={
+                    ev.carneSanidad === "SI_CUENTA"
+                      ? "ok"
+                      : ev.carneSanidad === "TRAMITE"
+                      ? "pendiente"
+                      : "no"
+                  }
+                  etiqueta={`Carné de sanidad: ${ETIQUETAS_CARNE_SANIDAD[ev.carneSanidad]}`}
+                />
+                <RequisitoBadge
+                  estado={ev.antecedentesPenales ? "no" : "ok"}
+                  etiqueta="Sin antecedentes penales"
+                />
               </div>
 
               {ev.comentarios && (

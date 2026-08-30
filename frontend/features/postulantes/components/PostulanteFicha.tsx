@@ -3,12 +3,13 @@
 
 import { useState } from "react";
 import { usePostulanteDetalle } from "../hooks/usePostulanteDetalle";
-import { EstadoBadge } from "./EstadoBadge";
+import { EstadoBadge, ESTILOS_ESTADO } from "./EstadoBadge";
 import { Timeline } from "./Timeline";
 import { DatosPersonalesTab } from "./DatosPersonalesTab";
 import { DocumentosTab } from "./DocumentosTab";
 import { EvaluacionesTab } from "./EvaluacionesTab";
 import { EstadosTab } from "./EstadosTab";
+import { useToast, ToastContainer } from "@/components/shared/Toast";
 
 type TabId = "datos" | "documentos" | "evaluaciones" | "estados";
 
@@ -32,10 +33,12 @@ export function PostulanteFicha({ id }: { id: string }) {
     guardando,
     guardarDatosPersonales,
     subirDocumento,
+    reemplazarDocumento,
     eliminarDocumento,
     registrarEvaluacion,
     cambiarEstado,
   } = usePostulanteDetalle(id);
+  const { toasts, mostrarToast } = useToast();
 
   if (loading) {
     return (
@@ -58,6 +61,21 @@ export function PostulanteFicha({ id }: { id: string }) {
   }
 
   const { datosPersonales: d } = postulante;
+  const procesoFinalizado =
+    postulante.estadoActual === "CONTRATADO" || postulante.estadoActual === "DESCARTADO";
+
+  const handleDecision = async (estado: "CONTRATADO" | "DESCARTADO") => {
+    const confirmado = window.confirm(
+      `¿Confirmas marcar a ${d.nombres} ${d.apellidos} como "${ESTILOS_ESTADO[estado].label}"?`
+    );
+    if (!confirmado) return;
+    try {
+      await cambiarEstado(estado);
+      mostrarToast(`Estado actualizado a "${ESTILOS_ESTADO[estado].label}"`, "success");
+    } catch {
+      mostrarToast("No se pudo actualizar el estado. Intenta nuevamente.", "error");
+    }
+  };
 
   return (
     <div className="mx-auto max-w-4xl space-y-6 p-6">
@@ -77,8 +95,26 @@ export function PostulanteFicha({ id }: { id: string }) {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2">
             <EstadoBadge estado={postulante.estadoActual} />
+            {!procesoFinalizado && (
+              <>
+                <button
+                  onClick={() => handleDecision("CONTRATADO")}
+                  disabled={guardando}
+                  className="rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+                >
+                  Contratado
+                </button>
+                <button
+                  onClick={() => handleDecision("DESCARTADO")}
+                  disabled={guardando}
+                  className="rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                >
+                  Descartado
+                </button>
+              </>
+            )}
             <button className="rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50">
               Enviar WhatsApp
             </button>
@@ -119,6 +155,7 @@ export function PostulanteFicha({ id }: { id: string }) {
               documentos={postulante.documentos}
               guardando={guardando}
               onSubir={subirDocumento}
+              onReemplazar={reemplazarDocumento}
               onEliminar={eliminarDocumento}
             />
           )}
@@ -139,6 +176,8 @@ export function PostulanteFicha({ id }: { id: string }) {
           )}
         </div>
       </div>
+
+      <ToastContainer toasts={toasts} />
     </div>
   );
 }

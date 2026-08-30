@@ -2,17 +2,11 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { EstadoProceso, HistorialEstado } from "../types/postulante.types";
-import { EstadoBadge } from "./EstadoBadge";
-
-const OPCIONES_ESTADO: { value: EstadoProceso; label: string }[] = [
-  { value: "POSTULADO", label: "Postulado" },
-  { value: "EN_EVALUACION", label: "En evaluación" },
-  { value: "ENTREVISTA", label: "Entrevista" },
-  { value: "PRESELECCIONADO", label: "Preseleccionado" },
-  { value: "CONTRATADO", label: "Contratado" },
-  { value: "DESCARTADO", label: "Descartado" },
-];
+import { EstadoBadge, ESTILOS_ESTADO } from "./EstadoBadge";
+import { EstadoSelector } from "./EstadoSelector";
+import { useToast, ToastContainer } from "@/components/shared/Toast";
 
 interface EstadosTabProps {
   estadoActual: EstadoProceso;
@@ -22,42 +16,36 @@ interface EstadosTabProps {
 }
 
 export function EstadosTab({ estadoActual, historial, guardando, onCambiarEstado }: EstadosTabProps) {
-  const [nuevoEstado, setNuevoEstado] = useState<EstadoProceso>(estadoActual);
   const [comentario, setComentario] = useState("");
+  const { toasts, mostrarToast } = useToast();
 
-  const handleCambiar = async () => {
-    if (nuevoEstado === estadoActual) return;
-    await onCambiarEstado(nuevoEstado, comentario || undefined);
-    setComentario("");
+  const handleSeleccionar = async (estado: EstadoProceso) => {
+    try {
+      await onCambiarEstado(estado, comentario || undefined);
+      setComentario("");
+      mostrarToast(`Estado actualizado a "${ESTILOS_ESTADO[estado].label}"`, "success");
+    } catch {
+      mostrarToast("No se pudo actualizar el estado. Intenta nuevamente.", "error");
+    }
   };
 
   return (
     <div className="space-y-6">
       <div className="rounded-lg border border-gray-100 p-4">
-        <p className="mb-3 text-xs font-medium text-gray-500">Cambiar estado del proceso</p>
+        <div className="mb-3 flex items-center justify-between">
+          <p className="text-xs font-medium text-gray-500">Cambiar estado del proceso</p>
+          <Link href="/postulantes/pipeline" className="text-xs font-medium text-[#1D2B53] hover:underline">
+            Ver vista Kanban →
+          </Link>
+        </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <select
-            value={nuevoEstado}
-            onChange={(e) => setNuevoEstado(e.target.value as EstadoProceso)}
-            className="rounded-md border border-gray-200 px-3 py-1.5 text-sm focus:border-[#1D2B53] focus:outline-none focus:ring-1 focus:ring-[#1D2B53]"
-          >
-            {OPCIONES_ESTADO.map((op) => (
-              <option key={op.value} value={op.value}>{op.label}</option>
-            ))}
-          </select>
+          <EstadoSelector estadoActual={estadoActual} disabled={guardando} onSeleccionar={handleSeleccionar} />
           <input
             value={comentario}
             onChange={(e) => setComentario(e.target.value)}
-            placeholder="Comentario (opcional)"
+            placeholder="Comentario (opcional, se aplica al próximo cambio)"
             className="flex-1 rounded-md border border-gray-200 px-3 py-1.5 text-sm focus:border-[#1D2B53] focus:outline-none focus:ring-1 focus:ring-[#1D2B53]"
           />
-          <button
-            onClick={handleCambiar}
-            disabled={guardando || nuevoEstado === estadoActual}
-            className="rounded-md bg-[#1D2B53] px-4 py-1.5 text-sm font-medium text-white hover:bg-[#16224A] disabled:opacity-40"
-          >
-            {guardando ? "Guardando…" : "Aplicar cambio"}
-          </button>
         </div>
       </div>
 
@@ -86,6 +74,8 @@ export function EstadosTab({ estadoActual, historial, guardando, onCambiarEstado
           ))}
         </ol>
       </div>
+
+      <ToastContainer toasts={toasts} />
     </div>
   );
 }

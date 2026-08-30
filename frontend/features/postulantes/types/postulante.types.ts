@@ -59,6 +59,11 @@ export interface CompetenciasEvaluacion {
 
 export type ResultadoEvaluacion = "APTO" | "NO_APTO";
 
+// El carné de sanidad admite un estado intermedio: el postulante puede estar
+// tramitándolo sin tenerlo aún en mano. Para el cálculo de APTO/NO APTO,
+// "TRAMITE" cuenta igual que "SI_CUENTA" (ver calcularResultado).
+export type EstadoCarneSanidad = "NO_CUENTA" | "TRAMITE" | "SI_CUENTA";
+
 export interface Evaluacion {
   id: string;
   evaluador: string;
@@ -66,7 +71,7 @@ export interface Evaluacion {
   competencias: CompetenciasEvaluacion;
   puntajeTotal: number; // 0-100, calculado a partir del promedio de competencias
   resultado: ResultadoEvaluacion; // calculado automáticamente (ver features/postulantes/utils/evaluacion.ts)
-  carneSanidad: boolean; // cuenta con carné de sanidad vigente
+  carneSanidad: EstadoCarneSanidad;
   antecedentesPenales: boolean; // registra antecedentes penales
   comentarios: string;
 }
