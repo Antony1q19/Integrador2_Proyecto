@@ -1,3 +1,3 @@
 export default function PostulantesPage() {
-  return <div>Postulantes</div>;
+  return <div>Postulantes prueba de git </div>;
 }
