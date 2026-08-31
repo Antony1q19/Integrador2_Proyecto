@@ -50,4 +50,4 @@ Una historia se considera terminada cuando:
 | Decisiones tecnológicas (ADR) | `docs/decisiones/` |
 | Flujo, wireframes y prototipo | `docs/ux/README.md` + Figma |
 | Entorno local (PostgreSQL) | `infra/README.md` |
-| Documentos de planificación (Sprint 1, Semanas 2-3) | `frontend/documentacion/` |
+
