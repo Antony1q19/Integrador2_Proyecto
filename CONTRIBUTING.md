@@ -1,7 +1,5 @@
 # Guía de colaboración — ERP de Reclutamiento
 
-Este documento resume cómo el equipo trabaja día a día, aplicando lo definido
-en `frontend/documentacion/` (Sprint 1, Semana 2 y Semana 3).
 
 ## 1. Flujo de trabajo (GitHub Flow)
 
@@ -31,15 +29,7 @@ en `frontend/documentacion/` (Sprint 1, Semana 2 y Semana 3).
 | Commit | `feat(frontend): add applicant search filters` |
 | Commit | `docs(riesgos): registrar R-07 duplicidad de anuncios` |
 
-## 3. Protección de `main`
-
-Configúralo una sola vez desde GitHub (Settings → Rules → Rulesets):
-
-- Exigir pull request antes de mergear (mínimo 1 aprobación).
-- Exigir que el check `build-and-lint` del workflow de CI pase.
-- Bloquear *force-push* y borrado de `main`.
-
-## 4. Definition of Done
+## 3. Definition of Done
 
 Una historia se considera terminada cuando:
 
@@ -50,7 +40,7 @@ Una historia se considera terminada cuando:
 - [ ] No introduce datos personales reales ni secretos.
 - [ ] La documentación relevante (`docs/`) quedó actualizada.
 
-## 5. Dónde vive cada cosa
+## 4. Dónde vive cada cosa
 
 | Necesitas... | Ve a... |
 |---|---|
