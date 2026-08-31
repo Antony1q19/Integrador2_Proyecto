@@ -9,14 +9,4 @@
 | **Decisión** | Adoptar **Next.js** (Front-End), **FastAPI** (Back-End, Python) y **PostgreSQL** (Datos). El estilo arquitectónico del Back-End (microservicios) se detalla en [ADR-002 — Arquitectura de microservicios](./ADR-002-arquitectura-microservicios.md). |
 | **Consecuencias** | Se gana velocidad de desarrollo y una curva de aprendizaje menor para el equipo. Se debe documentar con rigor los contratos de la API (esquemas Pydantic y OpenAPI), ya que no existe tipado compartido nativo entre Python y TypeScript. |
 | **Criterio de revisión** | Si el equipo no logra avanzar el Sprint 2 (integración Back-End) por falta de soporte o incompatibilidades, se reevalúa esta decisión. |
-| **Enlaces** | `frontend/documentacion/Semana2_Entorno_Colaboracion_UX_Reclutamiento.docx` (matriz de decisión completa). |
 
-> ✅ **Confirmado (31 de agosto de 2026):** el equipo confirmó Python/FastAPI como
-> Back-End. El `README.md` de la raíz ya fue actualizado ("Backend: Python (FastAPI)")
-> para que coincida con esta decisión; no quedan decisiones contradictorias en el repositorio.
-
-> 🧭 **Actualización (31 de agosto de 2026):** el estilo arquitectónico del Back-End quedó
-> definido en [ADR-002 — Arquitectura de microservicios](./ADR-002-arquitectura-microservicios.md)
-> (microservicios por dominio detrás de un API Gateway, en lugar del monolito modular
-> mencionado inicialmente en este ADR). Este ADR-001 queda limitado a la selección de
-> lenguaje, framework y base de datos.
