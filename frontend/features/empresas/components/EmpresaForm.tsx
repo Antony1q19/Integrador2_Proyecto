@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEmpresaForm } from "@/features/empresas/hooks/useEmpresaForm";
 import { EmpresaFormProps } from "@/features/empresas/types/formProp";
-import { EmpresaFormData } from "@/features/empresas/types/formData";
 
 export default function EmpresaForm({
   initialData,

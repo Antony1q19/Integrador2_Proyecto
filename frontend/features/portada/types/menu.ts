@@ -5,6 +5,7 @@ import {
     Building2,
     UserCircle,
     Users,
+    type LucideIcon,
 } from "lucide-react";
 
 // 1. Cambiamos los tipos para que coincidan con mockAuth.ts
@@ -13,7 +14,7 @@ export type Role = "Admin" | "RRHH" | "Supervisor";
 export interface MenuItem {
     name: string;
     href: string;
-    icon: any;
+    icon: LucideIcon;
     roles: Role[];
 }
 

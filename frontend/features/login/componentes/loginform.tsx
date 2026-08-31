@@ -20,7 +20,7 @@ export default function LoginForm() {
       const user = await loginMock(email, password);
       document.cookie = `userRole=${user.role}; path=/; max-age=86400`;
       document.cookie = `userName=${user.name}; path=/; max-age=86400`;
-      
+
       // REDIRECCIÓN SEGÚN ROL (#12)
       if (user.role === 'Admin') {
         router.push("/dashboard");
@@ -29,18 +29,8 @@ export default function LoginForm() {
       } else {
         router.push("/perfil"); // Supervisor
       }
-      
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }try {
-      const user = await loginMock(email, password);
-      // Guardar cookie de sesión
-      document.cookie = `userRole=${user.role}; path=/; max-age=86400`; 
-      router.push("/perfil"); 
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No se pudo iniciar sesión");
     } finally {
       setIsLoading(false);
     }

@@ -36,6 +36,9 @@ export function usePostulantesPipeline(): UsePostulantesPipelineResult {
   }, []);
 
   useEffect(() => {
+    // Carga inicial al montar (patrón estándar de fetch-en-efecto). `cargar` ya
+    // arranca en loading=true por defecto, por eso el setState inicial es intencional.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     cargar();
   }, [cargar]);
 

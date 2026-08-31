@@ -1,8 +1,39 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useSyncExternalStore } from "react";
 import Sidebar from "@/features/portada/components/sidebar";
 import { Role } from "@/features/portada/types/menu"; // Asegúrate de tener este import
+
+function getCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(";").shift() ?? null;
+  return null;
+}
+
+// Las cookies de sesión no emiten eventos de cambio dentro de esta pantalla, así que
+// no hay nada a lo que suscribirse; useSyncExternalStore se usa aquí solo para leer el
+// valor real del navegador sin el render en cascada de un useEffect + setState, y sin
+// desincronizar el HTML de servidor (que no tiene acceso a document.cookie) del cliente.
+function subscribeToCookies() {
+  return () => {};
+}
+
+function getUserRoleSnapshot(): Role {
+  return (getCookie("userRole") as Role) || "Admin";
+}
+function getUserRoleServerSnapshot(): Role {
+  return "Admin"; // valor por defecto mientras se hidrata en el cliente
+}
+
+function getUserNameSnapshot(): string {
+  const raw = getCookie("userName");
+  return raw ? decodeURIComponent(raw) : "Cargando...";
+}
+function getUserNameServerSnapshot(): string {
+  return "Cargando...";
+}
 
 export default function DashboardLayout({
   children,
@@ -10,27 +41,20 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  
-  // 1. Estados para guardar los datos del usuario
-  const [userName, setUserName] = useState("Cargando...");
-  const [userRole, setUserRole] = useState<Role>("Admin"); // Por defecto Admin mientras carga
 
-  // 2. Leer las cookies al cargar el componente
-  useEffect(() => {
-    const getCookie = (name: string) => {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop()?.split(";").shift();
-      return null;
-    };
-
-    const storedRole = getCookie("userRole") as Role;
-    // Decodificamos por si el nombre tiene espacios (ej: "Sofía%20Castro")
-    const storedName = getCookie("userName") ? decodeURIComponent(getCookie("userName") as string) : null;
-
-    if (storedRole) setUserRole(storedRole);
-    if (storedName) setUserName(storedName);
-  }, []);
+  // 1 y 2. Nombre y rol del usuario, leídos directamente de las cookies (sin
+  // useEffect + setState, para no disparar el render en cascada que señala
+  // react-hooks/set-state-in-effect).
+  const userName = useSyncExternalStore(
+    subscribeToCookies,
+    getUserNameSnapshot,
+    getUserNameServerSnapshot
+  );
+  const userRole = useSyncExternalStore(
+    subscribeToCookies,
+    getUserRoleSnapshot,
+    getUserRoleServerSnapshot
+  );
 
   // 3. Generar las iniciales y el texto del rol de forma dinámica
   const initials = userName === "Cargando..." 

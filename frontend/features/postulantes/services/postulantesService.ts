@@ -18,6 +18,9 @@ import {
 } from "../types/postulante.types";
 import { mockPostulantes, getMockPostulanteById } from "../data/mockPostulantes";
 
+// Se usará al conectar cada microservicio real (ver los bloques "MODO API" comentados
+// abajo); hoy no se referencia en código activo porque todo corre en modo mock.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const API_URL = process.env.NEXT_PUBLIC_API_URL; // ej: http://localhost:8080/api
 const LATENCIA_MOCK_MS = 400;
 

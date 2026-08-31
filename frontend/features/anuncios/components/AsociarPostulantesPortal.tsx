@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { Postulante } from "@/features/postulantes/types/postulante.types";
 
@@ -11,21 +11,29 @@ interface AsociarPostulantesModalProps {
   onCerrar: () => void;
 }
 
+// El portal solo puede crearse en el navegador (document existe), nunca durante el
+// renderizado en servidor. useSyncExternalStore con snapshots fijos (true en cliente,
+// false en servidor) resuelve esto sin useEffect + setState, evitando el render en
+// cascada que señala react-hooks/set-state-in-effect.
+function subscribe() {
+  return () => {};
+}
+function getSnapshot() {
+  return true;
+}
+function getServerSnapshot() {
+  return false;
+}
+
 export default function AsociarPostulantesModal({
   postulantesDisponibles,
   idsSeleccionados,
   onConfirmar,
   onCerrar,
 }: AsociarPostulantesModalProps) {
-  const [montado, setMontado] = useState(false);
+  const montado = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const [seleccionTemporal, setSeleccionTemporal] =
     useState<string[]>(idsSeleccionados);
-
-  // El portal solo puede crearse en el navegador (document existe),
-  // nunca durante el renderizado en servidor. useEffect solo corre en el cliente.
-  useEffect(() => {
-    setMontado(true);
-  }, []);
 
   // Cerrar con la tecla Escape
   useEffect(() => {

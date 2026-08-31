@@ -4,7 +4,7 @@ export type Role = 'Admin' | 'RRHH' | 'Supervisor';
 export interface User {
   id: string;
   email: string;
-  name: String;
+  name: string;
   role: Role;
 }
 
