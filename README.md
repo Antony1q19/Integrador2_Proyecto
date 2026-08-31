@@ -46,4 +46,4 @@ Proyecto académico — Proyecto Integrador II.
 - **Gestión de riesgos:** [`docs/riesgos/`](./docs/riesgos/).
 - **UX, flujo y prototipo:** [`docs/ux/`](./docs/ux/).
 - **Entorno local (PostgreSQL vía Docker):** [`infra/`](./infra/).
-- **Documentos de planificación (Sprint 1, Semana 2, Semana 3):** [`frontend/documentacion/`](./frontend/documentacion/).
+
