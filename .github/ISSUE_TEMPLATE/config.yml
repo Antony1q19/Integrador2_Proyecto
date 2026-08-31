@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documento de planificación del proyecto
+    url: https://github.com/Antony1q19/Integrador2_Proyecto/tree/main/frontend/documentacion
+    about: Consulta los documentos de Sprint 1, Semana 2 y Semana 3 antes de crear un issue.

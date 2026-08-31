@@ -20,15 +20,30 @@ El sistema resuelve la gestión integral de procesos de reclutamiento para una c
  
 ## 🧱 Arquitectura
  
-El proyecto está dividido en dos repositorios/módulos independientes que se comunican vía API REST:
+El Front-End (Next.js) consume el Back-End a través de una API REST. El Back-End se
+organiza como **microservicios por dominio** (postulantes, empresas/vacantes, procesos
+de selección) detrás de un API Gateway/BFF — ver [ADR-002](./docs/decisiones/ADR-002-arquitectura-microservicios.md).
  
 | Capa | Tecnología |
 |---|---|
 | **Frontend** | Next.js  |
-| **Backend** | Java |
+| **Backend** | Python (FastAPI) — microservicios + API Gateway |
 | **Base de datos** | *PostgreSQL* |
 | **Comunicación** | WhatsApp Business API |
 
 ## 📄 Licencia
  
 Proyecto académico — Proyecto Integrador II.
+---
+
+## 🔁 Flujo de trabajo y documentación
+
+- **Backlog y Sprint:** GitHub Projects (campos: Status, Priority, Size, Iteration, Requirement ID, Owner).
+- **Asignación del equipo:** [`docs/equipo/asignaciones.md`](./docs/equipo/asignaciones.md).
+- **Historias de usuario y riesgos:** ver plantillas en `.github/ISSUE_TEMPLATE/`.
+- **Cómo contribuir (ramas, commits, PR, Definition of Done):** [`CONTRIBUTING.md`](./CONTRIBUTING.md).
+- **Decisiones tecnológicas (ADR):** [`docs/decisiones/`](./docs/decisiones/).
+- **Gestión de riesgos:** [`docs/riesgos/`](./docs/riesgos/).
+- **UX, flujo y prototipo:** [`docs/ux/`](./docs/ux/).
+- **Entorno local (PostgreSQL vía Docker):** [`infra/`](./infra/).
+- **Documentos de planificación (Sprint 1, Semana 2, Semana 3):** [`frontend/documentacion/`](./frontend/documentacion/).
