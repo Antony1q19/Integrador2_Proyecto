@@ -10,9 +10,6 @@
 | **Decisión** | Adoptar la alternativa B: microservicios por dominio detrás de un API Gateway/BFF. Estructura inicial: `backend/gateway/` (enruta las peticiones del Front-End Next.js hacia cada microservicio y centraliza autenticación/CORS), `backend/servicio-postulantes/`, `backend/servicio-empresas-vacantes/` y `backend/servicio-procesos-seleccion/`, cada uno un proyecto FastAPI independiente con sus propios modelos, esquemas Pydantic y migraciones sobre PostgreSQL (esquema propio o base propia por servicio). La comunicación entre Front-End y Gateway, y entre Gateway y cada servicio, es REST síncrona sobre HTTP en esta etapa del curso. |
 | **Consecuencias** | Beneficio principal: cada integrante puede avanzar su módulo (y sus historias asignadas) de forma independiente, con menor riesgo de conflictos de código y despliegues acoplados. Costos aceptados: más piezas que configurar y documentar (un `Dockerfile` y una entrada en `infra/compose.yaml` por servicio, más el Gateway), necesidad de definir contratos de API estables entre servicios desde el inicio, y ausencia (por ahora) de mecanismos avanzados de resiliencia entre servicios (reintentos, *circuit breaker*, mensajería asíncrona), que quedan fuera de alcance del curso y se documentan como trabajo futuro. |
 | **Criterio de revisión** | Si hacia el Sprint 2 el equipo no logra levantar y mantener los servicios de forma reproducible (`docker compose config` fallando, integración Gateway-servicio inestable, o sobrecarga operativa desproporcionada para el tamaño del equipo), se reevalúa consolidar temporalmente dos o más servicios en la retrospectiva correspondiente, sin perder la separación de dominios a nivel de código. |
-| **Enlaces** | [ADR-001 — Selección de stack tecnológico](./ADR-001-stack-tecnologico.md); `docs/equipo/asignaciones.md`; `frontend/documentacion/Semana2_Entorno_Colaboracion_UX_Reclutamiento.docx` (secciones 4 a 7, actualizadas con esta decisión). |
+| **Enlaces** | [ADR-001 — Selección de stack tecnológico](./ADR-001-stack-tecnologico.md); `docs/equipo/asignaciones.md`;  |
 
-> 🧭 Este ADR reemplaza, en lo referente al estilo arquitectónico del Back-End, la
-> mención a "monolito modular" que aparecía en el ADR-001 y en la versión inicial del
-> documento de la Semana 2. El ADR-001 sigue vigente para la selección de lenguaje,
-> framework y base de datos.
+
