@@ -1,3 +1,6 @@
+// app/postulantes/page.tsx
+import { PostulantesList } from "@/features/postulantes/components/PostulantesList";
+
 export default function PostulantesPage() {
-  return <div>Postulantes prueba de git </div>;
+  return <PostulantesList />;
 }
