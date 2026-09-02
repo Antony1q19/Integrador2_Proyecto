@@ -44,6 +44,5 @@ Proyecto académico — Proyecto Integrador II.
 - **Cómo contribuir (ramas, commits, PR, Definition of Done):** [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 - **Decisiones tecnológicas (ADR):** [`docs/decisiones/`](./docs/decisiones/).
 - **Gestión de riesgos:** [`docs/riesgos/`](./docs/riesgos/).
-- **UX, flujo y prototipo:** [`docs/ux/`](./docs/ux/).
 - **Entorno local (PostgreSQL vía Docker):** [`infra/`](./infra/).
 
