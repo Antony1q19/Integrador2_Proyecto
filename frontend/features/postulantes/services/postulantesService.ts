@@ -17,6 +17,8 @@ import {
   DatosPersonales,
 } from "../types/postulante.types";
 import { mockPostulantes, getMockPostulanteById } from "../data/mockPostulantes";
+import { PostulanteFormData } from "../types/postulante.types";
+
 
 // Se usará al conectar cada microservicio real (ver los bloques "MODO API" comentados
 // abajo); hoy no se referencia en código activo porque todo corre en modo mock.
@@ -193,5 +195,58 @@ export async function updateEstado(
   //   body: JSON.stringify({ estado, comentario }),
   // });
   // if (!res.ok) throw new Error("Error al actualizar el estado");
+  // return res.json();
+}
+
+// ============================================================
+// CREAR NUEVO POSTULANTE
+// ============================================================
+
+export async function crearPostulante(
+  data: PostulanteFormData
+): Promise<Postulante> {
+  // ---- MODO MOCK (activo ahora) ----
+  await delay(LATENCIA_MOCK_MS);
+  
+  const nuevoPostulante: Postulante = {
+    id: String(mockPostulantes.length + 1),
+    fechaRegistro: new Date().toISOString(),
+    estadoActual: "POSTULADO",
+    datosPersonales: {
+      nombres: data.nombres,
+      apellidos: data.apellidos,
+      documentoTipo: data.documentoTipo,
+      documentoNumero: data.documentoNumero,
+      email: data.email,
+      telefono: data.telefono,
+      fechaNacimiento: data.fechaNacimiento,
+      direccion: data.direccion || "",
+      cargoPostulado: data.cargoPostulado,
+      empresaCliente: data.empresaCliente,
+      fuenteReclutamiento: data.fuenteReclutamiento || "",
+    },
+    documentos: [],
+    evaluaciones: [],
+    historialEstados: [
+      {
+        id: crypto.randomUUID(),
+        estado: "POSTULADO",
+        fecha: new Date().toISOString(),
+        usuarioResponsable: "Sistema",
+        comentario: "Postulante registrado desde el sistema",
+      },
+    ],
+  };
+  
+  mockPostulantes.push(nuevoPostulante);
+  return structuredClone(nuevoPostulante);
+
+  // ---- MODO API (descomentar al integrar backend Java) ----
+  // const res = await fetch(`${API_URL}/postulantes`, {
+  //   method: "POST",
+  //   headers: { "Content-Type": "application/json" },
+  //   body: JSON.stringify(data),
+  // });
+  // if (!res.ok) throw new Error("Error al crear el postulante");
   // return res.json();
 }

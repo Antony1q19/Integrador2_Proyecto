@@ -93,3 +93,57 @@ export interface Postulante {
   historialEstados: HistorialEstado[];
   fechaRegistro: string; // ISO datetime
 }
+
+// ============================================================
+// TIPOS PARA EL FORMULARIO DE NUEVO POSTULANTE
+// ============================================================
+
+export interface PostulanteFormData {
+  // Datos Personales
+  nombres: string;
+  apellidos: string;
+  documentoTipo: "DNI" | "CE" | "PASAPORTE";
+  documentoNumero: string;
+  fechaNacimiento: string;
+  
+  // Datos de Contacto
+  email: string;
+  telefono: string;
+  direccion?: string;
+  
+  // Datos de Postulación
+  cargoPostulado: string;
+  empresaCliente: string;
+  fuenteReclutamiento?: string;
+}
+
+export interface PostulanteFormErrors {
+  nombres?: string;
+  apellidos?: string;
+  documentoTipo?: string;
+  documentoNumero?: string;
+  fechaNacimiento?: string;
+  email?: string;
+  telefono?: string;
+  direccion?: string;
+  cargoPostulado?: string;
+  empresaCliente?: string;
+  fuenteReclutamiento?: string;
+  general?: string;
+}
+
+export const FUENTES_RECLUTAMIENTO = [
+  "LinkedIn",
+  "Bolsa de trabajo",
+  "Referido",
+  "Portal de empleo",
+  "Redes sociales",
+  "Universidad",
+  "Otro",
+] as const;
+
+export const TIPOS_DOCUMENTO = [
+  "DNI",
+  "CE",
+  "PASAPORTE",
+] as const;
