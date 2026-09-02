@@ -1,6 +1,8 @@
 // features/postulantes/components/PostulanteSuccessModal.tsx
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { CheckCircle, X } from "lucide-react";
 
 interface PostulanteSuccessModalProps {
@@ -12,6 +14,18 @@ export function PostulanteSuccessModal({
   isOpen,
   postulanteId,
 }: PostulanteSuccessModalProps) {
+  const router = useRouter();
+
+  // Redirigir automáticamente después de 3 segundos
+  useEffect(() => {
+    if (isOpen && postulanteId) {
+      const timer = setTimeout(() => {
+        router.push(`/postulantes/${postulanteId}`);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, postulanteId, router]);
+
   if (!isOpen) return null;
 
   return (
@@ -19,7 +33,7 @@ export function PostulanteSuccessModal({
       <div className="relative w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-2xl animate-in fade-in zoom-in duration-300">
         {/* Botón cerrar */}
         <button
-          onClick={() => window.location.href = `/postulantes/${postulanteId}`}
+          onClick={() => router.push("/postulantes")}
           className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition-colors"
         >
           <X className="h-5 w-5" />
@@ -45,13 +59,13 @@ export function PostulanteSuccessModal({
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <button
-            onClick={() => window.location.href = `/postulantes/${postulanteId}`}
+            onClick={() => router.push(`/postulantes/${postulanteId}`)}
             className="rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 transition-colors"
           >
             Ver ficha del postulante
           </button>
           <button
-            onClick={() => window.location.href = "/postulantes"}
+            onClick={() => router.push("/postulantes")}
             className="rounded-lg border border-slate-200 px-6 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors"
           >
             Ir al listado
