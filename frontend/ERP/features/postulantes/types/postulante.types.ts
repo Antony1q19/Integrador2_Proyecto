@@ -45,6 +45,34 @@ export interface DocumentoPostulante {
   url?: string; // vendrá del backend/storage real
 }
 
+// Datos que el propio postulante completa al crear su perfil en la bolsa de
+// trabajo (ver la app ANUNCIOS). RRHH solo los visualiza aquí, en la ficha.
+export interface FormacionAcademica {
+  id: string;
+  institucion: string;
+  titulo: string;
+  nivel: "SECUNDARIA" | "TECNICO" | "UNIVERSITARIO" | "POSTGRADO" | "OTRO";
+  fechaInicio: string; // yyyy-mm
+  fechaFin?: string; // vacío si "enCurso"
+  enCurso: boolean;
+}
+
+export interface IdiomaPostulante {
+  id: string;
+  nombre: string;
+  nivel: "BASICO" | "INTERMEDIO" | "AVANZADO" | "NATIVO";
+}
+
+export interface ExperienciaLaboral {
+  id: string;
+  empresa: string;
+  cargo: string;
+  fechaInicio: string; // yyyy-mm
+  fechaFin?: string; // vacío si "actualidad"
+  actualidad: boolean;
+  descripcion?: string;
+}
+
 // Competencias evaluadas en la entrevista de RRHH (HU-08). Cada una se
 // califica en escala 1-5. Si se agrega/quita una competencia, el backend
 // Java deberá reflejar el mismo set de claves en su DTO.
@@ -59,20 +87,13 @@ export interface CompetenciasEvaluacion {
 
 export type ResultadoEvaluacion = "APTO" | "NO_APTO";
 
-// El carné de sanidad admite un estado intermedio: el postulante puede estar
-// tramitándolo sin tenerlo aún en mano. Para el cálculo de APTO/NO APTO,
-// "TRAMITE" cuenta igual que "SI_CUENTA" (ver calcularResultado).
-export type EstadoCarneSanidad = "NO_CUENTA" | "TRAMITE" | "SI_CUENTA";
-
 export interface Evaluacion {
   id: string;
   evaluador: string;
   fecha: string; // ISO date
   competencias: CompetenciasEvaluacion;
   puntajeTotal: number; // 0-100, calculado a partir del promedio de competencias
-  resultado: ResultadoEvaluacion; // calculado automáticamente (ver features/postulantes/utils/evaluacion.ts)
-  carneSanidad: EstadoCarneSanidad;
-  antecedentesPenales: boolean; // registra antecedentes penales
+  resultado: ResultadoEvaluacion; // calculado automáticamente a partir solo del puntaje (ver features/postulantes/utils/evaluacion.ts)
   comentarios: string;
 }
 
@@ -84,6 +105,8 @@ export interface HistorialEstado {
   comentario?: string;
 }
 
+export type ResultadoPostulacion = "CONTRATADO" | "DESCARTADO";
+
 export interface Postulante {
   id: string;
   datosPersonales: DatosPersonales;
@@ -92,6 +115,17 @@ export interface Postulante {
   evaluaciones: Evaluacion[];
   historialEstados: HistorialEstado[];
   fechaRegistro: string; // ISO datetime
+  formacionAcademica: FormacionAcademica[];
+  idiomas: IdiomaPostulante[];
+  experiencia: ExperienciaLaboral[];
+  // Resultado final por cada anuncio al que se presentó (clave = id del
+  // anuncio, como string). Es independiente de `estadoActual`: un mismo
+  // postulante puede postular a varios anuncios a la vez y terminar
+  // contratado en uno y descartado en otro. `estadoActual` sigue
+  // reflejando el proceso "principal" que RRHH sigue en el pipeline; este
+  // mapa resuelve el desenlace de cada postulación individual (ver la
+  // pestaña "Dónde ha postulado", en PostulacionesTab.tsx).
+  resultadosPostulacion: Record<string, ResultadoPostulacion>;
 }
 
 // ============================================================

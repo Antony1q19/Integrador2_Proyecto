@@ -7,12 +7,16 @@ import {
   iniciarSesion as iniciarSesionService,
   cerrarSesion as cerrarSesionService,
 } from '@/features/auth/services/authService';
+import { establecerPerfilActivo } from '@/features/perfil/services/perfilService';
 
 interface AuthContextValue {
   usuario: Usuario | null;
   estaAutenticado: boolean;
   cargando: boolean;
   iniciarSesion: (email: string, password: string) => Promise<void>;
+  // Establece la sesión directamente con un usuario ya conocido (ej. justo
+  // después de crear la cuenta), sin pasar por el login mock.
+  registrarSesion: (usuario: Usuario) => void;
   cerrarSesion: () => Promise<void>;
 }
 
@@ -26,10 +30,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setCargando(true);
     try {
       const usuarioObtenido = await iniciarSesionService(email, password);
+      // Sincroniza qué perfil mock (features/perfil) corresponde a esta
+      // sesión: son dos mocks independientes, así que hay que enlazarlos
+      // explícitamente por id.
+      establecerPerfilActivo(usuarioObtenido.id);
       setUsuario(usuarioObtenido);
     } finally {
       setCargando(false);
     }
+  }
+
+  function registrarSesion(nuevoUsuario: Usuario) {
+    setUsuario(nuevoUsuario);
   }
 
   async function cerrarSesion() {
@@ -49,6 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         estaAutenticado: usuario !== null,
         cargando,
         iniciarSesion,
+        registrarSesion,
         cerrarSesion,
       }}
     >

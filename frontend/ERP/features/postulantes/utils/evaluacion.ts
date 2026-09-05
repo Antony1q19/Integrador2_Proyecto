@@ -6,11 +6,7 @@
 // idealmente venir ya resuelto) en el servicio; mientras tanto el frontend
 // lo simula para dar feedback inmediato al usuario de RRHH.
 
-import {
-  CompetenciasEvaluacion,
-  EstadoCarneSanidad,
-  ResultadoEvaluacion,
-} from "../types/postulante.types";
+import { CompetenciasEvaluacion, ResultadoEvaluacion } from "../types/postulante.types";
 
 export const COMPETENCIAS: { clave: keyof CompetenciasEvaluacion; etiqueta: string }[] = [
   { clave: "comunicacionEfectiva", etiqueta: "Comunicación efectiva" },
@@ -30,15 +26,9 @@ export function calcularPuntajeTotal(competencias: CompetenciasEvaluacion): numb
   return Math.round((promedio / 5) * 100);
 }
 
-// APTO requiere puntaje suficiente por competencias, no registrar
-// antecedentes penales y contar con el carné de sanidad (o al menos estar
-// en trámite: no se exige tenerlo ya en mano).
-export function calcularResultado(
-  competencias: CompetenciasEvaluacion,
-  carneSanidad: EstadoCarneSanidad,
-  antecedentesPenales: boolean
-): ResultadoEvaluacion {
-  const puntajeTotal = calcularPuntajeTotal(competencias);
-  const cumpleRequisitos = carneSanidad !== "NO_CUENTA" && !antecedentesPenales;
-  return puntajeTotal >= UMBRAL_APTO && cumpleRequisitos ? "APTO" : "NO_APTO";
+// APTO depende únicamente del puntaje de competencias. Carné de sanidad y
+// antecedentes penales ya no forman parte de este cálculo (se dejaron de
+// registrar en la evaluación por decisión de negocio).
+export function calcularResultado(competencias: CompetenciasEvaluacion): ResultadoEvaluacion {
+  return calcularPuntajeTotal(competencias) >= UMBRAL_APTO ? "APTO" : "NO_APTO";
 }

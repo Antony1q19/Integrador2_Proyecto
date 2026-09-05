@@ -2,14 +2,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CompetenciasEvaluacion, EstadoCarneSanidad, Evaluacion } from "../types/postulante.types";
+import { CompetenciasEvaluacion, Evaluacion } from "../types/postulante.types";
 import { COMPETENCIAS, calcularPuntajeTotal, calcularResultado } from "../utils/evaluacion";
-
-const ETIQUETAS_CARNE_SANIDAD: Record<EstadoCarneSanidad, string> = {
-  NO_CUENTA: "No cuenta",
-  TRAMITE: "En trámite",
-  SI_CUENTA: "Sí cuenta",
-};
 
 const COMPETENCIAS_INICIALES: CompetenciasEvaluacion = {
   comunicacionEfectiva: 3,
@@ -40,46 +34,17 @@ function ResultadoBadge({ resultado }: { resultado: Evaluacion["resultado"] }) {
   );
 }
 
-type EstadoRequisito = "ok" | "pendiente" | "no";
-
-const ESTILOS_REQUISITO: Record<EstadoRequisito, string> = {
-  ok: "bg-slate-50 text-slate-600",
-  pendiente: "bg-amber-50 text-amber-700",
-  no: "bg-red-50 text-red-600",
-};
-
-const ICONOS_REQUISITO: Record<EstadoRequisito, string> = {
-  ok: "✓",
-  pendiente: "…",
-  no: "✕",
-};
-
-function RequisitoBadge({ estado, etiqueta }: { estado: EstadoRequisito; etiqueta: string }) {
-  return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium ${ESTILOS_REQUISITO[estado]}`}
-    >
-      {ICONOS_REQUISITO[estado]} {etiqueta}
-    </span>
-  );
-}
-
 export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: EvaluacionesTabProps) {
   const [mostrarForm, setMostrarForm] = useState(false);
   const [form, setForm] = useState({
     evaluador: "",
     fecha: new Date().toISOString().slice(0, 10),
     competencias: COMPETENCIAS_INICIALES,
-    carneSanidad: "NO_CUENTA" as EstadoCarneSanidad,
-    antecedentesPenales: false,
     comentarios: "",
   });
 
   const puntajePreview = useMemo(() => calcularPuntajeTotal(form.competencias), [form.competencias]);
-  const resultadoPreview = useMemo(
-    () => calcularResultado(form.competencias, form.carneSanidad, form.antecedentesPenales),
-    [form.competencias, form.carneSanidad, form.antecedentesPenales]
-  );
+  const resultadoPreview = useMemo(() => calcularResultado(form.competencias), [form.competencias]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,16 +54,12 @@ export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: Evalua
       competencias: form.competencias,
       puntajeTotal: puntajePreview,
       resultado: resultadoPreview,
-      carneSanidad: form.carneSanidad,
-      antecedentesPenales: form.antecedentesPenales,
       comentarios: form.comentarios,
     });
     setForm({
       evaluador: "",
       fecha: new Date().toISOString().slice(0, 10),
       competencias: COMPETENCIAS_INICIALES,
-      carneSanidad: "NO_CUENTA",
-      antecedentesPenales: false,
       comentarios: "",
     });
     setMostrarForm(false);
@@ -186,34 +147,6 @@ export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: Evalua
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label className="mb-1 block text-xs font-medium text-gray-500">Carné de sanidad</label>
-              <select
-                value={form.carneSanidad}
-                onChange={(e) =>
-                  setForm({ ...form, carneSanidad: e.target.value as EstadoCarneSanidad })
-                }
-                className="w-full rounded-md border border-gray-200 px-3 py-1.5 text-sm focus:border-[#1D2B53] focus:outline-none focus:ring-1 focus:ring-[#1D2B53]"
-              >
-                <option value="NO_CUENTA">{ETIQUETAS_CARNE_SANIDAD.NO_CUENTA}</option>
-                <option value="TRAMITE">{ETIQUETAS_CARNE_SANIDAD.TRAMITE}</option>
-                <option value="SI_CUENTA">{ETIQUETAS_CARNE_SANIDAD.SI_CUENTA}</option>
-              </select>
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-gray-500">Antecedentes penales</label>
-              <select
-                value={form.antecedentesPenales ? "si" : "no"}
-                onChange={(e) => setForm({ ...form, antecedentesPenales: e.target.value === "si" })}
-                className="w-full rounded-md border border-gray-200 px-3 py-1.5 text-sm focus:border-[#1D2B53] focus:outline-none focus:ring-1 focus:ring-[#1D2B53]"
-              >
-                <option value="no">No registra</option>
-                <option value="si">Sí registra</option>
-              </select>
-            </div>
-          </div>
-
           <div>
             <label className="mb-1 block text-xs font-medium text-gray-500">Comentarios</label>
             <textarea
@@ -275,23 +208,6 @@ export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: Evalua
                     </span>
                   </div>
                 ))}
-              </div>
-
-              <div className="mt-3 flex flex-wrap gap-2">
-                <RequisitoBadge
-                  estado={
-                    ev.carneSanidad === "SI_CUENTA"
-                      ? "ok"
-                      : ev.carneSanidad === "TRAMITE"
-                      ? "pendiente"
-                      : "no"
-                  }
-                  etiqueta={`Carné de sanidad: ${ETIQUETAS_CARNE_SANIDAD[ev.carneSanidad]}`}
-                />
-                <RequisitoBadge
-                  estado={ev.antecedentesPenales ? "no" : "ok"}
-                  etiqueta="Sin antecedentes penales"
-                />
               </div>
 
               {ev.comentarios && (

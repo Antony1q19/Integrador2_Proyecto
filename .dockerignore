@@ -1,0 +1,32 @@
+# Dependencias
+node_modules/
+**/node_modules/
+__pycache__/
+*.pyc
+.venv/
+env/
+
+# Builds y cache de Next.js
+.next/
+**/.next/
+out/
+dist/
+build/
+
+# Git
+.git/
+.gitignore
+
+# Entornos y credenciales
+.env
+.env*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editores y SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -8,6 +8,7 @@ import {
   DocumentoPostulante,
   Evaluacion,
   EstadoProceso,
+  ResultadoPostulacion,
 } from "../types/postulante.types";
 import {
   fetchPostulanteById,
@@ -17,6 +18,7 @@ import {
   deleteDocumento,
   addEvaluacion,
   updateEstado,
+  actualizarResultadoPostulacion,
 } from "../services/postulantesService";
 
 interface UsePostulanteDetalleResult {
@@ -29,6 +31,7 @@ interface UsePostulanteDetalleResult {
   eliminarDocumento: (documentoId: string) => Promise<void>;
   registrarEvaluacion: (evaluacion: Omit<Evaluacion, "id">) => Promise<void>;
   cambiarEstado: (estado: EstadoProceso, comentario?: string) => Promise<void>;
+  actualizarResultadoPostulacion: (anuncioId: string, resultado: ResultadoPostulacion | null) => Promise<void>;
   guardando: boolean;
 }
 
@@ -128,6 +131,14 @@ export function usePostulanteDetalle(id: string): UsePostulanteDetalleResult {
     }
   };
 
+  const handleActualizarResultadoPostulacion = async (
+    anuncioId: string,
+    resultado: ResultadoPostulacion | null
+  ) => {
+    const actualizado = await actualizarResultadoPostulacion(id, anuncioId, resultado);
+    setPostulante(actualizado);
+  };
+
   return {
     postulante,
     loading,
@@ -138,6 +149,7 @@ export function usePostulanteDetalle(id: string): UsePostulanteDetalleResult {
     eliminarDocumento,
     registrarEvaluacion,
     cambiarEstado,
+    actualizarResultadoPostulacion: handleActualizarResultadoPostulacion,
     guardando,
   };
 }

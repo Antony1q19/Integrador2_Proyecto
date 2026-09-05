@@ -19,7 +19,7 @@ export const anunciosMock: Anuncio[] = [
     fechaCreacion: "2026-08-01",
   },
   {
-    postulantesAsociadosIds: [],
+    postulantesAsociadosIds: ["2"],
     id: 2,
     cargo: "Analista de Logística",
     descripcion:
@@ -36,7 +36,7 @@ export const anunciosMock: Anuncio[] = [
     fechaCreacion: "2026-07-15",
   },
   {
-    postulantesAsociadosIds: [],
+    postulantesAsociadosIds: ["3"],
     id: 3,
     cargo: "Asesor Financiero",
     descripcion:

@@ -70,7 +70,6 @@ export default function DashboardLayout({
       {/* SIDEBAR */}
       <Sidebar
         role={userRole}
-        userName={userName} // <-- Pasamos el nombre al Sidebar
         open={sidebarOpen}
         setOpen={setSidebarOpen}
       />

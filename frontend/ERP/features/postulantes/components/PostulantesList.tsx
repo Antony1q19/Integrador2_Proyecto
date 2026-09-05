@@ -62,7 +62,7 @@ export const PostulantesList = memo(function PostulantesList() {
   // ============================================================
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
+      <div className="flex flex-col items-center justify-center p-6 py-16 text-center">
         <div className="rounded-full bg-red-100 p-4">
           <svg
             className="h-8 w-8 text-red-600"
@@ -93,7 +93,7 @@ export const PostulantesList = memo(function PostulantesList() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
       {/* ENCABEZADO */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>

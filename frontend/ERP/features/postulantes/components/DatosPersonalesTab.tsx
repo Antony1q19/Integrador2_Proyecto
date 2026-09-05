@@ -2,12 +2,16 @@
 "use client";
 
 import { useState } from "react";
-import { DatosPersonales } from "../types/postulante.types";
+import { DatosPersonales, ExperienciaLaboral, FormacionAcademica, IdiomaPostulante } from "../types/postulante.types";
+import { PerfilProfesionalResumen } from "./PerfilProfesionalResumen";
 
 interface DatosPersonalesTabProps {
   datos: DatosPersonales;
   guardando: boolean;
   onGuardar: (datos: DatosPersonales) => Promise<void>;
+  formacionAcademica: FormacionAcademica[];
+  idiomas: IdiomaPostulante[];
+  experiencia: ExperienciaLaboral[];
 }
 
 function Campo({
@@ -40,7 +44,14 @@ function Campo({
   );
 }
 
-export function DatosPersonalesTab({ datos, guardando, onGuardar }: DatosPersonalesTabProps) {
+export function DatosPersonalesTab({
+  datos,
+  guardando,
+  onGuardar,
+  formacionAcademica,
+  idiomas,
+  experiencia,
+}: DatosPersonalesTabProps) {
   const [editando, setEditando] = useState(false);
   const [form, setForm] = useState<DatosPersonales>(datos);
 
@@ -90,9 +101,13 @@ export function DatosPersonalesTab({ datos, guardando, onGuardar }: DatosPersona
         <Campo label="Fecha de nacimiento" value={form.fechaNacimiento} editando={editando} onChange={(v) => set("fechaNacimiento", v)} type="date" />
         <Campo label="Dirección" value={form.direccion ?? ""} editando={editando} onChange={(v) => set("direccion", v)} />
         <Campo label="Fuente de reclutamiento" value={form.fuenteReclutamiento ?? ""} editando={editando} onChange={(v) => set("fuenteReclutamiento", v)} />
-        <Campo label="Cargo postulado" value={form.cargoPostulado} editando={editando} onChange={(v) => set("cargoPostulado", v)} />
-        <Campo label="Empresa cliente" value={form.empresaCliente} editando={editando} onChange={(v) => set("empresaCliente", v)} />
       </div>
+
+      <PerfilProfesionalResumen
+        formacionAcademica={formacionAcademica}
+        idiomas={idiomas}
+        experiencia={experiencia}
+      />
     </div>
   );
 }

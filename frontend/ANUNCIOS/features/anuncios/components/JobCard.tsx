@@ -15,7 +15,7 @@ export default function JobCard({ anuncio, isSelected, onClick }: JobCardProps) 
   return (
     <button
       onClick={onClick}
-      className={`w-full text-left bg-white rounded-xl border p-4 transition-all duration-150 ${
+      className={`w-full text-left bg-white rounded-xl border p-4 transition-[border-color,box-shadow,transform] duration-150 ease-out active:scale-[0.99] ${
         isSelected
           ? 'border-purple-600 ring-2 ring-purple-100 shadow-sm'
           : 'border-gray-200 hover:border-purple-300 hover:shadow-sm'

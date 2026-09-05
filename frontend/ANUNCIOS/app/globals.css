@@ -3,6 +3,32 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Curvas de easing con más "punch" que las nativas del navegador. */
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 400ms var(--ease-out-strong) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up {
+    animation-duration: 1ms;
+    animation-delay: 0ms !important;
+  }
 }
 
 @theme inline {
@@ -12,11 +38,13 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Esta app no tiene un tema oscuro real: todos los componentes usan colores
+   explícitos de Tailwind (bg-white, text-gray-900, etc.) pensados para fondo
+   claro. Por eso NO seguimos prefers-color-scheme aquí — hacerlo solo
+   invertía --foreground y dejaba texto claro heredado (p. ej. en inputs sin
+   clase de color propia) sobre fondos blancos, ilegible. */
+:root {
+  color-scheme: light;
 }
 
 body {

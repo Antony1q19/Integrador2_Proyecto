@@ -16,6 +16,13 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/perfil', request.url));
   }
 
+  // 2.b. La raíz "/" no tiene página propia: si hay sesión, mandarlo a su
+  // perfil (evita el 404 de "Página no encontrada" al entrar solo con
+  // "localhost:3000", sin ruta).
+  if (role && pathname === '/') {
+    return NextResponse.redirect(new URL('/perfil', request.url));
+  }
+
   // 3. RUTAS PROTEGIDAS SEGÚN ROL (Ejemplo de reglas)
   if (role) {
     // Si es Supervisor, prohibirle entrar a /empresas o /anuncios

@@ -15,6 +15,7 @@ import {
   EstadoProceso,
   HistorialEstado,
   DatosPersonales,
+  ResultadoPostulacion,
 } from "../types/postulante.types";
 import { mockPostulantes, getMockPostulanteById } from "../data/mockPostulantes";
 import { PostulanteFormData } from "../types/postulante.types";
@@ -198,6 +199,37 @@ export async function updateEstado(
   // return res.json();
 }
 
+// Marca (o revierte, pasando `resultado: null`) el desenlace de una
+// postulación puntual a un anuncio, sin tocar `estadoActual` — el mismo
+// postulante puede estar contratado en un anuncio y descartado en otro al
+// mismo tiempo.
+export async function actualizarResultadoPostulacion(
+  id: string,
+  anuncioId: string,
+  resultado: ResultadoPostulacion | null
+): Promise<Postulante> {
+  await delay(LATENCIA_MOCK_MS);
+  const postulante = mockPostulantes.find((p) => p.id === id);
+  if (!postulante) throw new Error("Postulante no encontrado");
+  const resultados = { ...postulante.resultadosPostulacion };
+  if (resultado) {
+    resultados[anuncioId] = resultado;
+  } else {
+    delete resultados[anuncioId];
+  }
+  postulante.resultadosPostulacion = resultados;
+  return structuredClone(postulante);
+
+  // ---- MODO API ----
+  // const res = await fetch(`${API_URL}/postulantes/${id}/postulaciones/${anuncioId}`, {
+  //   method: "PATCH",
+  //   headers: { "Content-Type": "application/json" },
+  //   body: JSON.stringify({ resultado }),
+  // });
+  // if (!res.ok) throw new Error("Error al actualizar el resultado de la postulación");
+  // return res.json();
+}
+
 // ============================================================
 // CREAR NUEVO POSTULANTE
 // ============================================================
@@ -236,8 +268,12 @@ export async function crearPostulante(
         comentario: "Postulante registrado desde el sistema",
       },
     ],
+    formacionAcademica: [],
+    idiomas: [],
+    experiencia: [],
+    resultadosPostulacion: {},
   };
-  
+
   mockPostulantes.push(nuevoPostulante);
   return structuredClone(nuevoPostulante);
 

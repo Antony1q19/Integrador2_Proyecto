@@ -1,0 +1,30 @@
+services:
+  erp:
+    container_name: erp-service
+    build:
+      context: ./frontend/ERP
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/ERP:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - WATCHPACK_POLLING=true
+      - NODE_ENV=development
+
+  anuncios:
+    container_name: anuncios-service
+    build:
+      context: ./frontend/ANUNCIOS
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./frontend/ANUNCIOS:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - WATCHPACK_POLLING=true
+      - NODE_ENV=development

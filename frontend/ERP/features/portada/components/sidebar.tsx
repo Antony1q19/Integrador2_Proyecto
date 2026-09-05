@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
+    ChevronDown,
     ChevronLeft,
     LogOut,
     Zap,
@@ -10,23 +12,21 @@ import {
 
 import { menuItems, Role } from "@/features/portada/types/menu";
 
-// 1. Agregamos userName a las propiedades que recibe el Sidebar
 interface SidebarProps {
     role: Role;
-    userName?: string; 
     open: boolean;
     setOpen: (value: boolean) => void;
 }
 
 export default function Sidebar({
     role,
-    userName = "Usuario", // Valor por defecto por si acaso
     open,
     setOpen,
 }: SidebarProps) {
 
     const pathname = usePathname();
     const router = useRouter();
+    const [submenusManuales, setSubmenusManuales] = useState<Record<string, boolean>>({});
 
     const handleLogout = () => {
         // 2. Borramos AMBAS cookies al salir (rol y nombre)
@@ -40,16 +40,6 @@ export default function Sidebar({
     const filteredItems = menuItems.filter((item) =>
         item.roles.includes(role)
     );
-
-    // 3. Generamos las iniciales (Ej: "Leonardo Morales" -> "LM")
-    const initials = userName === "Cargando..." 
-      ? "..." 
-      : userName.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
-
-    // 4. Formateamos el texto del rol
-    const displayRole = role === "RRHH" 
-      ? "Recursos Humanos" 
-      : role === "Admin" ? "Administrador" : "Supervisor";
 
     return (
         <>
@@ -101,30 +91,6 @@ export default function Sidebar({
                     </div>
 
 
-                    {/* PERFIL USUARIO (AHORA ES DINÁMICO) */}
-                    <div className="mx-4 mt-6 rounded-2xl border border-white/10 bg-white/[0.06] p-4 backdrop-blur-sm">
-                        <div className="flex items-center gap-3">
-                            {/* Avatar */}
-                            <div className="relative">
-                                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-violet-600 text-sm font-bold shadow-lg">
-                                    {initials}
-                                </div>
-                                {/* Estado online */}
-                                <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-[#172554] bg-emerald-400" />
-                            </div>
-
-                            <div className="min-w-0">
-                                <p className="truncate text-sm font-semibold text-white">
-                                    {userName}
-                                </p>
-                                <p className="mt-0.5 text-xs text-slate-400">
-                                    {displayRole}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-
                     {/* MENU */}
                     <nav className="mt-7 flex-1 px-4">
                         <p className="mb-3 px-3 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500">
@@ -135,31 +101,82 @@ export default function Sidebar({
                             {filteredItems.map((item) => {
                                 const Icon = item.icon;
                                 const active = pathname === item.href;
+                                const tieneSubItems = !!item.subItems?.length;
+                                const subItemActivo = item.subItems?.some((sub) => pathname === sub.href) ?? false;
+                                const expandido = submenusManuales[item.name] ?? (active || subItemActivo);
 
                                 return (
-                                    <Link
-                                        key={item.name}
-                                        href={item.href}
-                                        onClick={() => setOpen(false)}
-                                        className={`
-                      group relative flex items-center gap-3 overflow-hidden rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200
-                      ${active ? "bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-lg shadow-blue-950/30" : "text-slate-300 hover:bg-white/[0.08] hover:text-white"}
-                    `}
-                                    >
-                                        {/* Brillo del elemento activo */}
-                                        {active && <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent" />}
+                                    <div key={item.name}>
+                                        <div
+                                            className={`
+                        group relative flex items-center gap-3 overflow-hidden rounded-xl text-sm font-medium transition-all duration-200
+                        ${active ? "bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-lg shadow-blue-950/30" : "text-slate-300 hover:bg-white/[0.08] hover:text-white"}
+                      `}
+                                        >
+                                            {/* Brillo del elemento activo */}
+                                            {active && <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent" />}
 
-                                        {/* Icono */}
-                                        <div className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-lg transition ${active ? "bg-white/15" : "bg-white/5 group-hover:bg-white/10"}`}>
-                                            <Icon size={18} />
+                                            <Link
+                                                href={item.href}
+                                                onClick={() => setOpen(false)}
+                                                className="relative z-10 flex flex-1 items-center gap-3 px-4 py-3"
+                                            >
+                                                {/* Icono */}
+                                                <div className={`flex h-8 w-8 items-center justify-center rounded-lg transition ${active ? "bg-white/15" : "bg-white/5 group-hover:bg-white/10"}`}>
+                                                    <Icon size={18} />
+                                                </div>
+
+                                                {/* Texto */}
+                                                <span>{item.name}</span>
+
+                                                {/* Indicador */}
+                                                {active && <span className="ml-auto h-2 w-2 rounded-full bg-white shadow-lg" />}
+                                            </Link>
+
+                                            {/* Toggle de submenú */}
+                                            {tieneSubItems && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        setSubmenusManuales((prev) => ({
+                                                            ...prev,
+                                                            [item.name]: !expandido,
+                                                        }))
+                                                    }
+                                                    aria-label={expandido ? `Contraer ${item.name}` : `Expandir ${item.name}`}
+                                                    className="relative z-10 flex h-9 w-9 items-center justify-center rounded-lg text-inherit transition hover:bg-white/10"
+                                                >
+                                                    <ChevronDown
+                                                        size={16}
+                                                        className={`transition-transform duration-200 ${expandido ? "rotate-180" : ""}`}
+                                                    />
+                                                </button>
+                                            )}
                                         </div>
 
-                                        {/* Texto */}
-                                        <span className="relative z-10">{item.name}</span>
-
-                                        {/* Indicador */}
-                                        {active && <span className="relative z-10 ml-auto h-2 w-2 rounded-full bg-white shadow-lg" />}
-                                    </Link>
+                                        {/* Submenú */}
+                                        {tieneSubItems && expandido && (
+                                            <div className="ml-6 mt-1 space-y-1 border-l border-white/10 pl-4">
+                                                {item.subItems!.map((sub) => {
+                                                    const subActive = pathname === sub.href;
+                                                    return (
+                                                        <Link
+                                                            key={sub.href}
+                                                            href={sub.href}
+                                                            onClick={() => setOpen(false)}
+                                                            className={`block rounded-lg px-3 py-2 text-sm transition ${
+                                                                subActive
+                                                                    ? "font-medium text-white"
+                                                                    : "text-slate-400 hover:bg-white/[0.08] hover:text-white"
+                                                            }`}
+                                                        >
+                                                            {sub.name}
+                                                        </Link>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+                                    </div>
                                 );
                             })}
                         </div>

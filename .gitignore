@@ -6,6 +6,9 @@
 **/.pnp
 **/AGENTS.md
 **/CLAUDE.md
+**/.claude/
+**/.agents/
+skills-lock.json
 .pnp.*
 .yarn/*
 !.yarn/patches
@@ -54,3 +57,24 @@ yarn-error.log*
 
 *.tsbuildinfo
 next-env.d.ts
+
+# --- Python Backend ---
+**/__pycache__/
+*.py[cod]
+*$py.class
+**/.venv/
+**/env/
+**/venv/
+.pytest_cache/
+.mypy_cache/
+
+# --- Editores y Sistema Operativo ---
+.vscode/
+.idea/
+Thumbs.db
+ehthumbs.db
+
+# --- Docker ---
+# (Ignora datos de volúmenes locales persistidos si los llegas a mapear a disco)
+.docker/
+
