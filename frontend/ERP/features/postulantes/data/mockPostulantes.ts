@@ -107,7 +107,23 @@ export const mockPostulantes: Postulante[] = [
         actualidad: false,
       },
     ],
-    resultadosPostulacion: {},
+    // Postula a un solo anuncio (id "1"): su pipeline ahí coincide con el
+    // proceso "principal" de arriba.
+    procesosPostulacion: {
+      "1": {
+        estadoActual: "ENTREVISTA",
+        historialEstados: [
+          { id: "ph1", estado: "POSTULADO", fecha: "2026-07-02T09:15:00", usuarioResponsable: "Luis Fernández" },
+          { id: "ph2", estado: "EN_EVALUACION", fecha: "2026-07-03T11:00:00", usuarioResponsable: "Luis Fernández", comentario: "Pasa a evaluación técnica" },
+          { id: "ph3", estado: "ENTREVISTA", fecha: "2026-07-08T16:30:00", usuarioResponsable: "María Gutiérrez", comentario: "Programada entrevista con supervisor de área" },
+        ],
+      },
+    },
+    consentimientos: {
+      tratamientoDatos: true,
+      comunicacionesComerciales: false,
+      fechaAceptacion: "2026-07-02T09:10:00",
+    },
   },
   {
     id: "2",
@@ -157,7 +173,19 @@ export const mockPostulantes: Postulante[] = [
         descripcion: "Registro de operaciones contables, conciliaciones bancarias y apoyo en declaraciones tributarias mensuales.",
       },
     ],
-    resultadosPostulacion: {},
+    procesosPostulacion: {
+      "2": {
+        estadoActual: "POSTULADO",
+        historialEstados: [
+          { id: "ph4", estado: "POSTULADO", fecha: "2026-07-10T10:00:00", usuarioResponsable: "Luis Fernández" },
+        ],
+      },
+    },
+    consentimientos: {
+      tratamientoDatos: true,
+      comunicacionesComerciales: true,
+      fechaAceptacion: "2026-07-10T09:55:00",
+    },
   },
   {
     id: "3",
@@ -224,7 +252,30 @@ export const mockPostulantes: Postulante[] = [
         descripcion: "Atención a clientes, cumplimiento de metas mensuales de venta y manejo de caja.",
       },
     ],
-    resultadosPostulacion: {},
+    // Ejemplo de postulante con 2 procesos simultáneos en etapas distintas:
+    // "Asesor Financiero" recién arrancando, "Jefe de Tienda" ya contratada.
+    procesosPostulacion: {
+      "3": {
+        estadoActual: "EN_EVALUACION",
+        historialEstados: [
+          { id: "ph5", estado: "POSTULADO", fecha: "2026-08-10T09:00:00", usuarioResponsable: "Luis Fernández" },
+          { id: "ph6", estado: "EN_EVALUACION", fecha: "2026-08-12T10:00:00", usuarioResponsable: "María Gutiérrez" },
+        ],
+      },
+      "4": {
+        estadoActual: "CONTRATADO",
+        historialEstados: [
+          { id: "ph7", estado: "POSTULADO", fecha: "2026-06-06T09:00:00", usuarioResponsable: "Luis Fernández" },
+          { id: "ph8", estado: "ENTREVISTA", fecha: "2026-06-10T14:00:00", usuarioResponsable: "María Gutiérrez", comentario: "Entrevista con gerencia de tienda" },
+          { id: "ph9", estado: "CONTRATADO", fecha: "2026-06-18T09:00:00", usuarioResponsable: "María Gutiérrez", comentario: "Ya trabajó antes en la empresa; contratación directa" },
+        ],
+      },
+    },
+    consentimientos: {
+      tratamientoDatos: true,
+      comunicacionesComerciales: false,
+      fechaAceptacion: "2026-07-08T08:50:00",
+    },
   },
 ];
 

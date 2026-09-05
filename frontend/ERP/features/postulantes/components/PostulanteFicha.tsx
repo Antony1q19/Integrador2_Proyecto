@@ -2,22 +2,20 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { usePostulanteDetalle } from "../hooks/usePostulanteDetalle";
 import { EstadoBadge } from "./EstadoBadge";
-import { Timeline } from "./Timeline";
 import { DatosPersonalesTab } from "./DatosPersonalesTab";
 import { DocumentosTab } from "./DocumentosTab";
 import { EvaluacionesTab } from "./EvaluacionesTab";
-import { EstadosTab } from "./EstadosTab";
 import { PostulacionesTab } from "./PostulacionesTab";
 
-type TabId = "datos" | "documentos" | "evaluaciones" | "estados" | "postulaciones";
+type TabId = "datos" | "documentos" | "evaluaciones" | "postulaciones";
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "datos", label: "Datos personales" },
   { id: "documentos", label: "Documentos" },
   { id: "evaluaciones", label: "Evaluaciones" },
-  { id: "estados", label: "Historial de estados" },
   { id: "postulaciones", label: "Dónde ha postulado" },
 ];
 
@@ -37,13 +35,12 @@ export function PostulanteFicha({ id }: { id: string }) {
     reemplazarDocumento,
     eliminarDocumento,
     registrarEvaluacion,
-    cambiarEstado,
-    actualizarResultadoPostulacion,
+    actualizarEstadoPostulacion,
   } = usePostulanteDetalle(id);
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-4xl animate-pulse space-y-4 p-6">
+      <div className="mx-auto max-w-5xl animate-pulse space-y-4 p-6">
         <div className="h-24 rounded-xl bg-gray-100" />
         <div className="h-10 rounded-lg bg-gray-100" />
         <div className="h-64 rounded-xl bg-gray-100" />
@@ -64,7 +61,14 @@ export function PostulanteFicha({ id }: { id: string }) {
   const { datosPersonales: d } = postulante;
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6 p-6">
+    <div className="mx-auto max-w-5xl space-y-6 p-6">
+      <Link
+        href="/postulantes"
+        className="inline-flex items-center text-sm text-gray-500 hover:text-[#1D2B53]"
+      >
+        ← Volver
+      </Link>
+
       {/* Encabezado */}
       <div className="rounded-xl border border-gray-100 bg-white p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -88,15 +92,11 @@ export function PostulanteFicha({ id }: { id: string }) {
             </button>
           </div>
         </div>
-
-        <div className="mt-6 border-t border-gray-100 pt-6">
-          <Timeline estadoActual={postulante.estadoActual} />
-        </div>
       </div>
 
       {/* Tabs */}
       <div className="rounded-xl border border-gray-100 bg-white">
-        <div className="flex overflow-x-auto border-b border-gray-100 px-2">
+        <div className="flex flex-wrap border-b border-gray-100 px-2">
           {TABS.map((tab) => (
             <button
               key={tab.id}
@@ -141,20 +141,12 @@ export function PostulanteFicha({ id }: { id: string }) {
               onRegistrar={registrarEvaluacion}
             />
           )}
-          {tabActivo === "estados" && (
-            <EstadosTab
-              estadoActual={postulante.estadoActual}
-              historial={postulante.historialEstados}
-              guardando={guardando}
-              onCambiarEstado={cambiarEstado}
-            />
-          )}
           {tabActivo === "postulaciones" && (
             <PostulacionesTab
               postulanteId={postulante.id}
-              resultadosPostulacion={postulante.resultadosPostulacion}
+              procesosPostulacion={postulante.procesosPostulacion}
               guardando={guardando}
-              onActualizarResultado={actualizarResultadoPostulacion}
+              onActualizarEstado={actualizarEstadoPostulacion}
             />
           )}
         </div>

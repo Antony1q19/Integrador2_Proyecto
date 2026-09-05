@@ -105,7 +105,30 @@ export interface HistorialEstado {
   comentario?: string;
 }
 
-export type ResultadoPostulacion = "CONTRATADO" | "DESCARTADO";
+// El pipeline COMPLETO (no solo el desenlace final) de una postulación a un
+// anuncio puntual. Un mismo postulante puede estar en distintas etapas para
+// distintos anuncios a la vez (ej. "Entrevista" en uno, "Contratado" en
+// otro) — por eso cada anuncio lleva su propio estado + historial,
+// independiente del proceso "principal" (`Postulante.estadoActual` /
+// `historialEstados`, atado a `datosPersonales.cargoPostulado/empresaCliente`).
+export interface ProcesoPostulacion {
+  estadoActual: EstadoProceso;
+  historialEstados: HistorialEstado[];
+}
+
+// Consentimientos de tratamiento de datos personales que el postulante
+// otorgó al crear su cuenta en la bolsa de trabajo (app ANUNCIOS). Mismo
+// esquema que `ConsentimientosPerfil` en
+// ANUNCIOS/features/perfil/types/index.ts: "tratamientoDatos" (Términos y
+// Condiciones 1) es obligatorio para crear la cuenta; "comunicacionesComerciales"
+// (Términos y Condiciones 2) es independiente y opcional. Un postulante
+// dado de alta manualmente por RRHH (sin cuenta propia aún) los tiene en
+// `false` hasta que se registre por su cuenta en ANUNCIOS.
+export interface ConsentimientosPostulante {
+  tratamientoDatos: boolean;
+  comunicacionesComerciales: boolean;
+  fechaAceptacion: string; // ISO datetime, vacío si no ha aceptado
+}
 
 export interface Postulante {
   id: string;
@@ -118,14 +141,13 @@ export interface Postulante {
   formacionAcademica: FormacionAcademica[];
   idiomas: IdiomaPostulante[];
   experiencia: ExperienciaLaboral[];
-  // Resultado final por cada anuncio al que se presentó (clave = id del
-  // anuncio, como string). Es independiente de `estadoActual`: un mismo
-  // postulante puede postular a varios anuncios a la vez y terminar
-  // contratado en uno y descartado en otro. `estadoActual` sigue
-  // reflejando el proceso "principal" que RRHH sigue en el pipeline; este
-  // mapa resuelve el desenlace de cada postulación individual (ver la
-  // pestaña "Dónde ha postulado", en PostulacionesTab.tsx).
-  resultadosPostulacion: Record<string, ResultadoPostulacion>;
+  // Pipeline por cada anuncio al que se presentó (clave = id del anuncio,
+  // como string). Ver `ProcesoPostulacion` — es independiente de
+  // `estadoActual`/`historialEstados` de arriba, que siguen siendo el
+  // proceso "principal" (ver la pestaña "Dónde ha postulado", en
+  // PostulacionesTab.tsx).
+  procesosPostulacion: Record<string, ProcesoPostulacion>;
+  consentimientos: ConsentimientosPostulante;
 }
 
 // ============================================================

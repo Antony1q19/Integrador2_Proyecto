@@ -12,7 +12,7 @@ export function PostulantesTableSkeleton() {
         <table className="w-full">
           <thead className="bg-slate-50">
             <tr>
-              {[1, 2, 3, 4, 5].map((i) => (
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
                 <th key={i} className="px-4 py-3">
                   <div className="h-4 w-20 rounded bg-slate-200"></div>
                 </th>
@@ -22,7 +22,7 @@ export function PostulantesTableSkeleton() {
           <tbody>
             {[1, 2, 3, 4, 5].map((i) => (
               <tr key={i} className="border-t border-slate-100">
-                {[1, 2, 3, 4, 5].map((j) => (
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((j) => (
                   <td key={j} className="px-4 py-3">
                     <div className="h-4 w-full rounded bg-slate-100"></div>
                   </td>

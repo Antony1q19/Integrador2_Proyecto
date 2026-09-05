@@ -1,12 +1,18 @@
 // features/postulantes/components/PostulantesPipeline.tsx
 //
-// Vista Kanban del pipeline de selección (HU-09). Agrupa a los postulantes
-// por estado en columnas y permite arrastrarlos entre columnas para cambiar
-// su estado, con confirmación visual (toast) al soltar.
+// Vista Kanban del pipeline de selección (HU-09). Una TARJETA = una
+// postulación puntual (postulante + anuncio), no un postulante entero: si
+// alguien postuló a 2 anuncios, aparece con 2 tarjetas, cada una en la
+// columna que le corresponde a ESA postulación (ver
+// `procesosPostulacion` en el tipo Postulante). Arrastrar una tarjeta entre
+// columnas cambia el estado de esa postulación específica, sin afectar sus
+// otras postulaciones.
 "use client";
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { Anuncio } from "@/features/anuncios/types/anuncio";
+import { anunciosMock } from "@/features/anuncios/data/mock-anuncios";
 import { EstadoProceso, Postulante } from "../types/postulante.types";
 import { ESTILOS_ESTADO } from "./EstadoBadge";
 import { OPCIONES_ESTADO } from "./EstadoSelector";
@@ -23,19 +29,40 @@ function iniciales(nombres: string, apellidos: string) {
   return `${nombres[0] ?? ""}${apellidos[0] ?? ""}`.toUpperCase();
 }
 
+interface Tarjeta {
+  id: string; // "<postulanteId>:<anuncioId>"
+  postulante: Postulante;
+  anuncio: Anuncio;
+  estado: EstadoProceso;
+}
+
 export function PostulantesPipeline() {
-  const { postulantes, loading, error, moviendoId, moverEstado } = usePostulantesPipeline();
+  const { postulantes, loading, error, moviendoId, moverEstadoPostulacion } = usePostulantesPipeline();
   const { toasts, mostrarToast } = useToast();
   const [columnaSobre, setColumnaSobre] = useState<EstadoProceso | null>(null);
   const [empresaFiltro, setEmpresaFiltro] = useState<string>(TODAS_LAS_EMPRESAS);
   const [puestoFiltro, setPuestoFiltro] = useState<string>(TODOS_LOS_PUESTOS);
 
-  const empresas = useMemo(
+  // Una tarjeta por cada postulación (postulante + anuncio al que se
+  // presentó), no una por postulante.
+  const tarjetas: Tarjeta[] = useMemo(
     () =>
-      Array.from(new Set(postulantes.map((p) => p.datosPersonales.empresaCliente))).sort((a, b) =>
-        a.localeCompare(b)
+      postulantes.flatMap((postulante) =>
+        anunciosMock
+          .filter((anuncio) => anuncio.postulantesAsociadosIds.includes(postulante.id))
+          .map((anuncio) => ({
+            id: `${postulante.id}:${anuncio.id}`,
+            postulante,
+            anuncio,
+            estado: postulante.procesosPostulacion[String(anuncio.id)]?.estadoActual ?? "POSTULADO",
+          }))
       ),
     [postulantes]
+  );
+
+  const empresas = useMemo(
+    () => Array.from(new Set(tarjetas.map((t) => t.anuncio.empresaRazonSocial))).sort((a, b) => a.localeCompare(b)),
+    [tarjetas]
   );
   // Los puestos se acotan a la empresa seleccionada: si eliges una empresa,
   // el dropdown de puesto solo debe ofrecer los puestos que existen en ella.
@@ -43,24 +70,22 @@ export function PostulantesPipeline() {
     () =>
       Array.from(
         new Set(
-          postulantes
-            .filter(
-              (p) => empresaFiltro === TODAS_LAS_EMPRESAS || p.datosPersonales.empresaCliente === empresaFiltro
-            )
-            .map((p) => p.datosPersonales.cargoPostulado)
+          tarjetas
+            .filter((t) => empresaFiltro === TODAS_LAS_EMPRESAS || t.anuncio.empresaRazonSocial === empresaFiltro)
+            .map((t) => t.anuncio.cargo)
         )
       ).sort((a, b) => a.localeCompare(b)),
-    [postulantes, empresaFiltro]
+    [tarjetas, empresaFiltro]
   );
 
-  const postulantesFiltrados = useMemo(
+  const tarjetasFiltradas = useMemo(
     () =>
-      postulantes.filter(
-        (p) =>
-          (empresaFiltro === TODAS_LAS_EMPRESAS || p.datosPersonales.empresaCliente === empresaFiltro) &&
-          (puestoFiltro === TODOS_LOS_PUESTOS || p.datosPersonales.cargoPostulado === puestoFiltro)
+      tarjetas.filter(
+        (t) =>
+          (empresaFiltro === TODAS_LAS_EMPRESAS || t.anuncio.empresaRazonSocial === empresaFiltro) &&
+          (puestoFiltro === TODOS_LOS_PUESTOS || t.anuncio.cargo === puestoFiltro)
       ),
-    [postulantes, empresaFiltro, puestoFiltro]
+    [tarjetas, empresaFiltro, puestoFiltro]
   );
 
   const hayFiltrosActivos = empresaFiltro !== TODAS_LAS_EMPRESAS || puestoFiltro !== TODOS_LOS_PUESTOS;
@@ -72,10 +97,10 @@ export function PostulantesPipeline() {
     // explicación.
     const puestoSigueValido =
       puestoFiltro === TODOS_LOS_PUESTOS ||
-      postulantes.some(
-        (p) =>
-          (nuevaEmpresa === TODAS_LAS_EMPRESAS || p.datosPersonales.empresaCliente === nuevaEmpresa) &&
-          p.datosPersonales.cargoPostulado === puestoFiltro
+      tarjetas.some(
+        (t) =>
+          (nuevaEmpresa === TODAS_LAS_EMPRESAS || t.anuncio.empresaRazonSocial === nuevaEmpresa) &&
+          t.anuncio.cargo === puestoFiltro
       );
     if (!puestoSigueValido) setPuestoFiltro(TODOS_LOS_PUESTOS);
   };
@@ -85,13 +110,13 @@ export function PostulantesPipeline() {
     setPuestoFiltro(TODOS_LOS_PUESTOS);
   };
 
-  const handleDrop = async (postulante: Postulante, estadoDestino: EstadoProceso) => {
+  const handleDrop = async (tarjeta: Tarjeta, estadoDestino: EstadoProceso) => {
     setColumnaSobre(null);
-    if (postulante.estadoActual === estadoDestino) return;
+    if (tarjeta.estado === estadoDestino) return;
     try {
-      await moverEstado(postulante.id, estadoDestino);
+      await moverEstadoPostulacion(tarjeta.postulante.id, String(tarjeta.anuncio.id), estadoDestino);
       mostrarToast(
-        `${postulante.datosPersonales.nombres} ${postulante.datosPersonales.apellidos} pasó a "${ESTILOS_ESTADO[estadoDestino].label}"`,
+        `${tarjeta.postulante.datosPersonales.nombres} ${tarjeta.postulante.datosPersonales.apellidos} · "${tarjeta.anuncio.cargo}" pasó a "${ESTILOS_ESTADO[estadoDestino].label}"`,
         "success"
       );
     } catch {
@@ -125,8 +150,9 @@ export function PostulantesPipeline() {
       <div>
         <h1 className="text-lg font-semibold text-gray-900">Pipeline de selección</h1>
         <p className="text-sm text-gray-500">
-          Arrastra a un postulante entre columnas para cambiar su estado del proceso. Las
-          decisiones finales (Contratado / Descartado) se registran desde la ficha del postulante.
+          Cada tarjeta es una postulación puntual: si alguien postuló a 2 anuncios, aparece 2 veces.
+          Arrastra una tarjeta entre columnas para cambiar el estado de esa postulación. Las decisiones
+          finales (Contratado / Descartado) se registran desde &quot;Dónde ha postulado&quot;, en la ficha.
         </p>
       </div>
 
@@ -173,7 +199,7 @@ export function PostulantesPipeline() {
 
       <div className="flex gap-4 overflow-x-auto pb-4">
         {OPCIONES_ESTADO.map((op) => {
-          const postulantesColumna = postulantesFiltrados.filter((p) => p.estadoActual === op.value);
+          const tarjetasColumna = tarjetasFiltradas.filter((t) => t.estado === op.value);
 
           return (
             <div
@@ -185,9 +211,9 @@ export function PostulantesPipeline() {
               onDragLeave={() => setColumnaSobre((prev) => (prev === op.value ? null : prev))}
               onDrop={(e) => {
                 e.preventDefault();
-                const id = e.dataTransfer.getData("text/plain");
-                const postulante = postulantes.find((p) => p.id === id);
-                if (postulante) handleDrop(postulante, op.value);
+                const tarjetaId = e.dataTransfer.getData("text/plain");
+                const tarjeta = tarjetas.find((t) => t.id === tarjetaId);
+                if (tarjeta) handleDrop(tarjeta, op.value);
               }}
               className={`flex w-64 shrink-0 flex-col gap-3 rounded-xl border p-3 transition-colors ${
                 columnaSobre === op.value
@@ -198,42 +224,40 @@ export function PostulantesPipeline() {
               <div className="flex items-center justify-between px-1">
                 <span className="text-sm font-semibold text-gray-700">{op.label}</span>
                 <span className="rounded-full bg-white px-2 py-0.5 text-xs font-medium text-gray-400">
-                  {postulantesColumna.length}
+                  {tarjetasColumna.length}
                 </span>
               </div>
 
               <div className="flex min-h-[60px] flex-col gap-2">
-                {postulantesColumna.map((p) => (
+                {tarjetasColumna.map((t) => (
                   <div
-                    key={p.id}
+                    key={t.id}
                     draggable
-                    onDragStart={(e) => e.dataTransfer.setData("text/plain", p.id)}
+                    onDragStart={(e) => e.dataTransfer.setData("text/plain", t.id)}
                     className={`cursor-grab rounded-lg border border-gray-100 bg-white p-3 shadow-sm transition-opacity hover:border-gray-200 active:cursor-grabbing ${
-                      moviendoId === p.id ? "opacity-50" : ""
+                      moviendoId === t.id ? "opacity-50" : ""
                     }`}
                   >
-                    <Link href={`/postulantes/${p.id}`} className="block">
+                    <Link href={`/postulantes/${t.postulante.id}`} className="block">
                       <div className="flex items-center gap-2">
                         <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1D2B53] text-[10px] font-semibold text-white">
-                          {iniciales(p.datosPersonales.nombres, p.datosPersonales.apellidos)}
+                          {iniciales(t.postulante.datosPersonales.nombres, t.postulante.datosPersonales.apellidos)}
                         </div>
                         <div className="min-w-0">
                           <p className="truncate text-sm font-medium text-gray-800">
-                            {p.datosPersonales.nombres} {p.datosPersonales.apellidos}
+                            {t.postulante.datosPersonales.nombres} {t.postulante.datosPersonales.apellidos}
                           </p>
-                          <p className="truncate text-xs text-gray-500">{p.datosPersonales.cargoPostulado}</p>
+                          <p className="truncate text-xs text-gray-500">{t.anuncio.cargo}</p>
                         </div>
                       </div>
-                      <p className="mt-2 truncate text-[11px] text-gray-400">
-                        {p.datosPersonales.empresaCliente}
-                      </p>
+                      <p className="mt-2 truncate text-[11px] text-gray-400">{t.anuncio.empresaRazonSocial}</p>
                     </Link>
                   </div>
                 ))}
 
-                {postulantesColumna.length === 0 && (
+                {tarjetasColumna.length === 0 && (
                   <p className="rounded-lg border border-dashed border-gray-200 py-4 text-center text-[11px] text-gray-300">
-                    Sin postulantes
+                    Sin postulaciones
                   </p>
                 )}
               </div>

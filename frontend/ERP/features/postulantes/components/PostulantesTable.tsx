@@ -9,12 +9,37 @@ import {
   Eye,
   ChevronLeft,
   ChevronRight,
+  Check,
+  X,
 } from "lucide-react";
 
 import { Postulante } from "../types/postulante.types";
 import { SortableField } from "../hooks/usePostulantesList";
 import { PostulantesEmptyState } from "./PostulantesEmptyState";
 import { PostulantesTableSkeleton } from "./PostulantesSkeleton";
+import { anunciosMock } from "@/features/anuncios/data/mock-anuncios";
+
+// Cuántas evaluaciones tiene el postulante y su puntaje promedio (mismo
+// criterio que "Puntaje promedio" en EvaluacionesTab).
+function calcularPuntajePromedio(postulante: Postulante): number | null {
+  if (postulante.evaluaciones.length === 0) return null;
+  const suma = postulante.evaluaciones.reduce((acc, e) => acc + e.puntajeTotal, 0);
+  return Math.round(suma / postulante.evaluaciones.length);
+}
+
+// A cuántos anuncios está asociado (ver Anuncio.postulantesAsociadosIds,
+// la misma relación que consume PostulacionesTab en la ficha).
+function contarPostulaciones(postulanteId: string): number {
+  return anunciosMock.filter((a) => a.postulantesAsociadosIds.includes(postulanteId)).length;
+}
+
+function ConsentimientoIcono({ aceptado }: { aceptado: boolean }) {
+  return aceptado ? (
+    <Check className="h-4 w-4 text-emerald-600" aria-label="Aceptado" />
+  ) : (
+    <X className="h-4 w-4 text-gray-300" aria-label="No aceptado" />
+  );
+}
 
 interface PostulantesTableProps {
   postulantes: Postulante[];
@@ -33,18 +58,49 @@ interface PostulantesTableProps {
   sortOrder: "asc" | "desc";
 }
 
-// Mapeo de estados a colores
-const getEstadoConfig = (estado: string) => {
-  const configs: Record<string, { bg: string; text: string; label: string }> = {
-    POSTULADO: { bg: "bg-blue-100", text: "text-blue-700", label: "Postulado" },
-    EN_EVALUACION: { bg: "bg-yellow-100", text: "text-yellow-700", label: "En Evaluación" },
-    ENTREVISTA: { bg: "bg-purple-100", text: "text-purple-700", label: "Entrevista" },
-    PRESELECCIONADO: { bg: "bg-indigo-100", text: "text-indigo-700", label: "Preseleccionado" },
-    CONTRATADO: { bg: "bg-green-100", text: "text-green-700", label: "Contratado" },
-    DESCARTADO: { bg: "bg-red-100", text: "text-red-700", label: "Descartado" },
-  };
-  return configs[estado] || { bg: "bg-gray-100", text: "text-gray-700", label: estado };
-};
+// Ícono de ordenamiento de una columna.
+function SortIcon({
+  field,
+  sortBy,
+  sortOrder,
+}: {
+  field: SortableField;
+  sortBy: SortableField | "";
+  sortOrder: "asc" | "desc";
+}) {
+  if (sortBy !== field) {
+    return <ChevronUp className="h-3 w-3 opacity-30" />;
+  }
+  return sortOrder === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />;
+}
+
+// Cabecera de columna clickeable. Declarada fuera de PostulantesTable para
+// no recrear el componente (y perder su estado) en cada render.
+function SortableHeader({
+  field,
+  children,
+  sortBy,
+  sortOrder,
+  onSort,
+}: {
+  field: SortableField;
+  children: React.ReactNode;
+  sortBy: SortableField | "";
+  sortOrder: "asc" | "desc";
+  onSort: (field: SortableField) => void;
+}) {
+  return (
+    <th
+      className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider cursor-pointer hover:text-slate-700 transition-colors select-none"
+      onClick={() => onSort(field)}
+    >
+      <div className="flex items-center gap-1">
+        {children}
+        <SortIcon field={field} sortBy={sortBy} sortOrder={sortOrder} />
+      </div>
+    </th>
+  );
+}
 
 export const PostulantesTable = memo(function PostulantesTable({
   postulantes,
@@ -60,36 +116,7 @@ export const PostulantesTable = memo(function PostulantesTable({
   sortOrder,
 }: PostulantesTableProps) {
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
-
-  // Renderizar ícono de ordenamiento
-const renderSortIcon = (field: SortableField) => {
-  if (sortBy !== field) {
-    return <ChevronUp className="h-3 w-3 opacity-30" />;
-  }
-
-  return sortOrder === "asc"
-    ? <ChevronUp className="h-3 w-3" />
-    : <ChevronDown className="h-3 w-3" />;
-};
-
-  // Cabecera de columna clickeable
-  const SortableHeader = ({
-  field,
-  children,
-}: {
-  field: SortableField;
-  children: React.ReactNode;
-}) => (
-  <th
-    className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider cursor-pointer hover:text-slate-700 transition-colors select-none"
-    onClick={() => onSort(field)}
-  >
-    <div className="flex items-center gap-1">
-      {children}
-      {renderSortIcon(field)}
-    </div>
-  </th>
-);
+  const sortHeaderProps = { sortBy, sortOrder, onSort };
 
   // Estado de carga
   if (loading) {
@@ -108,21 +135,27 @@ const renderSortIcon = (field: SortableField) => {
         <table className="w-full">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
-              <SortableHeader field="datosPersonales.apellidos">
+              <SortableHeader {...sortHeaderProps} field="datosPersonales.apellidos">
                 Postulante
               </SortableHeader>
-              <SortableHeader field="datosPersonales.cargoPostulado">
-                Cargo
-              </SortableHeader>
-              <SortableHeader field="datosPersonales.empresaCliente">
-                Empresa
-              </SortableHeader>
-              <SortableHeader field="estadoActual">
-                Estado
-              </SortableHeader>
-              <SortableHeader field="fechaRegistro">
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                Correo
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                Puntaje
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                Postulaciones
+              </th>
+              <SortableHeader {...sortHeaderProps} field="fechaRegistro">
                 Fecha Registro
               </SortableHeader>
+              <th className="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider" title="Tratamiento de datos personales (obligatorio para crear la cuenta)">
+                Términos 1
+              </th>
+              <th className="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider" title="Comunicaciones comerciales (opcional)">
+                Términos 2
+              </th>
               <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
                 Acciones
               </th>
@@ -130,9 +163,10 @@ const renderSortIcon = (field: SortableField) => {
           </thead>
           <tbody className="divide-y divide-slate-100">
             {postulantes.map((postulante) => {
-              const estadoConfig = getEstadoConfig(postulante.estadoActual);
               const nombreCompleto = `${postulante.datosPersonales.nombres} ${postulante.datosPersonales.apellidos}`;
               const isHovered = hoveredRow === postulante.id;
+              const puntajePromedio = calcularPuntajePromedio(postulante);
+              const totalPostulaciones = contarPostulaciones(postulante.id);
 
               return (
                 <tr
@@ -161,25 +195,23 @@ const renderSortIcon = (field: SortableField) => {
                     </div>
                   </td>
 
-                  {/* Cargo */}
+                  {/* Correo */}
+                  <td className="px-4 py-3">
+                    <p className="text-sm text-slate-600">{postulante.datosPersonales.email}</p>
+                  </td>
+
+                  {/* Puntaje promedio de sus evaluaciones */}
                   <td className="px-4 py-3">
                     <p className="text-sm text-slate-700">
-                      {postulante.datosPersonales.cargoPostulado}
+                      {puntajePromedio !== null ? `${puntajePromedio}/100` : "—"}
                     </p>
                   </td>
 
-                  {/* Empresa */}
+                  {/* Cantidad de anuncios a los que postuló */}
                   <td className="px-4 py-3">
                     <p className="text-sm text-slate-700">
-                      {postulante.datosPersonales.empresaCliente}
+                      {totalPostulaciones} {totalPostulaciones === 1 ? "anuncio" : "anuncios"}
                     </p>
-                  </td>
-
-                  {/* Estado */}
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${estadoConfig.bg} ${estadoConfig.text}`}>
-                      {estadoConfig.label}
-                    </span>
                   </td>
 
                   {/* Fecha Registro */}
@@ -191,6 +223,16 @@ const renderSortIcon = (field: SortableField) => {
                         year: 'numeric'
                       })}
                     </p>
+                  </td>
+
+                  {/* Términos 1: tratamiento de datos (obligatorio) */}
+                  <td className="px-4 py-3 text-center">
+                    <ConsentimientoIcono aceptado={postulante.consentimientos.tratamientoDatos} />
+                  </td>
+
+                  {/* Términos 2: comunicaciones comerciales (opcional) */}
+                  <td className="px-4 py-3 text-center">
+                    <ConsentimientoIcono aceptado={postulante.consentimientos.comunicacionesComerciales} />
                   </td>
 
                   {/* Acciones */}

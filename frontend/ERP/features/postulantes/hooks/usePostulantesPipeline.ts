@@ -3,7 +3,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { EstadoProceso, Postulante } from "../types/postulante.types";
-import { fetchPostulantes, updateEstado } from "../services/postulantesService";
+import { fetchPostulantes, actualizarEstadoPostulacion } from "../services/postulantesService";
 
 // TODO: reemplazar por el usuario real de la sesión (features/auth/hooks/useAuth)
 const USUARIO_ACTUAL = "Usuario RRHH";
@@ -12,8 +12,9 @@ interface UsePostulantesPipelineResult {
   postulantes: Postulante[];
   loading: boolean;
   error: string | null;
+  // id compuesto "<postulanteId>:<anuncioId>" de la tarjeta que se está moviendo
   moviendoId: string | null;
-  moverEstado: (id: string, estado: EstadoProceso) => Promise<void>;
+  moverEstadoPostulacion: (postulanteId: string, anuncioId: string, estado: EstadoProceso) => Promise<void>;
 }
 
 export function usePostulantesPipeline(): UsePostulantesPipelineResult {
@@ -42,21 +43,27 @@ export function usePostulantesPipeline(): UsePostulantesPipelineResult {
     cargar();
   }, [cargar]);
 
-  const moverEstado = async (id: string, estado: EstadoProceso) => {
-    setMoviendoId(id);
+  const moverEstadoPostulacion = async (postulanteId: string, anuncioId: string, estado: EstadoProceso) => {
+    setMoviendoId(`${postulanteId}:${anuncioId}`);
     try {
-      const registro = await updateEstado(id, estado, USUARIO_ACTUAL);
+      const registro = await actualizarEstadoPostulacion(postulanteId, anuncioId, estado, USUARIO_ACTUAL);
       setPostulantes((prev) =>
-        prev.map((p) =>
-          p.id === id
-            ? { ...p, estadoActual: estado, historialEstados: [...p.historialEstados, registro] }
-            : p
-        )
+        prev.map((p) => {
+          if (p.id !== postulanteId) return p;
+          const historialPrevio = p.procesosPostulacion[anuncioId]?.historialEstados ?? [];
+          return {
+            ...p,
+            procesosPostulacion: {
+              ...p.procesosPostulacion,
+              [anuncioId]: { estadoActual: estado, historialEstados: [...historialPrevio, registro] },
+            },
+          };
+        })
       );
     } finally {
       setMoviendoId(null);
     }
   };
 
-  return { postulantes, loading, error, moviendoId, moverEstado };
+  return { postulantes, loading, error, moviendoId, moverEstadoPostulacion };
 }

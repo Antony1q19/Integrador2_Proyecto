@@ -53,7 +53,10 @@ export const anunciosMock: Anuncio[] = [
     fechaCreacion: "2026-08-10",
   },
   {
-    postulantesAsociadosIds: [],
+    // Valeria (id "3") ya trabajó en Retail Sur Perú S.A.C. (ver su
+    // experiencia laboral) y ahora también postula aquí: caso de ejemplo de
+    // un postulante presentado a 2 anuncios a la vez (ver PostulacionesTab).
+    postulantesAsociadosIds: ["3"],
     id: 4,
     cargo: "Jefe de Tienda",
     descripcion:

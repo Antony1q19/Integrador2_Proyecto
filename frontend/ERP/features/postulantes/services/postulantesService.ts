@@ -15,7 +15,6 @@ import {
   EstadoProceso,
   HistorialEstado,
   DatosPersonales,
-  ResultadoPostulacion,
 } from "../types/postulante.types";
 import { mockPostulantes, getMockPostulanteById } from "../data/mockPostulantes";
 import { PostulanteFormData } from "../types/postulante.types";
@@ -199,34 +198,45 @@ export async function updateEstado(
   // return res.json();
 }
 
-// Marca (o revierte, pasando `resultado: null`) el desenlace de una
-// postulación puntual a un anuncio, sin tocar `estadoActual` — el mismo
-// postulante puede estar contratado en un anuncio y descartado en otro al
-// mismo tiempo.
-export async function actualizarResultadoPostulacion(
+// Cambia el estado del pipeline de UNA postulación puntual (un anuncio),
+// sin tocar el proceso "principal" (`estadoActual`/`historialEstados`) —
+// el mismo postulante puede estar en "Entrevista" para un anuncio y ya
+// "Contratado" en otro al mismo tiempo. Para revertir una decisión final
+// (Contratado/Descartado), se llama de nuevo con estado "POSTULADO".
+export async function actualizarEstadoPostulacion(
   id: string,
   anuncioId: string,
-  resultado: ResultadoPostulacion | null
-): Promise<Postulante> {
+  estado: EstadoProceso,
+  usuarioResponsable: string,
+  comentario?: string
+): Promise<HistorialEstado> {
   await delay(LATENCIA_MOCK_MS);
   const postulante = mockPostulantes.find((p) => p.id === id);
   if (!postulante) throw new Error("Postulante no encontrado");
-  const resultados = { ...postulante.resultadosPostulacion };
-  if (resultado) {
-    resultados[anuncioId] = resultado;
-  } else {
-    delete resultados[anuncioId];
-  }
-  postulante.resultadosPostulacion = resultados;
-  return structuredClone(postulante);
+  const nuevoRegistro: HistorialEstado = {
+    id: crypto.randomUUID(),
+    estado,
+    fecha: new Date().toISOString(),
+    usuarioResponsable,
+    comentario,
+  };
+  const historialPrevio = postulante.procesosPostulacion[anuncioId]?.historialEstados ?? [];
+  postulante.procesosPostulacion = {
+    ...postulante.procesosPostulacion,
+    [anuncioId]: {
+      estadoActual: estado,
+      historialEstados: [...historialPrevio, nuevoRegistro],
+    },
+  };
+  return nuevoRegistro;
 
   // ---- MODO API ----
-  // const res = await fetch(`${API_URL}/postulantes/${id}/postulaciones/${anuncioId}`, {
-  //   method: "PATCH",
+  // const res = await fetch(`${API_URL}/postulantes/${id}/postulaciones/${anuncioId}/estado`, {
+  //   method: "POST",
   //   headers: { "Content-Type": "application/json" },
-  //   body: JSON.stringify({ resultado }),
+  //   body: JSON.stringify({ estado, comentario }),
   // });
-  // if (!res.ok) throw new Error("Error al actualizar el resultado de la postulación");
+  // if (!res.ok) throw new Error("Error al actualizar el estado de la postulación");
   // return res.json();
 }
 
@@ -271,7 +281,14 @@ export async function crearPostulante(
     formacionAcademica: [],
     idiomas: [],
     experiencia: [],
-    resultadosPostulacion: {},
+    procesosPostulacion: {},
+    // Registrado manualmente por RRHH: aún no tiene cuenta propia en la
+    // bolsa de trabajo, así que no ha aceptado el tratamiento de datos.
+    consentimientos: {
+      tratamientoDatos: false,
+      comunicacionesComerciales: false,
+      fechaAceptacion: "",
+    },
   };
 
   mockPostulantes.push(nuevoPostulante);
