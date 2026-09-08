@@ -43,3 +43,4 @@ export const config = {
   // Proteger todo excepto estáticos de Next y favicon
   matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
 }
+
