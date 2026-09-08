@@ -1,12 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User, Key, Users, Plus, Mail, Briefcase, ShieldCheck } from "lucide-react";
-import { Role } from "@/features/portada/types/menu";
+// Agregamos el ícono 'X' a la lista
+import { User, Key, Users, Plus, Mail, Briefcase, ShieldCheck, X } from "lucide-react"; 
 
 export default function PerfilPage() {
   const [activeTab, setActiveTab] = useState<"mi-perfil" | "usuarios">("mi-perfil");
   const [userData, setUserData] = useState({ name: "", role: "", email: "" });
+  
+  // NUEVO: Estado para controlar si el modal está abierto o cerrado
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // ... (tu useEffect se queda exactamente igual) ...
 
   useEffect(() => {
     // Leer cookies para cargar los datos del perfil activo
@@ -103,9 +108,16 @@ export default function PerfilPage() {
               <h2 className="text-lg font-bold text-slate-800">Trabajadores Registrados</h2>
               <p className="text-xs text-slate-500 mt-1">Administra los accesos de la consultora.</p>
             </div>
-            <button className="flex items-center gap-2 bg-slate-800 text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-slate-700 transition">
-              <Plus size={16} /> Nuevo Usuario
-            </button>
+            
+            {/* VALIDACIÓN DE ROL: Solo Admin y RRHH ven este botón */}
+            {(userData.role === "Admin" || userData.role === "RRHH") && (
+              <button 
+                onClick={() => setIsModalOpen(true)}
+                className="flex items-center gap-2 bg-slate-800 text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-slate-700 transition"
+              >
+                <Plus size={16} /> Nuevo Usuario
+              </button>
+            )}
           </div>
           
           {/* Tabla de Usuarios */}
@@ -137,6 +149,73 @@ export default function PerfilPage() {
           </div>
         </div>
       )}
+    {/* ===== MODAL DE NUEVO USUARIO ===== */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+            
+            {/* Cabecera del Modal */}
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+              <h3 className="text-lg font-bold text-slate-800">Crear Nuevo Trabajador</h3>
+              <button 
+                onClick={() => setIsModalOpen(false)} 
+                className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-1 rounded-md transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Formulario */}
+            <form 
+              onSubmit={(e) => { 
+                e.preventDefault(); 
+                setIsModalOpen(false); 
+                alert("Usuario creado exitosamente (Simulación)"); 
+              }} 
+              className="p-6 space-y-5"
+            >
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Nombre Completo</label>
+                <input type="text" required placeholder="Ej: Juan Pérez" className="w-full p-3 rounded-xl text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all" />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Correo Electrónico</label>
+                <input type="email" required placeholder="juan@test.com" className="w-full p-3 rounded-xl text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all" />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Rol en el Sistema</label>
+                <select required className="w-full p-3 rounded-xl text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all bg-white">
+                  <option value="">Selecciona un rol...</option>
+                  <option value="Admin">Administrador</option>
+                  <option value="RRHH">Recursos Humanos</option>
+                  <option value="Supervisor">Supervisor</option>
+                </select>
+              </div>
+
+              {/* Botones de acción */}
+              <div className="pt-2 flex gap-3">
+                <button 
+                  type="button" 
+                  onClick={() => setIsModalOpen(false)} 
+                  className="flex-1 py-3 bg-slate-100 text-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-200 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit" 
+                  className="flex-1 py-3 bg-violet-600 text-white rounded-xl text-sm font-semibold hover:bg-violet-700 shadow-md shadow-violet-200 transition-all"
+                >
+                  Guardar Usuario
+                </button>
+              </div>
+            </form>
+            
+          </div>
+        </div>
+      )}
+    
 
     </div>
   );
