@@ -68,7 +68,7 @@ export default function SesionMenu({ variant = 'light' }: SesionMenuProps) {
         }`}
       >
         <Link
-          href="/postulaciones"
+          href="/his_postulaciones"
           className="block px-4 py-2 text-sm text-gray-700 transition-colors duration-150 hover:bg-gray-50"
           onClick={() => setMenuAbierto(false)}
         >
