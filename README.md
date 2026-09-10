@@ -34,15 +34,3 @@ de selección) detrás de un API Gateway/BFF — ver [ADR-002](./docs/decisiones
 ## 📄 Licencia
  
 Proyecto académico — Proyecto Integrador II.
----
-
-## 🔁 Flujo de trabajo y documentación
-
-- **Backlog y Sprint:** GitHub Projects (campos: Status, Priority, Size, Iteration, Requirement ID, Owner).
-- **Asignación del equipo:** [`docs/equipo/asignaciones.md`](./docs/equipo/asignaciones.md).
-- **Historias de usuario y riesgos:** ver plantillas en `.github/ISSUE_TEMPLATE/`.
-- **Cómo contribuir (ramas, commits, PR, Definition of Done):** [`CONTRIBUTING.md`](./CONTRIBUTING.md).
-- **Decisiones tecnológicas (ADR):** [`docs/decisiones/`](./docs/decisiones/).
-- **Gestión de riesgos:** [`docs/riesgos/`](./docs/riesgos/).
-- **Entorno local (PostgreSQL vía Docker):** [`infra/`](./infra/).
-

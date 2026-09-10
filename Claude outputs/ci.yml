@@ -42,4 +42,6 @@ jobs:
       - name: Build de producción
         run: npm run build
 
-   
+      # Cuando el equipo agregue pruebas (Vitest o Jest), descomentar:
+      # - name: Pruebas automatizadas
+      #   run: npm test -- --run
