@@ -1,5 +1,7 @@
 // features/comunicaciones/data/mockData.ts
-import { Contacto, Mensaje, Conversacion } from "../types/comunicaciones.types";
+//import { Contacto, Mensaje, Conversacion } from "../types/comunicaciones.types";
+
+import { Contacto, Mensaje } from "../types/comunicaciones.types";
 
 export const mockContactos: Contacto[] = [
   {

@@ -1,7 +1,8 @@
 // features/postulantes/components/PostulantesFilters.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+//import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Filter, X } from "lucide-react";
 
 export interface FiltrosPostulantes {

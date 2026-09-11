@@ -1,7 +1,7 @@
 // app/comunicaciones/page.tsx
 "use client";
 
-import { useEffect } from "react";
+//import { useEffect } from "react";
 import { useChatMessages } from "@/features/comunicaciones/hooks/useChatMessages";
 import { useNotificaciones } from "@/features/comunicaciones/hooks/useNotificaciones";
 import { ConversationList } from "@/features/comunicaciones/components/ConversationList";

@@ -14,25 +14,46 @@ export function useChatMessages() {
   const [queryBusqueda, setQueryBusqueda] = useState("");
   const [error, setError] = useState<string | null>(null);
   
-  // Ref para scroll automático
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Ref para evitar doble carga en desarrollo (StrictMode)
+  const hasLoadedRef = useRef(false);
 
   // ============================================================
-  // CARGAR CONTACTOS
+  // CARGAR CONTACTOS - Envuelto en una función interna
   // ============================================================
-  const cargarContactos = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await fetchContactos();
-      setContactos(data);
-    } catch (err) {
-      setError("Error al cargar contactos");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  useEffect(() => {
+    if (hasLoadedRef.current) return;
+    hasLoadedRef.current = true;
+
+    let cancelled = false;
+
+    const cargar = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchContactos();
+        if (!cancelled) {
+          setContactos(data);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError("Error al cargar contactos");
+          console.error(err);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    cargar();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []); // ✅ Dependencias vacías, sin setState directo problemático
 
   // ============================================================
   // BUSCAR CONTACTOS
@@ -52,7 +73,7 @@ export function useChatMessages() {
   }, []);
 
   // ============================================================
-  // CARGAR MENSAJES DE UN CONTACTO
+  // CARGAR MENSAJES
   // ============================================================
   const cargarMensajes = useCallback(async (contactoId: string) => {
     setLoading(true);
@@ -72,6 +93,7 @@ export function useChatMessages() {
   // ============================================================
   const seleccionarContacto = useCallback(async (contacto: Contacto) => {
     setContactoSeleccionado(contacto);
+    setQueryBusqueda(""); // ✅ Mover aquí en lugar de useEffect
     await cargarMensajes(contacto.id);
   }, [cargarMensajes]);
 
@@ -86,7 +108,6 @@ export function useChatMessages() {
       const nuevoMensaje = await sendMessage(contactoSeleccionado.id, texto);
       setMensajes((prev) => [...prev, nuevoMensaje]);
       
-      // Actualizar último mensaje en la lista de contactos
       setContactos((prev) =>
         prev.map((c) =>
           c.id === contactoSeleccionado.id
@@ -106,7 +127,6 @@ export function useChatMessages() {
   // INSERTAR PLANTILLA
   // ============================================================
   const insertarPlantilla = useCallback((plantilla: PlantillaMensaje) => {
-    // Reemplazar placeholders con datos del contacto
     let contenido = plantilla.contenido;
     if (contactoSeleccionado) {
       contenido = contenido
@@ -118,27 +138,12 @@ export function useChatMessages() {
   }, [contactoSeleccionado]);
 
   // ============================================================
-  // SCROLL AUTOMÁTICO
+  // SCROLL AUTOMÁTICO - Es una sincronización con el DOM externo
+  // (esto SÍ está permitido en un useEffect)
   // ============================================================
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [mensajes]);
-
-  // ============================================================
-  // CARGA INICIAL
-  // ============================================================
-  useEffect(() => {
-    cargarContactos();
-  }, [cargarContactos]);
-
-  // ============================================================
-  // LIMPIAR BUSQUEDA AL SELECCIONAR CONTACTO
-  // ============================================================
-  useEffect(() => {
-    if (contactoSeleccionado) {
-      setQueryBusqueda("");
-    }
-  }, [contactoSeleccionado]);
 
   return {
     contactos,
@@ -149,7 +154,6 @@ export function useChatMessages() {
     error,
     queryBusqueda,
     messagesEndRef,
-    cargarContactos,
     buscarContactos,
     seleccionarContacto,
     enviarMensaje,

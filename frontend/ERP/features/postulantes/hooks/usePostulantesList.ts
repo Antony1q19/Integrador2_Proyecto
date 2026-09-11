@@ -1,7 +1,8 @@
 // features/postulantes/hooks/usePostulantesList.ts
 "use client";
 
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+//import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Postulante } from "../types/postulante.types";
 import { fetchPostulantes } from "../services/postulantesService";
 
@@ -254,10 +255,10 @@ export function usePostulantesList(): UsePostulantesListReturn {
   // CAMBIAR ORDEN
   // ============================================================
   const cambiarOrden = useCallback((field: SortableField) => {
-    setSortBy((prev) => field);
-    setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
-    setPage(1);
-  }, []);
+    setSortBy(field);
+  setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+  setPage(1);
+}, []);
 
   // ============================================================
   // LIMPIAR FILTROS

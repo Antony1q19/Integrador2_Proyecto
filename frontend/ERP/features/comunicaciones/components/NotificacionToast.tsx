@@ -1,7 +1,7 @@
 // features/comunicaciones/components/NotificacionToast.tsx
 "use client";
 
-import { useEffect } from "react";
+//import { useEffect } from "react";
 import { MessageCircle, X } from "lucide-react";
 import { NotificacionMensaje } from "../types/notificaciones.types";
 

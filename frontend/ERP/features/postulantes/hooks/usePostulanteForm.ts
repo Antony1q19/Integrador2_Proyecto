@@ -3,10 +3,14 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
+//import { 
+//  PostulanteFormData, 
+//  PostulanteFormErrors,
+//  FUENTES_RECLUTAMIENTO 
+//} from "../types/postulante.types";
 import { 
   PostulanteFormData, 
-  PostulanteFormErrors,
-  FUENTES_RECLUTAMIENTO 
+  PostulanteFormErrors
 } from "../types/postulante.types";
 import { crearPostulante } from "../services/postulantesService";
 import { empresasMock } from "@/features/empresas/data/mock_empresas";
