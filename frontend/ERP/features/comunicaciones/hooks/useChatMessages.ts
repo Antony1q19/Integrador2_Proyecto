@@ -15,17 +15,11 @@ export function useChatMessages() {
   const [error, setError] = useState<string | null>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
-  // Ref para evitar doble carga en desarrollo (StrictMode)
-  const hasLoadedRef = useRef(false);
 
   // ============================================================
-  // CARGAR CONTACTOS - Envuelto en una función interna
+  // CARGAR CONTACTOS - SIN hasLoadedRef (funciona con StrictMode)
   // ============================================================
   useEffect(() => {
-    if (hasLoadedRef.current) return;
-    hasLoadedRef.current = true;
-
     let cancelled = false;
 
     const cargar = async () => {
@@ -35,14 +29,12 @@ export function useChatMessages() {
         const data = await fetchContactos();
         if (!cancelled) {
           setContactos(data);
+          setLoading(false); // ✅ Solo quitar loading si no se canceló
         }
       } catch (err) {
         if (!cancelled) {
           setError("Error al cargar contactos");
           console.error(err);
-        }
-      } finally {
-        if (!cancelled) {
           setLoading(false);
         }
       }
@@ -53,7 +45,7 @@ export function useChatMessages() {
     return () => {
       cancelled = true;
     };
-  }, []); // ✅ Dependencias vacías, sin setState directo problemático
+  }, []);
 
   // ============================================================
   // BUSCAR CONTACTOS
@@ -93,7 +85,7 @@ export function useChatMessages() {
   // ============================================================
   const seleccionarContacto = useCallback(async (contacto: Contacto) => {
     setContactoSeleccionado(contacto);
-    setQueryBusqueda(""); // ✅ Mover aquí en lugar de useEffect
+    setQueryBusqueda("");
     await cargarMensajes(contacto.id);
   }, [cargarMensajes]);
 
@@ -138,8 +130,7 @@ export function useChatMessages() {
   }, [contactoSeleccionado]);
 
   // ============================================================
-  // SCROLL AUTOMÁTICO - Es una sincronización con el DOM externo
-  // (esto SÍ está permitido en un useEffect)
+  // SCROLL AUTOMÁTICO
   // ============================================================
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

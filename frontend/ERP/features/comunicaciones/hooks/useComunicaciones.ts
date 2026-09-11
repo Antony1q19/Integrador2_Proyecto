@@ -1,7 +1,7 @@
 // features/comunicaciones/hooks/useComunicaciones.ts
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect } from "react";
 import { fetchContactos, fetchPlantillas } from "../services/comunicacionesService";
 import { Contacto, PlantillaMensaje } from "../types/comunicaciones.types";
 
@@ -10,14 +10,8 @@ export function useComunicaciones() {
   const [plantillas, setPlantillas] = useState<PlantillaMensaje[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
-  const hasLoadedRef = useRef(false);
 
-  // ✅ useEffect con función interna asíncrona (no setState directo)
   useEffect(() => {
-    if (hasLoadedRef.current) return;
-    hasLoadedRef.current = true;
-
     let cancelled = false;
 
     const cargar = async () => {
@@ -31,14 +25,12 @@ export function useComunicaciones() {
         if (!cancelled) {
           setContactos(contactosData);
           setPlantillas(plantillasData);
+          setLoading(false);
         }
       } catch (err) {
         if (!cancelled) {
           setError("Error al cargar datos de comunicaciones");
           console.error(err);
-        }
-      } finally {
-        if (!cancelled) {
           setLoading(false);
         }
       }

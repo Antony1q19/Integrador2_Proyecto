@@ -9,7 +9,7 @@ export function useNotificaciones() {
   const timeoutRefs = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
   // ============================================================
-  // DECLARAR FUNCIONES PRIMERO (antes de usarlas)
+  // DECLARAR FUNCIONES PRIMERO
   // ============================================================
   const agregarNotificacion = useCallback((notif: NotificacionMensaje) => {
     setNotificaciones((prev) => [notif, ...prev]);
@@ -38,7 +38,7 @@ export function useNotificaciones() {
   }, []);
 
   // ============================================================
-  // SIMULAR RECEPCIÓN (después de declarar agregarNotificacion)
+  // SIMULAR RECEPCIÓN
   // ============================================================
   useEffect(() => {
     const interval = setInterval(() => {
@@ -62,10 +62,13 @@ export function useNotificaciones() {
     }, 15000);
 
     return () => clearInterval(interval);
-  }, [agregarNotificacion]); // ✅ Ahora agregarNotificacion ya está declarada
+  }, [agregarNotificacion]);
 
-  // Limpiar timeouts al desmontar
+  // ============================================================
+  // LIMPIAR TIMEOUTS AL DESMONTAR
+  // ============================================================
   useEffect(() => {
+    // Guardar referencia al Map actual
     const timeouts = timeoutRefs.current;
     return () => {
       timeouts.forEach((timeout) => clearTimeout(timeout));
