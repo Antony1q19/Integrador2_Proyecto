@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { loginMock } from "@/features/login/sesion/mockAuth";
+import { login } from "@/features/login/sesion/authService";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -17,9 +17,14 @@ export default function LoginForm() {
     setError("");
 
     try {
-      const user = await loginMock(email, password);
+      const user = await login(email, password);
       document.cookie = `userRole=${user.role}; path=/; max-age=86400`;
       document.cookie = `userName=${user.name}; path=/; max-age=86400`;
+      document.cookie = `userEmail=${user.email}; path=/; max-age=86400`;
+      // No es un secreto (solo IDs de empresa), por eso va en cookie
+      // normal igual que userRole/userName -la usa /empresas para
+      // filtrar qué ve cada rol que no sea Admin-.
+      document.cookie = `userEmpresas=${encodeURIComponent(JSON.stringify(user.empresasVisibles))}; path=/; max-age=86400`;
 
       // REDIRECCIÓN SEGÚN ROL (#12)
       if (user.role === 'Admin') {

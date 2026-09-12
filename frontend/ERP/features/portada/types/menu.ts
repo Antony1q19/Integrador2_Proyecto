@@ -8,7 +8,7 @@ import {
     type LucideIcon,
 } from "lucide-react";
 
-// 1. Cambiamos los tipos para que coincidan con mockAuth.ts
+// 1. Cambiamos los tipos para que coincidan con authService.ts
 export type Role = "Admin" | "RRHH" | "Supervisor";
 
 export interface MenuSubItem {

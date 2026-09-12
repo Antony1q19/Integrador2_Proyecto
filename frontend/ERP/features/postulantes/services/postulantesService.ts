@@ -19,24 +19,64 @@ import {
 import { mockPostulantes, getMockPostulanteById } from "../data/mockPostulantes";
 import { PostulanteFormData } from "../types/postulante.types";
 
-
-// Se usará al conectar cada microservicio real (ver los bloques "MODO API" comentados
-// abajo); hoy no se referencia en código activo porque todo corre en modo mock.
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const API_URL = process.env.NEXT_PUBLIC_API_URL; // ej: http://localhost:8080/api
+// NEXT_PUBLIC_API_URL ya no se usa para construir URLs (el navegador solo
+// llama a las rutas propias del servidor, ej. /api/postulantes -que son
+// las que de verdad hablan con el Gateway, con el JWT que sacan de la
+// cookie httpOnly-); acá solo funciona como interruptor mock/API.
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const LATENCIA_MOCK_MS = 400;
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+// Traduce el DTO plano que hoy devuelve servicio-postulantes al shape
+// anidado que espera el resto del Front-End (`Postulante`). Los campos
+// que todavía no existen en el backend real (evaluaciones, historial de
+// estados, pipeline por anuncio) llegan vacíos hasta que se conecte
+// servicio-procesos-seleccion.
+function mapearPostulanteDeApi(dto: Record<string, unknown>): Postulante {
+  return {
+    id: dto.id as string,
+    datosPersonales: {
+      nombres: dto.nombres as string,
+      apellidos: dto.apellidos as string,
+      documentoTipo: dto.documentoTipo as DatosPersonales["documentoTipo"],
+      documentoNumero: dto.documentoNumero as string,
+      email: dto.email as string,
+      telefono: (dto.telefono as string) ?? "",
+      fechaNacimiento: "",
+      cargoPostulado: (dto.cargoPostulado as string) ?? "",
+      empresaCliente: (dto.empresaCliente as string) ?? "",
+    },
+    estadoActual: "POSTULADO",
+    documentos: [],
+    evaluaciones: [],
+    historialEstados: [],
+    fechaRegistro: dto.fechaRegistro as string,
+    formacionAcademica: (dto.formacionAcademica as Postulante["formacionAcademica"]) ?? [],
+    idiomas: (dto.idiomas as Postulante["idiomas"]) ?? [],
+    experiencia: (dto.experiencia as Postulante["experiencia"]) ?? [],
+    procesosPostulacion: {},
+    consentimientos: {
+      tratamientoDatos: Boolean(dto.consentimientoTratamientoDatos),
+      comunicacionesComerciales: Boolean(dto.consentimientoComunicacionesComerciales),
+      fechaAceptacion: "",
+    },
+  };
+}
+
 export async function fetchPostulantes(): Promise<Postulante[]> {
-  // ---- MODO MOCK (activo ahora) ----
+  if (API_URL) {
+    // ---- MODO API (navegador -> /api/postulantes (Next.js) -> Gateway -> servicio-postulantes) ----
+    const res = await fetch("/api/postulantes");
+    if (res.status === 401) throw new Error("No hay una sesión activa. Vuelve a iniciar sesión.");
+    if (!res.ok) throw new Error("Error al obtener los postulantes");
+    const dtos: Record<string, unknown>[] = await res.json();
+    return dtos.map(mapearPostulanteDeApi);
+  }
+
+  // ---- MODO MOCK (activo por defecto, ej. `npm run dev` sin Docker) ----
   await delay(LATENCIA_MOCK_MS);
   return structuredClone(mockPostulantes);
-
-  // ---- MODO API (descomentar al integrar backend Java) ----
-  // const res = await fetch(`${API_URL}/postulantes`);
-  // if (!res.ok) throw new Error("Error al obtener los postulantes");
-  // return res.json();
 }
 
 export async function fetchPostulanteById(id: string): Promise<Postulante> {
