@@ -3,8 +3,38 @@
 
 //import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { Postulante } from "../types/postulante.types";
+import { ORDEN_PIPELINE, Postulante } from "../types/postulante.types";
 import { fetchPostulantes } from "../services/postulantesService";
+
+
+// --- Filtros dinámicos ------------------------------------------------------
+// Los tres desplegables (estado, cargo, empresa) se ajustan entre sí: las opciones de
+// cada uno son solo los valores que existen entre los postulantes que cumplen los OTROS
+// filtros ya elegidos. Ej.: si eliges una empresa, "Cargo" solo ofrece los cargos de esa
+// empresa; y si eliges un cargo, "Empresa" solo ofrece las empresas que lo tienen.
+type Faceta = "estado" | "cargo" | "empresa";
+type Seleccion = Record<Faceta, string>;
+
+const FACETAS: Faceta[] = ["estado", "cargo", "empresa"];
+const ORDEN_ESTADOS: string[] = ["NUEVO", ...ORDEN_PIPELINE, "DESCARTADO"];
+
+function valorDeFaceta(p: Postulante, faceta: Faceta): string {
+  if (faceta === "estado") return p.estadoActual;
+  if (faceta === "cargo") return p.datosPersonales.cargoPostulado;
+  return p.datosPersonales.empresaCliente;
+}
+
+function opcionesDeFaceta(postulantes: Postulante[], faceta: Faceta, seleccion: Seleccion): string[] {
+  const otras = FACETAS.filter((f) => f !== faceta && seleccion[f] !== "");
+  const valores = postulantes
+    .filter((p) => otras.every((f) => valorDeFaceta(p, f) === seleccion[f]))
+    .map((p) => valorDeFaceta(p, faceta))
+    .filter((v) => v !== "");
+  const unicos = Array.from(new Set(valores));
+  return faceta === "estado"
+    ? unicos.sort((a, b) => ORDEN_ESTADOS.indexOf(a) - ORDEN_ESTADOS.indexOf(b))
+    : unicos.sort((a, b) => a.localeCompare(b));
+}
 
 export type SortableField =
   | "fechaRegistro"
@@ -17,8 +47,6 @@ export interface FiltrosLista {
   estado: string;
   cargo: string;
   empresa: string;
-  fechaInicio: string;
-  fechaFin: string;
   search: string;
   sortBy: SortableField | "";
   sortOrder: "asc" | "desc";
@@ -58,8 +86,6 @@ export function usePostulantesList(): UsePostulantesListReturn {
   const [estado, setEstado] = useState("");
   const [cargo, setCargo] = useState("");
   const [empresa, setEmpresa] = useState("");
-  const [fechaInicio, setFechaInicio] = useState("");
-  const [fechaFin, setFechaFin] = useState("");
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<SortableField | "">("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
@@ -69,8 +95,6 @@ export function usePostulantesList(): UsePostulantesListReturn {
     estado,
     cargo,
     empresa,
-    fechaInicio,
-    fechaFin,
     search,
     sortBy,
     sortOrder,
@@ -130,14 +154,6 @@ export function usePostulantesList(): UsePostulantesListReturn {
       );
     }
 
-    // FILTRO POR FECHA
-    if (fechaInicio !== "") {
-      resultados = resultados.filter((p) => p.fechaRegistro >= fechaInicio);
-    }
-    if (fechaFin !== "") {
-      resultados = resultados.filter((p) => p.fechaRegistro <= fechaFin);
-    }
-
     // ORDENAMIENTO
     if (sortBy) {
       resultados.sort((a, b) => {
@@ -179,8 +195,6 @@ export function usePostulantesList(): UsePostulantesListReturn {
     estado,
     cargo,
     empresa,
-    fechaInicio,
-    fechaFin,
     sortBy,
     sortOrder,
   ]); // <- Dependencias individuales y estables
@@ -198,57 +212,48 @@ export function usePostulantesList(): UsePostulantesListReturn {
   // ============================================================
   // OPCIONES DE FILTROS
   // ============================================================
-  const estadosOptions = useMemo(() => {
-    return Array.from(new Set(allPostulantes.map((p) => p.estadoActual)));
-  }, [allPostulantes]);
-
-  const cargosOptions = useMemo(() => {
-    return Array.from(
-      new Set(allPostulantes.map((p) => p.datosPersonales.cargoPostulado))
-    );
-  }, [allPostulantes]);
-
-  const empresasOptions = useMemo(() => {
-    return Array.from(
-      new Set(allPostulantes.map((p) => p.datosPersonales.empresaCliente))
-    );
-  }, [allPostulantes]);
+  const seleccion: Seleccion = useMemo(() => ({ estado, cargo, empresa }), [estado, cargo, empresa]);
+  const estadosOptions = useMemo(
+    () => opcionesDeFaceta(allPostulantes, "estado", seleccion),
+    [allPostulantes, seleccion]
+  );
+  const cargosOptions = useMemo(
+    () => opcionesDeFaceta(allPostulantes, "cargo", seleccion),
+    [allPostulantes, seleccion]
+  );
+  const empresasOptions = useMemo(
+    () => opcionesDeFaceta(allPostulantes, "empresa", seleccion),
+    [allPostulantes, seleccion]
+  );
 
   // ============================================================
   // ACTUALIZAR FILTRO
   // ============================================================
   const actualizarFiltro = useCallback(
     <K extends keyof FiltrosLista>(key: K, value: FiltrosLista[K]) => {
-      // Usar los setters individuales según la key
-      switch (key) {
-        case "estado":
-          setEstado(value as string);
-          break;
-        case "cargo":
-          setCargo(value as string);
-          break;
-        case "empresa":
-          setEmpresa(value as string);
-          break;
-        case "fechaInicio":
-          setFechaInicio(value as string);
-          break;
-        case "fechaFin":
-          setFechaFin(value as string);
-          break;
-        case "search":
-          setSearch(value as string);
-          break;
-        case "sortBy":
-          setSortBy(value as SortableField | "");
-          break;
-        case "sortOrder":
-          setSortOrder(value as "asc" | "desc");
-          break;
+      if (key === "estado" || key === "cargo" || key === "empresa") {
+        // Se aplica el cambio y luego se limpian los otros desplegables cuyo valor
+        // ya no existe con esta nueva combinación (para no dejar un filtro "imposible"
+        // que muestre 0 resultados sin explicación).
+        const siguiente: Seleccion = { ...seleccion, [key]: value as string };
+        for (const otra of FACETAS.filter((f) => f !== key)) {
+          if (siguiente[otra] !== "" && !opcionesDeFaceta(allPostulantes, otra, siguiente).includes(siguiente[otra])) {
+            siguiente[otra] = "";
+          }
+        }
+        setEstado(siguiente.estado);
+        setCargo(siguiente.cargo);
+        setEmpresa(siguiente.empresa);
+      } else if (key === "search") {
+        setSearch(value as string);
+      } else if (key === "sortBy") {
+        setSortBy(value as SortableField | "");
+      } else if (key === "sortOrder") {
+        setSortOrder(value as "asc" | "desc");
       }
       setPage(1);
     },
-    []
+    [allPostulantes, seleccion]
   );
 
   // ============================================================
@@ -267,8 +272,6 @@ export function usePostulantesList(): UsePostulantesListReturn {
     setEstado("");
     setCargo("");
     setEmpresa("");
-    setFechaInicio("");
-    setFechaFin("");
     setSearch("");
     setSortBy("");
     setSortOrder("asc");

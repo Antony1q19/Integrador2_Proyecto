@@ -1,17 +1,13 @@
-import { anunciosMock } from "@/features/anuncios/data/mock-anuncios";
+import { Anuncio } from "@/features/anuncios/types/anuncio";
 import { colorEstado } from "@/features/anuncios/utils/estado";
 
 interface AnunciosPorEmpresaProps {
-  empresaId: number;
+  anuncios: Anuncio[]; // los anuncios de esa empresa
 }
 
 export default function AnunciosPorEmpresa({
-  empresaId,
+  anuncios,
 }: AnunciosPorEmpresaProps) {
-  const anuncios = anunciosMock.filter(
-    (anuncio) => anuncio.empresaId === empresaId
-  );
-
   if (anuncios.length === 0) {
     return (
       <p className="text-sm text-slate-400">

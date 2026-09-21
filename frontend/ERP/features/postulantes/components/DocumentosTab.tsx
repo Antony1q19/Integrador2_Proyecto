@@ -5,6 +5,8 @@ import { useRef, useState } from "react";
 import { DocumentoPostulante } from "../types/postulante.types";
 import { Uploader, validarArchivo } from "@/components/shared/Uploader";
 import { useProgresoSimulado } from "@/components/shared/useProgresoSimulado";
+import { descargarArchivoDelDocumento } from "../utils/archivo";
+import { VisorDocumentoModal } from "./VisorDocumentoModal";
 
 const ETIQUETAS_TIPO: Record<DocumentoPostulante["tipo"], string> = {
   CV: "CV",
@@ -46,17 +48,16 @@ export function DocumentosTab({
   const inputReemplazoRef = useRef<HTMLInputElement>(null);
   const { progreso, activo, ejecutar } = useProgresoSimulado();
 
-  const handleDescargar = (doc: DocumentoPostulante) => {
-    if (!doc.url) return;
-    const enlace = document.createElement("a");
-    enlace.href = doc.url;
-    enlace.download = doc.nombreArchivo;
-    enlace.click();
-  };
+  const [documentoAbierto, setDocumentoAbierto] = useState<DocumentoPostulante | null>(null);
+  const [errorDescarga, setErrorDescarga] = useState<string | null>(null);
 
-  const handleVer = (doc: DocumentoPostulante) => {
-    if (!doc.url) return;
-    window.open(doc.url, "_blank", "noopener,noreferrer");
+  const handleDescargar = async (doc: DocumentoPostulante) => {
+    setErrorDescarga(null);
+    try {
+      await descargarArchivoDelDocumento(doc);
+    } catch (e) {
+      setErrorDescarga(e instanceof Error ? e.message : "No se pudo descargar el documento.");
+    }
   };
 
   const abrirSelectorReemplazo = (documentoId: string) => {
@@ -124,6 +125,7 @@ export function DocumentosTab({
         }}
       />
       {errorReemplazo && <p className="text-xs text-red-600">{errorReemplazo}</p>}
+      {errorDescarga && <p className="text-xs text-red-600">{errorDescarga}</p>}
 
       {documentos.length === 0 ? (
         <p className="py-6 text-center text-sm text-gray-400">
@@ -155,7 +157,7 @@ export function DocumentosTab({
 
                   <div className="flex shrink-0 items-center gap-1">
                     <button
-                      onClick={() => handleVer(doc)}
+                      onClick={() => setDocumentoAbierto(doc)}
                       disabled={!doc.url}
                       title={doc.url ? "Ver documento" : "Sin archivo disponible (dato de ejemplo)"}
                       className="rounded-md px-2 py-1 text-xs font-medium text-gray-500 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
@@ -204,6 +206,10 @@ export function DocumentosTab({
             );
           })}
         </ul>
+      )}
+
+      {documentoAbierto && (
+        <VisorDocumentoModal documento={documentoAbierto} onCerrar={() => setDocumentoAbierto(null)} />
       )}
     </div>
   );

@@ -5,9 +5,10 @@
 // no está soportado por PATCH /usuarios/{id}).
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { X } from "lucide-react";
-import { empresasMock } from "@/features/empresas/data/mock_empresas";
+import { Empresa } from "@/features/empresas/types/empresa";
+import { fetchEmpresas } from "@/features/empresas/services/empresasApi";
 import { crearUsuario, actualizarUsuario, ROLES_INTERNOS } from "../services/usuariosService";
 import { RolInterno, Usuario } from "../types/usuario";
 
@@ -25,6 +26,27 @@ export function UsuarioFormModal({ usuarioExistente, onGuardado, onCerrar }: Usu
   const [empresasVisibles, setEmpresasVisibles] = useState<number[]>(usuarioExistente?.empresasVisibles ?? []);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState("");
+
+  // Las empresas que se pueden asignar salen de la base de datos.
+  const [empresas, setEmpresas] = useState<Empresa[]>([]);
+  const [cargandoEmpresas, setCargandoEmpresas] = useState(true);
+  const [errorEmpresas, setErrorEmpresas] = useState("");
+  useEffect(() => {
+    let cancelado = false;
+    fetchEmpresas()
+      .then((lista) => {
+        if (!cancelado) setEmpresas(lista);
+      })
+      .catch((e) => {
+        if (!cancelado) setErrorEmpresas(e instanceof Error ? e.message : "No se pudieron cargar las empresas");
+      })
+      .finally(() => {
+        if (!cancelado) setCargandoEmpresas(false);
+      });
+    return () => {
+      cancelado = true;
+    };
+  }, []);
 
   const alternarEmpresa = (empresaId: number) => {
     setEmpresasVisibles((prev) =>
@@ -118,7 +140,12 @@ export function UsuarioFormModal({ usuarioExistente, onGuardado, onCerrar }: Usu
                 Empresas que puede ver
               </label>
               <div className="space-y-1.5 max-h-40 overflow-y-auto rounded-xl border border-slate-200 p-3">
-                {empresasMock.map((empresa) => (
+                {cargandoEmpresas && <p className="text-xs text-slate-400">Cargando empresas…</p>}
+                {errorEmpresas && <p className="text-xs text-red-600">{errorEmpresas}</p>}
+                {!cargandoEmpresas && !errorEmpresas && empresas.length === 0 && (
+                  <p className="text-xs text-slate-400">Todavía no hay empresas registradas.</p>
+                )}
+                {empresas.map((empresa) => (
                   <label key={empresa.id} className="flex items-center gap-2 text-sm text-slate-700">
                     <input
                       type="checkbox"

@@ -12,7 +12,6 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Anuncio } from "@/features/anuncios/types/anuncio";
-import { anunciosMock } from "@/features/anuncios/data/mock-anuncios";
 import { EstadoProceso, Postulante } from "../types/postulante.types";
 import { ESTILOS_ESTADO } from "./EstadoBadge";
 import { OPCIONES_ESTADO } from "./EstadoSelector";
@@ -37,19 +36,24 @@ interface Tarjeta {
 }
 
 export function PostulantesPipeline() {
-  const { postulantes, loading, error, moviendoId, moverEstadoPostulacion } = usePostulantesPipeline();
+  const { postulantes, anuncios, loading, error, moviendoId, moverEstadoPostulacion } = usePostulantesPipeline();
   const { toasts, mostrarToast } = useToast();
   const [columnaSobre, setColumnaSobre] = useState<EstadoProceso | null>(null);
   const [empresaFiltro, setEmpresaFiltro] = useState<string>(TODAS_LAS_EMPRESAS);
   const [puestoFiltro, setPuestoFiltro] = useState<string>(TODOS_LOS_PUESTOS);
 
   // Una tarjeta por cada postulación (postulante + anuncio al que se
-  // presentó), no una por postulante.
+  // presentó), no una por postulante. Una postulación existe si figura en
+  // `procesosPostulacion` (datos reales) o, en modo mock, en `postulantesAsociadosIds`.
   const tarjetas: Tarjeta[] = useMemo(
     () =>
       postulantes.flatMap((postulante) =>
-        anunciosMock
-          .filter((anuncio) => anuncio.postulantesAsociadosIds.includes(postulante.id))
+        anuncios
+          .filter(
+            (anuncio) =>
+              anuncio.postulantesAsociadosIds.includes(postulante.id) ||
+              String(anuncio.id) in postulante.procesosPostulacion
+          )
           .map((anuncio) => ({
             id: `${postulante.id}:${anuncio.id}`,
             postulante,
@@ -57,15 +61,23 @@ export function PostulantesPipeline() {
             estado: postulante.procesosPostulacion[String(anuncio.id)]?.estadoActual ?? "POSTULADO",
           }))
       ),
-    [postulantes]
+    [postulantes, anuncios]
   );
 
+  // Los dos desplegables se ajustan entre sí: si eliges un puesto, "Empresa" solo ofrece
+  // las empresas que tienen ese puesto...
   const empresas = useMemo(
-    () => Array.from(new Set(tarjetas.map((t) => t.anuncio.empresaRazonSocial))).sort((a, b) => a.localeCompare(b)),
-    [tarjetas]
+    () =>
+      Array.from(
+        new Set(
+          tarjetas
+            .filter((t) => puestoFiltro === TODOS_LOS_PUESTOS || t.anuncio.cargo === puestoFiltro)
+            .map((t) => t.anuncio.empresaRazonSocial)
+        )
+      ).sort((a, b) => a.localeCompare(b)),
+    [tarjetas, puestoFiltro]
   );
-  // Los puestos se acotan a la empresa seleccionada: si eliges una empresa,
-  // el dropdown de puesto solo debe ofrecer los puestos que existen en ella.
+  // ...y si eliges una empresa, "Puesto" solo ofrece los puestos que existen en ella.
   const puestos = useMemo(
     () =>
       Array.from(

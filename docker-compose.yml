@@ -37,8 +37,8 @@ services:
       - NODE_ENV=development
 
   # --- Backend (ADR-002: microservicios detrás de un API Gateway) ---
-  # Por ahora solo existe el dominio "postulantes"; empresas-vacantes y
-  # procesos-seleccion se agregan acá cuando se creen sus microservicios.
+  # Gateway + 3 microservicios de dominio (postulantes, empresas-vacantes y
+  # procesos-seleccion), cada uno con SU base de datos dentro de Postgres.
   # Cada servicio trae su config en su propio ".env" (copiado de su
   # ".env.example"); acá solo se referencia con "env_file", nada de
   # secretos ni URLs sueltas en este archivo.
@@ -89,6 +89,38 @@ services:
       - ./backend/servicio-postulantes/app:/app/app
     env_file:
       - ./backend/servicio-postulantes/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Por ahora solo tienen TABLAS y datos de prueba (sin rutas de negocio), por
+  # eso el Gateway todavía no les reenvía peticiones.
+  servicio-empresas-vacantes:
+    container_name: empresas-vacantes-service
+    build:
+      context: ./backend
+      dockerfile: servicio-empresas-vacantes/Dockerfile
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./backend/servicio-empresas-vacantes/app:/app/app
+    env_file:
+      - ./backend/servicio-empresas-vacantes/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  servicio-procesos-seleccion:
+    container_name: procesos-seleccion-service
+    build:
+      context: ./backend
+      dockerfile: servicio-procesos-seleccion/Dockerfile
+    ports:
+      - "8003:8003"
+    volumes:
+      - ./backend/servicio-procesos-seleccion/app:/app/app
+    env_file:
+      - ./backend/servicio-procesos-seleccion/.env
     depends_on:
       postgres:
         condition: service_healthy

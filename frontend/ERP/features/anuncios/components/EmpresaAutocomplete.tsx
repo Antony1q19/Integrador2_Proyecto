@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { empresasMock } from "@/features/empresas/data/mock_empresas";
+import { Empresa } from "@/features/empresas/types/empresa";
+import { fetchEmpresas } from "@/features/empresas/services/empresasApi";
 
 interface EmpresaAutocompleteProps {
   value: number | undefined; // el empresaId seleccionado actualmente
@@ -14,17 +15,35 @@ export default function EmpresaAutocomplete({
   onChange,
   error,
 }: EmpresaAutocompleteProps) {
-  const empresaSeleccionada = empresasMock.find((e) => e.id === value);
-
-  const [busqueda, setBusqueda] = useState(
-    empresaSeleccionada?.razonSocial ?? ""
-  );
+  // Solo se ofrecen las empresas que el usuario puede ver (las trae el backend).
+  const [empresas, setEmpresas] = useState<Empresa[]>([]);
+  const [busqueda, setBusqueda] = useState("");
   const [dropdownAbierto, setDropdownAbierto] = useState(false);
   const contenedorRef = useRef<HTMLDivElement>(null);
 
-  const empresasFiltradas = empresasMock.filter((empresa) =>
+  const empresasFiltradas = empresas.filter((empresa) =>
     empresa.razonSocial.toLowerCase().includes(busqueda.toLowerCase())
   );
+
+  useEffect(() => {
+    let cancelado = false;
+    fetchEmpresas()
+      .then((lista) => {
+        if (cancelado) return;
+        setEmpresas(lista);
+        // Si ya había una empresa elegida (edición), se muestra su nombre.
+        const elegida = lista.find((e) => e.id === value);
+        if (elegida) setBusqueda(elegida.razonSocial);
+      })
+      .catch(() => {
+        // Sin lista, el desplegable mostrará "No se encontraron empresas".
+      });
+    return () => {
+      cancelado = true;
+    };
+    // Se carga una sola vez al abrir el formulario.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Cierra el dropdown si el usuario hace clic fuera del componente
   useEffect(() => {

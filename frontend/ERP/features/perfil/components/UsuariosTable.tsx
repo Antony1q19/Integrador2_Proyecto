@@ -1,8 +1,10 @@
 // features/perfil/components/UsuariosTable.tsx
 "use client";
 
+import { useEffect, useState } from "react";
 import { KeyRound, Pencil } from "lucide-react";
-import { empresasMock } from "@/features/empresas/data/mock_empresas";
+import { Empresa } from "@/features/empresas/types/empresa";
+import { fetchEmpresas } from "@/features/empresas/services/empresasApi";
 import { EstadoUsuario, Usuario } from "../types/usuario";
 
 const ESTILOS_ROL: Record<Usuario["rol"], string> = {
@@ -17,11 +19,10 @@ const ESTILOS_ESTADO: Record<EstadoUsuario, string> = {
   Eliminado: "text-red-500",
 };
 
-function nombresEmpresas(ids: number[]): string {
+// Nombres de las empresas asignadas (los ids que ya no existen en la base de datos se muestran como "#id").
+function nombresEmpresas(ids: number[], empresas: Empresa[]): string {
   if (ids.length === 0) return "—";
-  return ids
-    .map((id) => empresasMock.find((e) => e.id === id)?.razonSocial ?? `#${id}`)
-    .join(", ");
+  return ids.map((id) => empresas.find((e) => e.id === id)?.razonSocial ?? `#${id}`).join(", ");
 }
 
 interface UsuariosTableProps {
@@ -41,6 +42,22 @@ export function UsuariosTable({
   onRestablecerPassword,
   onCambiarEstado,
 }: UsuariosTableProps) {
+  // Las empresas se leen de la base de datos (solo para mostrar sus nombres).
+  const [empresas, setEmpresas] = useState<Empresa[]>([]);
+  useEffect(() => {
+    let cancelado = false;
+    fetchEmpresas()
+      .then((lista) => {
+        if (!cancelado) setEmpresas(lista);
+      })
+      .catch(() => {
+        // Si falla, se muestran los ids (#1, #2...) en vez de los nombres.
+      });
+    return () => {
+      cancelado = true;
+    };
+  }, []);
+
   if (cargando) {
     return <p className="p-6 text-center text-sm text-slate-400">Cargando trabajadores...</p>;
   }
@@ -78,7 +95,7 @@ export function UsuariosTable({
                   </span>
                 </td>
                 <td className="py-4 text-xs text-slate-500 max-w-[220px]">
-                  {usuario.rol === "Admin" ? "Todas" : nombresEmpresas(usuario.empresasVisibles)}
+                  {usuario.rol === "Admin" ? "Todas" : nombresEmpresas(usuario.empresasVisibles, empresas)}
                 </td>
                 <td className="py-4">
                   <select

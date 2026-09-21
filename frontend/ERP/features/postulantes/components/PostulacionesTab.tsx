@@ -1,18 +1,21 @@
 // features/postulantes/components/PostulacionesTab.tsx
 //
-// Muestra a qué anuncios/vacantes está asociado el postulante (relación
-// definida en `Anuncio.postulantesAsociadosIds`, la misma que gestiona
-// PostulantesAsociados.tsx desde el lado del anuncio) y el pipeline
+// Muestra a qué anuncios/vacantes se presentó el postulante y el pipeline
 // COMPLETO de cada postulación por separado: un mismo postulante puede
 // estar en "Entrevista" para un anuncio y ya "Contratado" en otro al mismo
 // tiempo, cada uno con su propia línea de tiempo e historial.
+//
+// Un anuncio se muestra si el postulante tiene una postulación a él (clave en
+// `procesosPostulacion`, que en modo API viene de servicio-procesos-seleccion)
+// o, en modo mock, si figura en `Anuncio.postulantesAsociadosIds`. Los datos del
+// anuncio (cargo, empresa, fechas) se piden con `fetchAnuncios()`.
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { anunciosMock } from "@/features/anuncios/data/mock-anuncios";
-import { EstadoAnuncio } from "@/features/anuncios/types/anuncio";
+import { Anuncio, EstadoAnuncio } from "@/features/anuncios/types/anuncio";
 import { EstadoProceso, HistorialEstado, ProcesoPostulacion } from "../types/postulante.types";
+import { fetchAnuncios } from "../services/postulantesService";
 import { EstadoBadge, ESTILOS_ESTADO } from "./EstadoBadge";
 import { EstadoSelector } from "./EstadoSelector";
 import { Timeline } from "./Timeline";
@@ -59,9 +62,32 @@ export function PostulacionesTab({
 }: PostulacionesTabProps) {
   const { toasts, mostrarToast } = useToast();
   const [comentarios, setComentarios] = useState<Record<string, string>>({});
+  const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
+  const [cargandoAnuncios, setCargandoAnuncios] = useState(true);
+  const [errorAnuncios, setErrorAnuncios] = useState<string | null>(null);
 
-  const anunciosPostulados = anunciosMock.filter((a) =>
-    a.postulantesAsociadosIds.includes(postulanteId)
+  useEffect(() => {
+    // Carga inicial de los anuncios. Los setState van dentro de las respuestas de
+    // la promesa (no directamente en el efecto); `cancelado` evita actualizar el
+    // estado si la pestaña se cierra antes de que llegue la respuesta.
+    let cancelado = false;
+    fetchAnuncios()
+      .then((lista) => {
+        if (!cancelado) setAnuncios(lista);
+      })
+      .catch((e) => {
+        if (!cancelado) setErrorAnuncios(e instanceof Error ? e.message : "No se pudieron cargar los anuncios");
+      })
+      .finally(() => {
+        if (!cancelado) setCargandoAnuncios(false);
+      });
+    return () => {
+      cancelado = true;
+    };
+  }, []);
+
+  const anunciosPostulados = anuncios.filter(
+    (a) => a.postulantesAsociadosIds.includes(postulanteId) || String(a.id) in procesosPostulacion
   );
 
   const handleCambiarEstado = async (anuncioId: string, cargo: string, estado: EstadoProceso) => {
@@ -90,6 +116,14 @@ export function PostulacionesTab({
       mostrarToast("No se pudo revertir la decisión. Intenta nuevamente.", "error");
     }
   };
+
+  if (cargandoAnuncios) {
+    return <p className="py-6 text-center text-sm text-gray-400">Cargando postulaciones…</p>;
+  }
+
+  if (errorAnuncios) {
+    return <p className="py-6 text-center text-sm text-red-500">{errorAnuncios}</p>;
+  }
 
   if (anunciosPostulados.length === 0) {
     return (

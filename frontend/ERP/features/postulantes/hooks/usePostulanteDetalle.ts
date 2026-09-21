@@ -6,7 +6,7 @@ import {
   Postulante,
   DatosPersonales,
   DocumentoPostulante,
-  Evaluacion,
+  NuevaEvaluacion,
   EstadoProceso,
 } from "../types/postulante.types";
 import {
@@ -28,7 +28,7 @@ interface UsePostulanteDetalleResult {
   subirDocumento: (archivo: File, tipo: DocumentoPostulante["tipo"]) => Promise<void>;
   reemplazarDocumento: (documentoId: string, archivo: File) => Promise<void>;
   eliminarDocumento: (documentoId: string) => Promise<void>;
-  registrarEvaluacion: (evaluacion: Omit<Evaluacion, "id">) => Promise<void>;
+  registrarEvaluacion: (evaluacion: NuevaEvaluacion) => Promise<void>;
   cambiarEstado: (estado: EstadoProceso, comentario?: string) => Promise<void>;
   actualizarEstadoPostulacion: (
     anuncioId: string,
@@ -108,7 +108,7 @@ export function usePostulanteDetalle(id: string): UsePostulanteDetalleResult {
     );
   };
 
-  const registrarEvaluacion = async (evaluacion: Omit<Evaluacion, "id">) => {
+  const registrarEvaluacion = async (evaluacion: NuevaEvaluacion) => {
     setGuardando(true);
     try {
       const nueva = await addEvaluacion(id, evaluacion);

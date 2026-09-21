@@ -1,19 +1,49 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { anunciosMock } from "@/features/anuncios/data/mock-anuncios";
+import { Anuncio } from "@/features/anuncios/types/anuncio";
+import { Empresa } from "@/features/empresas/types/empresa";
+import { fetchAnuncios } from "@/features/anuncios/services/anunciosApi";
+import { fetchEmpresas } from "@/features/empresas/services/empresasApi";
 import { useAnunciosFilters } from "@/features/anuncios/hooks/useAnunciosFilters";
 import AnunciosFiltros from "@/features/anuncios/components/AnunciosFiltros";
 import AnunciosView from "@/features/anuncios/components/AnunciosView";
 
 export default function AnunciosPage() {
+  // Los anuncios y las empresas salen de la base de datos; el backend solo entrega los de las
+  // empresas que este usuario tiene asignadas (un Admin ve todos).
+  const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
+  const [empresas, setEmpresas] = useState<Empresa[]>([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelado = false;
+    Promise.all([fetchAnuncios(), fetchEmpresas()])
+      .then(([listaAnuncios, listaEmpresas]) => {
+        if (cancelado) return;
+        setAnuncios(listaAnuncios);
+        setEmpresas(listaEmpresas);
+      })
+      .catch((e) => {
+        if (!cancelado) setError(e instanceof Error ? e.message : "No se pudieron cargar los anuncios");
+      })
+      .finally(() => {
+        if (!cancelado) setCargando(false);
+      });
+    return () => {
+      cancelado = true;
+    };
+  }, []);
+
   const {
     filtros,
     actualizarFiltro,
     limpiarFiltros,
     cargosDisponibles,
     anunciosFiltrados,
-  } = useAnunciosFilters(anunciosMock);
+  } = useAnunciosFilters(anuncios);
 
   return (
     <div className="min-h-screen bg-slate-50 p-8">
@@ -24,7 +54,7 @@ export default function AnunciosPage() {
               Anuncios
             </h1>
             <p className="mt-1 text-sm text-slate-500">
-              {anunciosFiltrados.length} de {anunciosMock.length} anuncios
+              {anunciosFiltrados.length} de {anuncios.length} anuncios
             </p>
           </div>
           <Link
@@ -35,14 +65,22 @@ export default function AnunciosPage() {
           </Link>
         </div>
 
-        <AnunciosFiltros
-          filtros={filtros}
-          actualizarFiltro={actualizarFiltro}
-          limpiarFiltros={limpiarFiltros}
-          cargosDisponibles={cargosDisponibles}
-        />
+        {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+        {cargando ? (
+          <p className="py-10 text-center text-sm text-slate-400">Cargando anuncios…</p>
+        ) : (
+          <>
+            <AnunciosFiltros
+              filtros={filtros}
+              actualizarFiltro={actualizarFiltro}
+              limpiarFiltros={limpiarFiltros}
+              cargosDisponibles={cargosDisponibles}
+              empresas={empresas}
+            />
 
-        <AnunciosView anuncios={anunciosFiltrados} />
+            <AnunciosView anuncios={anunciosFiltrados} />
+          </>
+        )}
       </div>
     </div>
   );

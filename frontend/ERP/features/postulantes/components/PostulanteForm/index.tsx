@@ -24,6 +24,8 @@ export function PostulanteForm() {
     currentSection,
     empresasOptions,
     cargosOptions,
+    cargandoOpciones,
+    errorOpciones,
     handleChange,
     handleSubmit,
     irASiguienteSeccion,
@@ -54,6 +56,8 @@ export function PostulanteForm() {
             onChange={handleChange}
             empresasOptions={empresasOptions}
             cargosOptions={cargosOptions}
+            cargandoOpciones={cargandoOpciones}
+            errorOpciones={errorOpciones}
           />
 
           {/* Error general */}

@@ -1,23 +1,32 @@
-"""Punto de entrada del API Gateway / BFF (ADR-002).
+"""Punto de arranque del GATEWAY (la "puerta de entrada" del backend).
 
-Responsabilidades: autenticación centralizada (`/api/v1/auth`), CORS, y
-enrutamiento de las peticiones del Front-End hacia cada microservicio de
-dominio (`/api/v1/{postulantes,empresas,anuncios,procesos,evaluaciones}`).
-Los Front-End (ERP y ANUNCIOS) nunca llaman a los microservicios
-directamente: siempre pasan por acá.
+¿Qué es el Gateway?
+Piensa en la recepción de un edificio de oficinas: TODOS los visitantes (los
+frontends ERP y ANUNCIOS) pasan primero por ahí, y la recepción decide a qué
+oficina (microservicio) mandarlos. Los microservicios nunca reciben visitas
+directas.
+
+El Gateway hace tres cosas:
+  1. LOGIN: comprueba usuario y contraseña y entrega un token (api/v1/auth.py).
+  2. USUARIOS: crear/editar trabajadores del ERP (api/v1/usuarios.py).
+  3. REENVÍO: revisa el token y pasa la petición al microservicio correcto
+     (api/v1/proxy.py).
+Además configura CORS: el permiso para que los frontends (puertos 3000 y 3001)
+puedan llamar a este servidor desde el navegador.
+
+Para ver todas las rutas disponibles, con el backend encendido abre:
+    http://localhost:8000/docs
 """
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import select
 
 from app.api.v1 import auth, proxy, usuarios
 from app.core.config import settings
-from app.core.database import SessionLocal, engine
+from app.core.database import engine
 from app.core.http_client import cerrar_cliente
-from app.core.security import hash_password
-from app.infrastructure.models import Usuario
+from app.infrastructure.seed import sembrar_datos_de_prueba
 from shared_kernel.database import Base
 from shared_kernel.exceptions import registrar_manejadores_excepciones
 from shared_kernel.logging import configurar_logging
@@ -25,57 +34,37 @@ from shared_kernel.logging import configurar_logging
 configurar_logging("gateway", settings.log_level)
 
 
-# Mismas 3 cuentas y mismo password genérico que
-# `features/login/sesion/mockAuth.ts` del ERP (MOCK_USERS), para que
-# cualquiera que ya usaba el mock pueda loguearse igual contra el backend
-# real sin aprender credenciales nuevas.
-_USUARIOS_SEED = [
-    {"email": "admin@test.com", "nombre": "Leonardo Morales", "rol": "Admin"},
-    {"email": "rrhh@test.com", "nombre": "Xavier Ibarra", "rol": "RRHH"},
-    {"email": "super@test.com", "nombre": "Marco Alanya", "rol": "Supervisor"},
-]
-_PASSWORD_SEED = "123456"
-
-
-async def _sembrar_usuarios_de_prueba() -> None:
-    """Solo en desarrollo: crea las 3 cuentas de arriba si no existen
-    todavía (una por rol interno del ERP). Idempotente -se puede llamar en
-    cada arranque, no duplica nada-."""
-    async with SessionLocal() as sesion:
-        for datos in _USUARIOS_SEED:
-            existente = await sesion.execute(select(Usuario).where(Usuario.email == datos["email"]))
-            if existente.scalar_one_or_none() is not None:
-                continue
-            sesion.add(
-                Usuario(
-                    email=datos["email"],
-                    nombre=datos["nombre"],
-                    password_hash=hash_password(_PASSWORD_SEED),
-                    rol=datos["rol"],
-                )
-            )
-        await sesion.commit()
-
-
+# ---------------------------------------------------------------------------
+# Qué pasa al encender y al apagar el servidor
+# ---------------------------------------------------------------------------
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # En desarrollo se crean las tablas automáticamente; en producción esto
-    # lo maneja Alembic (ver gateway/alembic/).
+    # AL ENCENDER: en modo "desarrollo" crea las tablas que falten y siembra
+    # los datos de prueba (infrastructure/seed.py). En producción, las tablas
+    # se manejarían con migraciones de Alembic (carpeta alembic/), no así.
     if settings.entorno == "desarrollo":
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
-        await _sembrar_usuarios_de_prueba()
-    yield
+        await sembrar_datos_de_prueba()
+
+    yield  # <- aquí el servidor queda funcionando y atendiendo peticiones
+
+    # AL APAGAR: cierra la conexión HTTP que usamos para hablar con los microservicios.
     await cerrar_cliente()
 
 
+# ---------------------------------------------------------------------------
+# La aplicación
+# ---------------------------------------------------------------------------
 app = FastAPI(
     title="Gateway - Sistema de Reclutamiento",
-    description="BFF que centraliza autenticación, CORS y enrutamiento hacia los microservicios de dominio.",
+    description="Puerta de entrada: login, usuarios del ERP y reenvío hacia los microservicios.",
     version="1.0.0",
     lifespan=lifespan,
 )
 
+# CORS: sin esto, el navegador bloquearía las llamadas desde los frontends.
+# Solo se permiten los orígenes escritos en CORS_ORIGINS (archivo .env).
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.lista_cors_origins,
@@ -86,15 +75,15 @@ app.add_middleware(
 
 registrar_manejadores_excepciones(app)
 
-app.include_router(auth.router, prefix="/api/v1")
-app.include_router(usuarios.router, prefix="/api/v1")
-# El catch-all de "proxy" va AL FINAL a propósito: su ruta "/{servicio}{ruta:path}"
-# matchea cualquier cosa bajo /api/v1, así que si fuera antes se comería
-# también /api/v1/usuarios (interpretándolo como un microservicio
-# inexistente llamado "usuarios" y devolviendo 404).
-app.include_router(proxy.router, prefix="/api/v1")
+# Rutas. IMPORTANTE: el orden importa. FastAPI prueba las rutas en el orden
+# en que se registran, y "proxy" acepta CUALQUIER dirección bajo /api/v1, por
+# eso tiene que ir SIEMPRE al final; si no, se "comería" /auth y /usuarios.
+app.include_router(auth.router, prefix="/api/v1")       # /api/v1/auth/...
+app.include_router(usuarios.router, prefix="/api/v1")   # /api/v1/usuarios/...
+app.include_router(proxy.router, prefix="/api/v1")      # /api/v1/postulantes/... (y lo demás)
 
 
 @app.get("/health", tags=["health"])
 async def health() -> dict:
+    """Sirve para comprobar rápido que el servicio está vivo."""
     return {"status": "ok", "servicio": "gateway"}

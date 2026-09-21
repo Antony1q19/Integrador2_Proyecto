@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { empresasMock } from "@/features/empresas/data/mock_empresas";
+import { mapearEmpresaDeApi } from "@/features/empresas/services/empresasApi";
+import { mapearAnuncioDeApi } from "@/features/anuncios/services/anunciosApi";
 import AnunciosPorEmpresa from "@/features/anuncios/components/AnunciosPorEmpresa";
+import { obtenerDelGateway } from "@/lib/datosServidor";
 
 export default async function EmpresasFicha({
     params, 
@@ -10,11 +12,16 @@ export default async function EmpresasFicha({
 }) {
     const {id} = await params;
     const empresaId = Number(id);
-    const empresa = empresasMock.find((e) => e.id === empresaId);
+    // Solo llegan las empresas que este usuario puede ver: si no está asignada, no aparece y da 404.
+    const empresasApi = (await obtenerDelGateway<Record<string, unknown>[]>("/empresas")) ?? [];
+    const empresa = empresasApi.map(mapearEmpresaDeApi).find((e) => e.id === empresaId);
 
     if (!empresa) {
         notFound();
     }
+
+    const anunciosApi = (await obtenerDelGateway<Record<string, unknown>[]>("/anuncios")) ?? [];
+    const anuncios = anunciosApi.map(mapearAnuncioDeApi).filter((a) => a.empresaId === empresa.id);
 
     return (
     <div className="min-h-screen bg-slate-50 p-8">
@@ -85,7 +92,7 @@ export default async function EmpresasFicha({
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">
             Anuncios Asociados
           </h2>
-          <AnunciosPorEmpresa empresaId={empresa.id} />
+          <AnunciosPorEmpresa anuncios={anuncios} />
         </div>
       </div>
     </div>

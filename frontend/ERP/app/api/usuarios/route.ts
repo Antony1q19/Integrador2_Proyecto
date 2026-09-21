@@ -1,6 +1,6 @@
 // app/api/usuarios/route.ts — listar (GET) y crear (POST) trabajadores.
 // Solo Admin puede llegar acá de verdad: el Gateway (servicio dueño de
-// gateway_db.usuarios) es quien lo exige con requerir_rol("Admin"); acá
+// usuario_db.usuarios) es quien lo exige con requerir_rol("Admin"); acá
 // solo se reenvía la petición ya autenticada.
 import { NextRequest, NextResponse } from "next/server";
 import { reenviarAlGateway } from "@/lib/gatewayProxy";

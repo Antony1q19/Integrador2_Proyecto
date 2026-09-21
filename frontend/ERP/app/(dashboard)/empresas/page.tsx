@@ -1,25 +1,10 @@
-import { cookies } from "next/headers";
-import { empresasMock } from "@/features/empresas/data/mock_empresas";
 import { EmpresasView } from "@/features/empresas/components/EmpresasView";
+import { mapearEmpresaDeApi } from "@/features/empresas/services/empresasApi";
+import { obtenerDelGateway } from "@/lib/datosServidor";
 
 export default async function EmpresasPage() {
-  // Las cookies "userRole"/"userEmpresas" las pone loginform.tsx al
-  // loguear (ver features/login/sesion/authService.ts -> login()); un
-  // Admin ve todas las empresas, RRHH/Supervisor solo las que un Admin
-  // les haya asignado en /perfil -> "Gestión de Trabajadores".
-  const almacenCookies = await cookies();
-  const rol = almacenCookies.get("userRole")?.value;
-
-  let empresas = empresasMock;
-  if (rol !== "Admin") {
-    let idsVisibles: number[] = [];
-    try {
-      idsVisibles = JSON.parse(almacenCookies.get("userEmpresas")?.value ?? "[]");
-    } catch {
-      idsVisibles = [];
-    }
-    empresas = empresasMock.filter((empresa) => idsVisibles.includes(empresa.id));
-  }
-
-  return <EmpresasView empresas={empresas} />;
+  // Las empresas salen de la base de datos, ya filtradas por el backend: un Admin ve todas;
+  // RRHH/Supervisor solo las que un Admin les asignó en /perfil -> "Gestión de Trabajadores".
+  const dtos = (await obtenerDelGateway<Record<string, unknown>[]>("/empresas")) ?? [];
+  return <EmpresasView empresas={dtos.map(mapearEmpresaDeApi)} />;
 }

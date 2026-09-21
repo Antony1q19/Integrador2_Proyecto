@@ -1,9 +1,8 @@
-"""Logging uniforme para los cuatro servicios (Gateway + 3 microservicios).
+"""Registro de mensajes (logs) con el mismo formato en todos los servicios.
 
-Se usa un formato JSON simple con `logging` estándar en vez de una
-dependencia adicional (structlog, etc.): es suficiente para correlacionar
-logs por `nombre_servicio` en esta etapa del curso. Se documenta como
-mejora futura en el README si el equipo necesita trazas distribuidas.
+Los logs son lo que ves en `docker logs <contenedor>`. Cada línea sale en
+formato JSON e incluye el nombre del servicio que la escribió, para saber de
+dónde viene cada mensaje cuando miras varios servicios a la vez.
 """
 import logging
 import sys

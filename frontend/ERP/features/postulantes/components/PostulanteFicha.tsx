@@ -80,9 +80,7 @@ export function PostulanteFicha({ id }: { id: string }) {
               <h1 className="text-lg font-semibold text-gray-900">
                 {d.nombres} {d.apellidos}
               </h1>
-              <p className="text-sm text-gray-500">
-                {d.cargoPostulado} · {d.empresaCliente}
-              </p>
+              <p className="text-sm text-gray-500">{d.direccion || "Dirección no registrada"}</p>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">

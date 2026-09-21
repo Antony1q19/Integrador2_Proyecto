@@ -1,22 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { mockPostulantes } from "@/features/postulantes/data/mockPostulantes";
+import { Postulante } from "@/features/postulantes/types/postulante.types";
 import AsociarPostulantesModal from "@/features/anuncios/components/AsociarPostulantesPortal";
 
 interface PostulantesAsociadosProps {
   postulantesAsociadosIds: string[];
+  postulantes: Postulante[]; // los postulantes que este usuario puede ver
 }
 
 export default function PostulantesAsociados({
   postulantesAsociadosIds,
+  postulantes,
 }: PostulantesAsociadosProps) {
   const [asociadosIds, setAsociadosIds] = useState<string[]>(
     postulantesAsociadosIds
   );
   const [modalAbierto, setModalAbierto] = useState(false);
 
-  const postulantesAsociados = mockPostulantes.filter((p) =>
+  const postulantesAsociados = postulantes.filter((p) =>
     asociadosIds.includes(p.id)
   );
 
@@ -64,7 +66,7 @@ export default function PostulantesAsociados({
 
       {modalAbierto && (
         <AsociarPostulantesModal
-          postulantesDisponibles={mockPostulantes}
+          postulantesDisponibles={postulantes}
           idsSeleccionados={asociadosIds}
           onConfirmar={handleConfirmar}
           onCerrar={() => setModalAbierto(false)}

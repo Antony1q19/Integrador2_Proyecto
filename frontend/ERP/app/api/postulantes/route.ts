@@ -8,6 +8,8 @@
 // cliente en ningún punto del flujo.
 import { NextRequest, NextResponse } from "next/server";
 
+import { reenviarAlGateway } from "@/lib/gatewayProxy";
+
 const GATEWAY_URL = process.env.GATEWAY_INTERNAL_URL;
 
 export async function GET(request: NextRequest) {
@@ -33,4 +35,21 @@ export async function GET(request: NextRequest) {
     status: respuestaGateway.status,
     headers: { "Content-Type": "application/json" },
   });
+}
+
+// POST → registra un postulante nuevo (el formulario "Nuevo postulante"). Se reenvía al
+// Gateway con el JWT de la cookie; el backend decide si se acepta (rol, duplicados...) y
+// responde con el postulante creado o con el motivo del rechazo (409 si ya existe).
+export async function POST(request: NextRequest) {
+  const token = request.cookies.get("authToken")?.value;
+  if (!token) {
+    return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+  }
+
+  const respuesta = await reenviarAlGateway(token, "/postulantes", {
+    method: "POST",
+    body: await request.text(),
+  });
+  const cuerpo = await respuesta.text();
+  return new NextResponse(cuerpo, { status: respuesta.status, headers: { "Content-Type": "application/json" } });
 }

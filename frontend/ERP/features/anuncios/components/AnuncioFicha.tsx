@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { Anuncio } from "@/features/anuncios/types/anuncio";
+import { Postulante } from "@/features/postulantes/types/postulante.types";
 import { colorEstado } from "@/features/anuncios/utils/estado";
 import PostulantesAsociados from "@/features/anuncios/components/PostulantesAsociados";
 
 interface AnuncioFichaProps {
     anuncio: Anuncio;
+    postulantes: Postulante[];
 }
 
-export default function AnuncioFicha({ anuncio }: AnuncioFichaProps) {
+export default function AnuncioFicha({ anuncio, postulantes }: AnuncioFichaProps) {
     return (
         <div className="min-h-screen bg-slate-50 p-8">
             <div className="mx-auto max-w-4xl">
@@ -91,6 +93,7 @@ export default function AnuncioFicha({ anuncio }: AnuncioFichaProps) {
                 <div className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
                     <PostulantesAsociados
                         postulantesAsociadosIds={anuncio.postulantesAsociadosIds}
+                        postulantes={postulantes}
                     />
                 </div>
             </div>

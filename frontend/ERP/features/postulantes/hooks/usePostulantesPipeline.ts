@@ -2,14 +2,16 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { Anuncio } from "@/features/anuncios/types/anuncio";
 import { EstadoProceso, Postulante } from "../types/postulante.types";
-import { fetchPostulantes, actualizarEstadoPostulacion } from "../services/postulantesService";
+import { fetchPostulantes, fetchAnuncios, actualizarEstadoPostulacion } from "../services/postulantesService";
 
-// TODO: reemplazar por el usuario real de la sesión (features/auth/hooks/useAuth)
+// Nombre para el historial en modo mock; con backend lo pone el servidor (la cuenta con sesión).
 const USUARIO_ACTUAL = "Usuario RRHH";
 
 interface UsePostulantesPipelineResult {
   postulantes: Postulante[];
+  anuncios: Anuncio[];
   loading: boolean;
   error: string | null;
   // id compuesto "<postulanteId>:<anuncioId>" de la tarjeta que se está moviendo
@@ -19,6 +21,7 @@ interface UsePostulantesPipelineResult {
 
 export function usePostulantesPipeline(): UsePostulantesPipelineResult {
   const [postulantes, setPostulantes] = useState<Postulante[]>([]);
+  const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [moviendoId, setMoviendoId] = useState<string | null>(null);
@@ -27,8 +30,11 @@ export function usePostulantesPipeline(): UsePostulantesPipelineResult {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchPostulantes();
-      setPostulantes(data);
+      // Los postulantes (con sus postulaciones) y los anuncios se piden a la vez: los
+      // anuncios dan el cargo y la empresa que se muestran en cada tarjeta.
+      const [dataPostulantes, dataAnuncios] = await Promise.all([fetchPostulantes(), fetchAnuncios()]);
+      setPostulantes(dataPostulantes);
+      setAnuncios(dataAnuncios);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error al cargar los postulantes");
     } finally {
@@ -65,5 +71,5 @@ export function usePostulantesPipeline(): UsePostulantesPipelineResult {
     }
   };
 
-  return { postulantes, loading, error, moviendoId, moverEstadoPostulacion };
+  return { postulantes, anuncios, loading, error, moviendoId, moverEstadoPostulacion };
 }

@@ -4,7 +4,21 @@ import type { NextRequest } from 'next/server'
  
 export function middleware(request: NextRequest) {
   const role = request.cookies.get('userRole')?.value;
+  const token = request.cookies.get('authToken')?.value;
   const { pathname } = request.nextUrl;
+
+  // 0. Sesión vencida: el token (cookie httpOnly) dura 1 hora y desaparece solo, pero las
+  // cookies de UI (userRole...) podrían seguir ahí. Sin token no hay sesión real: se limpian
+  // y se manda al login (si no, la pantalla cargaría y todas las llamadas darían 401).
+  if (role && !token) {
+    const respuesta = pathname.startsWith('/login')
+      ? NextResponse.next()
+      : NextResponse.redirect(new URL('/login', request.url));
+    for (const nombre of ['userRole', 'userName', 'userEmail', 'userEmpresas']) {
+      respuesta.cookies.delete(nombre);
+    }
+    return respuesta;
+  }
   
   // 1. Si no hay sesión y no está en /login, redirigir al login
   if (!role && !pathname.startsWith('/login')) {
@@ -30,10 +44,8 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/perfil', request.url));
     }
 
-    // Si es RRHH, prohibirle entrar a la configuración de sistema (ejemplo /dashboard global)
-    if (role === 'RRHH' && pathname === '/dashboard') {
-      return NextResponse.redirect(new URL('/postulantes', request.url));
-    }
+    // El Dashboard lo pueden ver los 3 roles: el backend solo entrega los datos de las empresas que
+    // cada persona tiene asignada (un Admin ve todas), así que no hace falta bloquearlo por rol.
   }
  
   return NextResponse.next();

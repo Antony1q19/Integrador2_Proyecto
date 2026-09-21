@@ -8,6 +8,8 @@ interface DatosPostulacionSectionProps {
   errors: PostulanteFormErrors;
   empresasOptions: string[];
   cargosOptions: string[];
+  cargandoOpciones: boolean;
+  errorOpciones: string | null;
   onChange: (field: keyof PostulanteFormData, value: string) => void;
 }
 
@@ -16,37 +18,16 @@ export function DatosPostulacionSection({
   errors,
   empresasOptions,
   cargosOptions,
+  cargandoOpciones,
+  errorOpciones,
   onChange,
 }: DatosPostulacionSectionProps) {
   return (
     <div className="space-y-6">
+      {errorOpciones && (
+        <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600">{errorOpciones}</p>
+      )}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        {/* Cargo Postulado */}
-        <div>
-          <label className="block text-sm font-medium text-slate-700">
-            Cargo Postulado <span className="text-red-500">*</span>
-          </label>
-          <select
-            value={formData.cargoPostulado}
-            onChange={(e) => onChange("cargoPostulado", e.target.value)}
-            className={`mt-1 w-full rounded-lg border px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 ${
-              errors.cargoPostulado
-                ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                : "border-slate-200 focus:border-indigo-500 focus:ring-indigo-200"
-            }`}
-          >
-            <option value="">Selecciona un cargo</option>
-            {cargosOptions.map((cargo) => (
-              <option key={cargo} value={cargo}>
-                {cargo}
-              </option>
-            ))}
-          </select>
-          {errors.cargoPostulado && (
-            <p className="mt-1 text-xs text-red-600">{errors.cargoPostulado}</p>
-          )}
-        </div>
-
         {/* Empresa Cliente */}
         <div>
           <label className="block text-sm font-medium text-slate-700">
@@ -54,6 +35,7 @@ export function DatosPostulacionSection({
           </label>
           <select
             value={formData.empresaCliente}
+            disabled={cargandoOpciones}
             onChange={(e) => onChange("empresaCliente", e.target.value)}
             className={`mt-1 w-full rounded-lg border px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 ${
               errors.empresaCliente
@@ -61,7 +43,7 @@ export function DatosPostulacionSection({
                 : "border-slate-200 focus:border-indigo-500 focus:ring-indigo-200"
             }`}
           >
-            <option value="">Selecciona una empresa</option>
+            <option value="">{cargandoOpciones ? "Cargando…" : "Selecciona una empresa"}</option>
             {empresasOptions.map((empresa) => (
               <option key={empresa} value={empresa}>
                 {empresa}
@@ -70,6 +52,33 @@ export function DatosPostulacionSection({
           </select>
           {errors.empresaCliente && (
             <p className="mt-1 text-xs text-red-600">{errors.empresaCliente}</p>
+          )}
+        </div>
+
+        {/* Cargo Postulado */}
+        <div>
+          <label className="block text-sm font-medium text-slate-700">
+            Cargo Postulado <span className="text-red-500">*</span>
+          </label>
+          <select
+            value={formData.cargoPostulado}
+            disabled={cargandoOpciones}
+            onChange={(e) => onChange("cargoPostulado", e.target.value)}
+            className={`mt-1 w-full rounded-lg border px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 ${
+              errors.cargoPostulado
+                ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                : "border-slate-200 focus:border-indigo-500 focus:ring-indigo-200"
+            }`}
+          >
+            <option value="">{cargandoOpciones ? "Cargando…" : "Selecciona un cargo"}</option>
+            {cargosOptions.map((cargo) => (
+              <option key={cargo} value={cargo}>
+                {cargo}
+              </option>
+            ))}
+          </select>
+          {errors.cargoPostulado && (
+            <p className="mt-1 text-xs text-red-600">{errors.cargoPostulado}</p>
           )}
         </div>
 
