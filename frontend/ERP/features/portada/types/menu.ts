@@ -1,4 +1,6 @@
 import {
+    BadgeCheck,
+    CalendarClock,
     LayoutDashboard,
     MessageCircle,
     Megaphone,
@@ -40,6 +42,18 @@ export const menuItems: MenuItem[] = [
             { name: "Listado", href: "/postulantes" },
             { name: "Pipeline", href: "/postulantes/pipeline" },
         ],
+    },
+    {
+        name: "Entrevistas",
+        href: "/entrevistas",
+        icon: CalendarClock,
+        roles: ["Admin", "RRHH", "Supervisor"],
+    },
+    {
+        name: "Contrataciones",
+        href: "/contrataciones",
+        icon: BadgeCheck,
+        roles: ["Admin", "RRHH", "Supervisor"],
     },
     {
         name: "Comunicaciones",

@@ -2,7 +2,7 @@
 //
 // Documentos (CV, DNI, imágenes...) de un postulante:
 //   GET  → lista
-//   POST → sube un archivo NUEVO (multipart). Los archivos se guardan en Cloudinary;
+//   POST → sube un archivo NUEVO (multipart). Los archivos se guardan en Supabase Storage (bucket privado);
 //          la subida la hace el backend (servicio-postulantes), que es quien tiene
 //          las claves — acá solo se reenvía el archivo tal cual, con el JWT de la
 //          cookie httpOnly (ver app/api/postulantes/[id]/route.ts).

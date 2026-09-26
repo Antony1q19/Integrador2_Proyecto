@@ -1,6 +1,6 @@
 // app/api/postulantes/[id]/documentos/[documentoId]/route.ts
 //
-// DELETE → elimina un documento (el backend también borra el archivo de Cloudinary).
+// DELETE → elimina un documento (el backend también borra el archivo del Storage).
 import { NextRequest, NextResponse } from "next/server";
 import { reenviarAlGateway } from "@/lib/gatewayProxy";
 

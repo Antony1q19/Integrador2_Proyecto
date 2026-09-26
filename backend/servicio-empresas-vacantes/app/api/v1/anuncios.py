@@ -12,7 +12,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import requerir_rol
-from app.core.database import obtener_sesion
+from app.core.database import obtener_sesion_lectura
 from app.infrastructure.models import Anuncio, Empresa
 from app.schemas.anuncio import AnuncioRespuesta
 from shared_kernel.exceptions import RecursoNoEncontrado
@@ -52,7 +52,7 @@ def _solo_los_visibles(consulta, usuario: dict):
 
 @router.get("", response_model=list[AnuncioRespuesta])
 async def listar_anuncios(
-    sesion: AsyncSession = Depends(obtener_sesion),
+    sesion: AsyncSession = Depends(obtener_sesion_lectura),
     usuario: dict = Depends(requerir_rol("Admin", "RRHH", "Supervisor")),
 ) -> list[AnuncioRespuesta]:
     resultado = await sesion.execute(_solo_los_visibles(_ANUNCIOS_CON_EMPRESA, usuario).order_by(Anuncio.id))
@@ -62,7 +62,7 @@ async def listar_anuncios(
 @router.get("/{anuncio_id}", response_model=AnuncioRespuesta)
 async def obtener_anuncio(
     anuncio_id: int,
-    sesion: AsyncSession = Depends(obtener_sesion),
+    sesion: AsyncSession = Depends(obtener_sesion_lectura),
     usuario: dict = Depends(requerir_rol("Admin", "RRHH", "Supervisor")),
 ) -> AnuncioRespuesta:
     resultado = await sesion.execute(_solo_los_visibles(_ANUNCIOS_CON_EMPRESA, usuario).where(Anuncio.id == anuncio_id))

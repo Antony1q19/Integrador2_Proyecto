@@ -17,8 +17,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar el código propio del Gateway.
 COPY gateway/app ./app
-COPY gateway/alembic.ini ./alembic.ini
-COPY gateway/alembic ./alembic
 
 # Evitar que Python cree carpetas __pycache__ (archivos .pyc de caché) dentro del
 # proyecto: no aportan nada y ensucian las carpetas. Se pone después de instalar
@@ -30,4 +28,4 @@ ENV PYTHONUNBUFFERED=1
 EXPOSE 8000
 
 # --reload: reinicia solo cuando cambias el código (cómodo para desarrollar).
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--timeout-keep-alive", "60"]

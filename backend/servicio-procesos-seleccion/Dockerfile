@@ -17,8 +17,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar el código propio del servicio.
 COPY servicio-procesos-seleccion/app ./app
-COPY servicio-procesos-seleccion/alembic.ini ./alembic.ini
-COPY servicio-procesos-seleccion/alembic ./alembic
 
 # Evitar que Python cree carpetas __pycache__ (archivos .pyc de caché) dentro del
 # proyecto. PYTHONUNBUFFERED hace que los logs salgan al instante en `docker logs`.
@@ -28,4 +26,4 @@ ENV PYTHONUNBUFFERED=1
 EXPOSE 8003
 
 # --reload: reinicia solo cuando cambias el código (cómodo para desarrollar).
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8003", "--reload"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8003", "--reload", "--timeout-keep-alive", "60"]

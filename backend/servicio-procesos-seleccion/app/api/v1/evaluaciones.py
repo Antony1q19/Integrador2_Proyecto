@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import requerir_rol
 from app.api.visibilidad import postulantes_ocultos
-from app.core.database import obtener_sesion
+from app.core.database import obtener_sesion, obtener_sesion_lectura
 from app.domain.evaluaciones import calcular_puntaje_total, calcular_resultado
 from app.infrastructure.models import Evaluacion
 from app.schemas.evaluacion import Competencias, EvaluacionCrear, EvaluacionRespuesta
@@ -48,7 +48,7 @@ def _a_respuesta(e: Evaluacion) -> EvaluacionRespuesta:
 @router.get("", response_model=list[EvaluacionRespuesta])
 async def listar_evaluaciones(
     postulanteId: str | None = None,  # opcional: si se envía, solo las de ese postulante
-    sesion: AsyncSession = Depends(obtener_sesion),
+    sesion: AsyncSession = Depends(obtener_sesion_lectura),
     usuario: dict = Depends(requerir_rol("Admin", "RRHH", "Supervisor")),
 ) -> list[EvaluacionRespuesta]:
     ocultos = await postulantes_ocultos(sesion, usuario)
@@ -102,5 +102,5 @@ async def crear_evaluacion(
     )
     sesion.add(evaluacion)
     await sesion.commit()
-    await sesion.refresh(evaluacion)  # vuelve a leerla (trae su id y su fecha)
+    # (el id y la fecha ya quedaron puestos en el objeto: no hace falta volver a leerla)
     return _a_respuesta(evaluacion)

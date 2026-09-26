@@ -10,10 +10,12 @@ shared_kernel/datos_prueba.py.
 
 Los datos son ficticios.
 """
+from datetime import datetime, timedelta, timezone
+
 from sqlalchemy import select
 
 from app.core.database import SessionLocal
-from app.infrastructure.models import Evaluacion, HistorialEstado, ProcesoPostulacion
+from app.infrastructure.models import Entrevista, Evaluacion, HistorialEstado, ProcesoPostulacion
 from shared_kernel.datos_prueba import ANUNCIO_PRUEBA_ID, POSTULANTE_PRUEBA_ID
 
 
@@ -49,6 +51,26 @@ async def sembrar_datos_de_prueba() -> None:
                     estado="POSTULADO",
                     usuario_responsable="Xavier Ibarra",
                     comentario="Postulación de prueba (seed)",
+                )
+            )
+
+        # --- Tabla `entrevistas` -------------------------------------------------
+        # Una entrevista de ejemplo (mañana a las 10:00, hora de Perú) para la postulación de prueba.
+        hay_entrevistas = await sesion.execute(select(Entrevista).where(Entrevista.proceso_id == proceso.id))
+        if hay_entrevistas.first() is None:
+            manana_10am = (datetime.now(timezone(timedelta(hours=-5))) + timedelta(days=1)).replace(
+                hour=10, minute=0, second=0, microsecond=0
+            )
+            sesion.add(
+                Entrevista(
+                    proceso_id=proceso.id,
+                    fecha_hora=manana_10am,
+                    duracion_min=45,
+                    modalidad="Virtual",
+                    lugar_o_enlace="https://meet.example.com/entrevista-de-prueba",
+                    entrevistador="Xavier Ibarra",
+                    notas="Entrevista de prueba (seed)",
+                    creado_por="Xavier Ibarra",
                 )
             )
 

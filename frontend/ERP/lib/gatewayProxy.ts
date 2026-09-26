@@ -11,13 +11,25 @@ export async function reenviarAlGateway(token: string, ruta: string, init?: Requ
   if (!GATEWAY_URL) {
     throw new Error("GATEWAY_INTERNAL_URL no está configurada en el servidor");
   }
-  return fetch(`${GATEWAY_URL}${ruta}`, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(init?.headers ?? {}),
-      Authorization: `Bearer ${token}`,
-    },
-    cache: "no-store",
-  });
+  const pedir = () =>
+    fetch(`${GATEWAY_URL}${ruta}`, {
+      ...init,
+      headers: {
+        "Content-Type": "application/json",
+        ...(init?.headers ?? {}),
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+
+  try {
+    return await pedir();
+  } catch (error) {
+    // A veces Node intenta reutilizar una conexión que el Gateway ya cerró por inactividad ("other side
+    // closed") y la petición falla sin haber llegado a ningún lado. Si es una consulta (GET), es seguro
+    // repetirla una vez sobre una conexión nueva. Lo que guarda datos (POST/PATCH/...) NO se repite.
+    const metodo = (init?.method ?? "GET").toUpperCase();
+    if (metodo === "GET" && error instanceof TypeError) return await pedir();
+    throw error;
+  }
 }

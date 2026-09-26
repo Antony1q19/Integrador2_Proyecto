@@ -5,6 +5,7 @@
 import { Anuncio } from "../types/anuncio";
 import { anunciosMock } from "../data/mock-anuncios";
 import { mensajeDeError, sesionVencida } from "@/lib/apiCliente";
+import { cargarConCache } from "@/lib/cacheCliente";
 
 // Interruptor mock/API (ver postulantesService.ts): con API se usan las rutas /api/... del ERP.
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -29,8 +30,12 @@ export function mapearAnuncioDeApi(dto: Record<string, unknown>): Anuncio {
   };
 }
 
-// Lista de anuncios (desde el navegador).
-export async function fetchAnuncios(): Promise<Anuncio[]> {
+// Lista de anuncios (desde el navegador). Se recuerda 60 s: se pide en muchas pantallas y casi no cambia.
+export function fetchAnuncios(): Promise<Anuncio[]> {
+  return cargarConCache("anuncios:lista", pedirAnuncios, 60_000);
+}
+
+async function pedirAnuncios(): Promise<Anuncio[]> {
   if (API_URL) {
     // ---- MODO API (navegador -> /api/anuncios (Next.js) -> Gateway -> servicio-empresas-vacantes) ----
     const res = await fetch("/api/anuncios");

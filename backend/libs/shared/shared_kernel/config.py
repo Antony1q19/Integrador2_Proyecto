@@ -26,6 +26,12 @@ class BaseServiceSettings(BaseSettings):
     # Dirección de la base de datos de ESTE servicio (usuario, clave, host, nombre).
     database_url: str = Field(alias="DATABASE_URL")
 
+    # Esquema (carpeta) de la base de datos donde viven las tablas de este servicio, ej.
+    # "postulantes". Vacío = el esquema normal ("public", el caso del Postgres local).
+    # Ojo: el valor que realmente se usa lo lee shared_kernel/database.py directamente de
+    # la variable de entorno; este campo solo lo deja a la vista.
+    db_schema: str | None = Field(default=None, alias="DB_SCHEMA")
+
     # Clave secreta con la que se FIRMAN los tokens de login (JWT).
     # Solo el Gateway crea tokens; los microservicios únicamente los revisan.
     jwt_secret: str = Field(alias="JWT_SECRET")

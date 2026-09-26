@@ -10,18 +10,23 @@ Tablas de este servicio:
   - historial_estados    → el registro de cada cambio de etapa de una postulación.
   - evaluaciones         → las evaluaciones por competencias que RRHH hace a un
                            postulante (puntaje y resultado Apto / No apto).
+  - entrevistas          → las entrevistas programadas de una postulación (cuándo,
+                           dónde, con quién y cómo salió).
+  - contrataciones       → cuando una postulación termina en "Contratado": fecha de
+                           ingreso, cargo final, tipo de contrato y salario.
+  - seguimientos_postingreso → los controles después de que la persona ingresa
+                           (a los 30, 60 y 90 días): si se adaptó, observaciones.
 
 IMPORTANTE: el postulante y el anuncio viven en OTROS servicios (con otras bases
 de datos). Aquí solo se guardan sus ids (`postulante_id`, `anuncio_id`) como
 referencia, sin llave foránea: la base de datos no puede comprobar que existan,
 esa comprobación la hará la lógica del servicio cuando se escriba.
 
-Solo son las TABLAS: todavía no hay rutas que las usen.
 """
 import uuid
 from datetime import date, datetime, timedelta, timezone
 
-from sqlalchemy import Date, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import Date, DateTime, ForeignKey, Integer, Numeric, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from shared_kernel.database import Base
@@ -120,3 +125,97 @@ class Evaluacion(Base):
     resultado: Mapped[str] = mapped_column(String(10), nullable=False)
 
     comentarios: Mapped[str] = mapped_column(Text, nullable=True)
+
+
+class Entrevista(Base):
+    """Una entrevista de una postulación (un postulante puede tener varias, incluso para el mismo anuncio)."""
+
+    __tablename__ = "entrevistas"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_nuevo_id)
+
+    # A qué postulación (postulante + anuncio) pertenece.
+    proceso_id: Mapped[str] = mapped_column(ForeignKey("procesos_postulacion.id"), nullable=False, index=True)
+
+    fecha_hora: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
+    duracion_min: Mapped[int] = mapped_column(Integer, nullable=False, default=30)
+
+    # Presencial | Virtual | Telefónica
+    modalidad: Mapped[str] = mapped_column(String(20), nullable=False)
+    # Dirección (si es presencial) o enlace de la videollamada (si es virtual).
+    lugar_o_enlace: Mapped[str] = mapped_column(String(500), nullable=True)
+    entrevistador: Mapped[str] = mapped_column(String(150), nullable=False)
+
+    # Programada | Realizada | Cancelada | No asistió
+    estado: Mapped[str] = mapped_column(String(20), nullable=False, default="Programada")
+    # Solo cuando ya se realizó: Aprobada | No aprobada | Pendiente de decisión
+    resultado: Mapped[str] = mapped_column(String(30), nullable=True)
+    notas: Mapped[str] = mapped_column(Text, nullable=True)
+
+    creado_por: Mapped[str] = mapped_column(String(150), nullable=False)
+    fecha_creacion: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+
+    proceso: Mapped[ProcesoPostulacion] = relationship()
+
+
+class Contratacion(Base):
+    """Los datos de la contratación de una postulación que terminó en "Contratado" (una sola por postulación)."""
+
+    __tablename__ = "contrataciones"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_nuevo_id)
+    # unique=True → una postulación solo puede tener UNA contratación.
+    proceso_id: Mapped[str] = mapped_column(
+        ForeignKey("procesos_postulacion.id"), nullable=False, unique=True, index=True
+    )
+
+    fecha_ingreso: Mapped[date] = mapped_column(Date, nullable=False)
+    cargo: Mapped[str] = mapped_column(String(150), nullable=False)  # cargo final (puede diferir del anuncio)
+    # Plazo fijo | Plazo indeterminado | Locación de servicios | Prácticas | Otro
+    tipo_contrato: Mapped[str] = mapped_column(String(30), nullable=False)
+    salario: Mapped[float] = mapped_column(Numeric(10, 2), nullable=True)
+    moneda: Mapped[str] = mapped_column(String(3), nullable=False, default="PEN")
+
+    # Por ingresar | Activo | Finalizado | Cancelado
+    estado: Mapped[str] = mapped_column(String(20), nullable=False, default="Por ingresar")
+    observaciones: Mapped[str] = mapped_column(Text, nullable=True)
+
+    creado_por: Mapped[str] = mapped_column(String(150), nullable=False)
+    fecha_creacion: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+
+    proceso: Mapped[ProcesoPostulacion] = relationship()
+    seguimientos: Mapped[list["SeguimientoPostingreso"]] = relationship(
+        back_populates="contratacion",
+        cascade="all, delete-orphan",
+        order_by="SeguimientoPostingreso.fecha_programada",
+    )
+
+
+class SeguimientoPostingreso(Base):
+    """Un control después del ingreso (a los 30, 60 o 90 días, o uno adicional)."""
+
+    __tablename__ = "seguimientos_postingreso"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_nuevo_id)
+    contratacion_id: Mapped[str] = mapped_column(ForeignKey("contrataciones.id"), nullable=False, index=True)
+
+    hito_dias: Mapped[int] = mapped_column(Integer, nullable=False)  # 30, 60, 90...
+    fecha_programada: Mapped[date] = mapped_column(Date, nullable=False, index=True)
+    fecha_realizada: Mapped[date] = mapped_column(Date, nullable=True)
+
+    # Pendiente | Realizado | Omitido
+    estado: Mapped[str] = mapped_column(String(20), nullable=False, default="Pendiente")
+    # Solo al realizarlo: Satisfactorio | Con observaciones | Insatisfactorio
+    valoracion: Mapped[str] = mapped_column(String(20), nullable=True)
+    observaciones: Mapped[str] = mapped_column(Text, nullable=True)
+    realizado_por: Mapped[str] = mapped_column(String(150), nullable=True)
+
+    fecha_creacion: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+
+    contratacion: Mapped[Contratacion] = relationship(back_populates="seguimientos")

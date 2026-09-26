@@ -10,25 +10,12 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { reenviarAlGateway } from "@/lib/gatewayProxy";
 
-const GATEWAY_URL = process.env.GATEWAY_INTERNAL_URL;
-
 export async function GET(request: NextRequest) {
   const token = request.cookies.get("authToken")?.value;
   if (!token) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 });
   }
-  if (!GATEWAY_URL) {
-    return NextResponse.json(
-      { error: "GATEWAY_INTERNAL_URL no está configurada en el servidor" },
-      { status: 500 }
-    );
-  }
-
-  const respuestaGateway = await fetch(`${GATEWAY_URL}/postulantes`, {
-    headers: { Authorization: `Bearer ${token}` },
-    // Sin caché: la lista de postulantes puede cambiar entre requests.
-    cache: "no-store",
-  });
+  const respuestaGateway = await reenviarAlGateway(token, "/postulantes");
 
   const cuerpo = await respuestaGateway.text();
   return new NextResponse(cuerpo, {

@@ -33,6 +33,7 @@ COMPETENCIAS = [
 
 MAXIMO_DIAS_DE_RANGO = 1830  # unos 5 años
 CANTIDAD_ACTIVIDAD_RECIENTE = 8
+CANTIDAD_AGENDA = 6  # cuántas entrevistas / controles próximos se listan en el Dashboard
 
 
 def limites_del_rango(desde: date, hasta: date) -> tuple[datetime, datetime]:
@@ -85,6 +86,10 @@ def calcular_dashboard(
     contrataciones: dict[str, datetime],
     eventos: list[dict[str, Any]],
     evaluaciones: list[dict[str, Any]],
+    entrevistas: list[dict[str, Any]] | None = None,
+    contrataciones_registradas: list[dict[str, Any]] | None = None,
+    seguimientos_pendientes: list[dict[str, Any]] | None = None,
+    ahora: datetime | None = None,
 ) -> dict[str, Any]:
     """Arma todos los indicadores del Dashboard.
 
@@ -93,6 +98,10 @@ def calcular_dashboard(
     contrataciones: {id de la postulación: fecha en que se marcó "Contratado"} (solo las que hoy están Contratadas)
     eventos:        [{procesoId, estado, fecha, usuario}]   (cambios de etapa, para la actividad reciente)
     evaluaciones:   [{puntaje, resultado, competencias: {...}}]  (ya filtradas por rango y empresa)
+    entrevistas:    [{id, procesoId, fecha, estado, modalidad}]   (todas las de esas postulaciones)
+    contrataciones_registradas: [{procesoId, estado}]              (para contar los "por ingresar")
+    seguimientos_pendientes:   [{id, procesoId, hitoDias, fecha}]  (controles post-ingreso "Pendiente"; fecha = date)
+    ahora:          el momento actual (se puede fijar para probar; por defecto, ahora mismo)
     """
     inicio, fin = limites_del_rango(desde, hasta)
     anuncio_por_id = {a["id"]: a for a in anuncios}
@@ -251,6 +260,52 @@ def calcular_dashboard(
             }
         )
 
+    # --- Agenda: entrevistas y seguimientos post-ingreso ----------------------
+    # Estos indicadores son "de hoy en adelante" (una foto del momento), no dependen del rango de fechas,
+    # salvo las entrevistas realizadas, que sí se cuentan dentro del rango.
+    ahora = ahora or datetime.now(ZONA_PERU)
+    hoy = ahora.astimezone(ZONA_PERU).date()
+    inicio_de_hoy = datetime.combine(hoy, time.min, ZONA_PERU)
+    entrevistas = entrevistas or []
+    programadas = sorted(
+        (e for e in entrevistas if e["estado"] == "Programada" and e["fecha"] >= inicio_de_hoy),
+        key=lambda e: e["fecha"],
+    )
+    seguimientos_pendientes = sorted(seguimientos_pendientes or [], key=lambda s: s["fecha"])
+
+    resumen["entrevistasHoy"] = sum(1 for e in programadas if e["fecha"].astimezone(ZONA_PERU).date() == hoy)
+    resumen["entrevistasProximas"] = sum(1 for e in programadas if e["fecha"] < inicio_de_hoy + timedelta(days=8))
+    resumen["entrevistasRealizadas"] = sum(1 for e in entrevistas if e["estado"] == "Realizada" and inicio <= e["fecha"] < fin)
+    resumen["seguimientosPendientes"] = len(seguimientos_pendientes)
+    resumen["seguimientosVencidos"] = sum(1 for s in seguimientos_pendientes if s["fecha"] < hoy)
+    resumen["ingresosPorIniciar"] = sum(1 for c in (contrataciones_registradas or []) if c["estado"] == "Por ingresar")
+
+    def datos_de(proceso_id: str) -> dict[str, Any]:
+        proceso = proceso_por_id.get(proceso_id)
+        anuncio = anuncio_por_id.get(proceso["anuncioId"], {}) if proceso else {}
+        return {
+            "postulanteId": proceso["postulanteId"] if proceso else "",
+            "cargo": anuncio.get("cargo", ""),
+            "empresa": anuncio.get("empresaRazonSocial", ""),
+        }
+
+    agenda = {
+        "proximasEntrevistas": [
+            {"id": e["id"], "fechaHora": e["fecha"].isoformat(), "modalidad": e["modalidad"], **datos_de(e["procesoId"])}
+            for e in programadas[:CANTIDAD_AGENDA]
+        ],
+        "seguimientosPorHacer": [
+            {
+                "id": s["id"],
+                "hitoDias": s["hitoDias"],
+                "fechaProgramada": s["fecha"].isoformat(),
+                "vencido": s["fecha"] < hoy,
+                **datos_de(s["procesoId"]),
+            }
+            for s in seguimientos_pendientes[:CANTIDAD_AGENDA]
+        ],
+    }
+
     return {
         "rango": {"desde": desde.isoformat(), "hasta": hasta.isoformat(), "granularidad": granularidad},
         "resumen": resumen,
@@ -260,4 +315,5 @@ def calcular_dashboard(
         "porAnuncio": por_anuncio,
         "competencias": competencias,
         "actividad": actividad,
+        "agenda": agenda,
     }

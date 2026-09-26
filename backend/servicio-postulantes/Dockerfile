@@ -17,8 +17,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar el código propio del servicio.
 COPY servicio-postulantes/app ./app
-COPY servicio-postulantes/alembic.ini ./alembic.ini
-COPY servicio-postulantes/alembic ./alembic
 
 # Evitar que Python cree carpetas __pycache__ (archivos .pyc de caché) dentro del
 # proyecto: no aportan nada y ensucian las carpetas. Se pone después de instalar
@@ -30,4 +28,4 @@ ENV PYTHONUNBUFFERED=1
 EXPOSE 8001
 
 # --reload: reinicia solo cuando cambias el código (cómodo para desarrollar).
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001", "--reload"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001", "--reload", "--timeout-keep-alive", "60"]

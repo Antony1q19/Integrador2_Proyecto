@@ -38,28 +38,11 @@ services:
 
   # --- Backend (ADR-002: microservicios detrás de un API Gateway) ---
   # Gateway + 3 microservicios de dominio (postulantes, empresas-vacantes y
-  # procesos-seleccion), cada uno con SU base de datos dentro de Postgres.
+  # procesos-seleccion). La base de datos NO corre en Docker: es Supabase (2 proyectos),
+  # cada servicio con su propio esquema; se configura con DATABASE_URL y DB_SCHEMA en su ".env".
   # Cada servicio trae su config en su propio ".env" (copiado de su
   # ".env.example"); acá solo se referencia con "env_file", nada de
   # secretos ni URLs sueltas en este archivo.
-
-  postgres:
-    image: postgres:16-alpine
-    container_name: postgres-db
-    env_file:
-      - ./backend/infra/postgres/.env
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-      # Solo corre la primera vez que se crea el volumen: crea un usuario
-      # y una base de datos por microservicio.
-      - ./backend/infra/postgres-init:/docker-entrypoint-initdb.d
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
 
   gateway:
     container_name: gateway-service
@@ -73,8 +56,6 @@ services:
     env_file:
       - ./backend/gateway/.env
     depends_on:
-      postgres:
-        condition: service_healthy
       servicio-postulantes:
         condition: service_started
 
@@ -89,9 +70,6 @@ services:
       - ./backend/servicio-postulantes/app:/app/app
     env_file:
       - ./backend/servicio-postulantes/.env
-    depends_on:
-      postgres:
-        condition: service_healthy
 
   # Por ahora solo tienen TABLAS y datos de prueba (sin rutas de negocio), por
   # eso el Gateway todavía no les reenvía peticiones.
@@ -106,9 +84,6 @@ services:
       - ./backend/servicio-empresas-vacantes/app:/app/app
     env_file:
       - ./backend/servicio-empresas-vacantes/.env
-    depends_on:
-      postgres:
-        condition: service_healthy
 
   servicio-procesos-seleccion:
     container_name: procesos-seleccion-service
@@ -121,9 +96,3 @@ services:
       - ./backend/servicio-procesos-seleccion/app:/app/app
     env_file:
       - ./backend/servicio-procesos-seleccion/.env
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-volumes:
-  pgdata:

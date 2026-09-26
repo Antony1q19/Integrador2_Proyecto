@@ -5,18 +5,23 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePostulanteDetalle } from "../hooks/usePostulanteDetalle";
 import { EstadoBadge } from "./EstadoBadge";
+import { Skeleton } from "@/components/shared/Skeleton";
 import { DatosPersonalesTab } from "./DatosPersonalesTab";
 import { DocumentosTab } from "./DocumentosTab";
 import { EvaluacionesTab } from "./EvaluacionesTab";
 import { PostulacionesTab } from "./PostulacionesTab";
+import { EntrevistasTab } from "@/features/entrevistas/components/EntrevistasTab";
+import { ContratacionTab } from "@/features/contrataciones/components/ContratacionTab";
 
-type TabId = "datos" | "documentos" | "evaluaciones" | "postulaciones";
+type TabId = "datos" | "documentos" | "evaluaciones" | "postulaciones" | "entrevistas" | "contratacion";
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "datos", label: "Datos personales" },
   { id: "documentos", label: "Documentos" },
   { id: "evaluaciones", label: "Evaluaciones" },
   { id: "postulaciones", label: "Dónde ha postulado" },
+  { id: "entrevistas", label: "Entrevistas" },
+  { id: "contratacion", label: "Contratación" },
 ];
 
 function iniciales(nombres: string, apellidos: string) {
@@ -36,14 +41,43 @@ export function PostulanteFicha({ id }: { id: string }) {
     eliminarDocumento,
     registrarEvaluacion,
     actualizarEstadoPostulacion,
+    refrescar,
   } = usePostulanteDetalle(id);
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-5xl animate-pulse space-y-4 p-6">
-        <div className="h-24 rounded-xl bg-gray-100" />
-        <div className="h-10 rounded-lg bg-gray-100" />
-        <div className="h-64 rounded-xl bg-gray-100" />
+      <div aria-hidden className="mx-auto max-w-5xl space-y-6 p-6">
+        <Skeleton className="h-4 w-16" />
+        <div className="flex items-center justify-between gap-4 rounded-xl border border-gray-100 bg-white p-6">
+          <div className="flex items-center gap-4">
+            <Skeleton className="h-12 w-12 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-5 w-48" />
+              <Skeleton className="h-4 w-64" />
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Skeleton className="h-7 w-24 rounded-full" />
+            <Skeleton className="h-9 w-32" />
+          </div>
+        </div>
+        <div className="rounded-xl border border-gray-100 bg-white">
+          <div className="flex gap-2 border-b border-gray-100 px-4 py-3.5">
+            {["w-28", "w-20", "w-24", "w-20", "w-24"].map((ancho, i) => (
+              <Skeleton key={i} className={`h-4 ${ancho}`} />
+            ))}
+          </div>
+          <div className="space-y-5 p-6">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="space-y-2">
+                  <Skeleton className="h-3 w-24" />
+                  <Skeleton className="h-9 w-full" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -141,12 +175,16 @@ export function PostulanteFicha({ id }: { id: string }) {
           )}
           {tabActivo === "postulaciones" && (
             <PostulacionesTab
+              nombrePostulante={`${d.nombres} ${d.apellidos}`}
+              onContratado={refrescar}
               postulanteId={postulante.id}
               procesosPostulacion={postulante.procesosPostulacion}
               guardando={guardando}
               onActualizarEstado={actualizarEstadoPostulacion}
             />
           )}
+          {tabActivo === "entrevistas" && <EntrevistasTab postulanteId={postulante.id} onCambio={refrescar} />}
+          {tabActivo === "contratacion" && <ContratacionTab postulanteId={postulante.id} onCambio={refrescar} />}
         </div>
       </div>
     </div>

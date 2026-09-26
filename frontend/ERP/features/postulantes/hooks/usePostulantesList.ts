@@ -2,9 +2,10 @@
 "use client";
 
 //import { useState, useEffect, useCallback, useMemo, useRef } from "react";
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { ORDEN_PIPELINE, Postulante } from "../types/postulante.types";
 import { fetchPostulantes } from "../services/postulantesService";
+import { useCargaConCache } from "@/lib/cacheCliente";
 
 
 // --- Filtros dinámicos ------------------------------------------------------
@@ -76,9 +77,14 @@ interface UsePostulantesListReturn {
 }
 
 export function usePostulantesList(): UsePostulantesListReturn {
-  const [allPostulantes, setAllPostulantes] = useState<Postulante[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // La lista se recuerda entre visitas: al volver a esta pantalla se ve AL INSTANTE la de la vez anterior y
+  // se actualiza sola en segundo plano (ver lib/cacheCliente.ts). Solo hay "cargando" la primera vez.
+  const { datos, cargando: loading, error: errorCarga, recargar } = useCargaConCache<Postulante[]>(
+    "postulantes:lista",
+    fetchPostulantes
+  );
+  const allPostulantes = useMemo(() => datos ?? [], [datos]);
+  const error = errorCarga ? "Error al cargar los postulantes" : null;
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   
@@ -99,24 +105,6 @@ export function usePostulantesList(): UsePostulantesListReturn {
     sortBy,
     sortOrder,
   };
-
-  // Cargar datos (solo una vez)
-  useEffect(() => {
-    const cargarDatos = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await fetchPostulantes();
-        setAllPostulantes(data);
-      } catch (err) {
-        console.error("Error al cargar postulantes:", err);
-        setError("Error al cargar los postulantes");
-      } finally {
-        setLoading(false);
-      }
-    };
-    cargarDatos();
-  }, []); // <- Dependencias vacías = solo una vez
 
   // ============================================================
   // FILTRADO Y ORDENAMIENTO - Con dependencias individuales
@@ -276,23 +264,6 @@ export function usePostulantesList(): UsePostulantesListReturn {
     setSortBy("");
     setSortOrder("asc");
     setPage(1);
-  }, []);
-
-  // ============================================================
-  // RECARGAR
-  // ============================================================
-  const recargar = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await fetchPostulantes();
-      setAllPostulantes(data);
-    } catch (err) {
-      console.error("Error al cargar postulantes:", err);
-      setError("Error al cargar los postulantes");
-    } finally {
-      setLoading(false);
-    }
   }, []);
 
   // ============================================================

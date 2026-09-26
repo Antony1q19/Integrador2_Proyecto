@@ -11,7 +11,7 @@
 // anuncio (cargo, empresa, fechas) se piden con `fetchAnuncios()`.
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Anuncio, EstadoAnuncio } from "@/features/anuncios/types/anuncio";
 import { EstadoProceso, HistorialEstado, ProcesoPostulacion } from "../types/postulante.types";
@@ -20,6 +20,9 @@ import { EstadoBadge, ESTILOS_ESTADO } from "./EstadoBadge";
 import { EstadoSelector } from "./EstadoSelector";
 import { Timeline } from "./Timeline";
 import { useToast, ToastContainer } from "@/components/shared/Toast";
+import { ContratacionModal } from "@/features/contrataciones/components/ContratacionModal";
+import { Skeleton } from "@/components/shared/Skeleton";
+import { useCargaConCache } from "@/lib/cacheCliente";
 
 const ESTILOS_ESTADO_ANUNCIO: Record<EstadoAnuncio, string> = {
   Abierto: "bg-emerald-50 text-emerald-700",
@@ -34,6 +37,9 @@ interface PostulacionesTabProps {
   procesosPostulacion: Record<string, ProcesoPostulacion>;
   guardando: boolean;
   onActualizarEstado: (anuncioId: string, estado: EstadoProceso, comentario?: string) => Promise<void>;
+  nombrePostulante?: string;
+  // Se llama después de registrar una contratación (cambia la etapa de la postulación en el servidor).
+  onContratado?: () => void;
 }
 
 function HistorialPostulacion({ historial }: { historial: HistorialEstado[] }) {
@@ -59,32 +65,19 @@ export function PostulacionesTab({
   procesosPostulacion,
   guardando,
   onActualizarEstado,
+  nombrePostulante,
+  onContratado,
 }: PostulacionesTabProps) {
+  const [contratando, setContratando] = useState<{ anuncioId: string; cargo: string } | null>(null);
   const { toasts, mostrarToast } = useToast();
   const [comentarios, setComentarios] = useState<Record<string, string>>({});
-  const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
-  const [cargandoAnuncios, setCargandoAnuncios] = useState(true);
-  const [errorAnuncios, setErrorAnuncios] = useState<string | null>(null);
-
-  useEffect(() => {
-    // Carga inicial de los anuncios. Los setState van dentro de las respuestas de
-    // la promesa (no directamente en el efecto); `cancelado` evita actualizar el
-    // estado si la pestaña se cierra antes de que llegue la respuesta.
-    let cancelado = false;
-    fetchAnuncios()
-      .then((lista) => {
-        if (!cancelado) setAnuncios(lista);
-      })
-      .catch((e) => {
-        if (!cancelado) setErrorAnuncios(e instanceof Error ? e.message : "No se pudieron cargar los anuncios");
-      })
-      .finally(() => {
-        if (!cancelado) setCargandoAnuncios(false);
-      });
-    return () => {
-      cancelado = true;
-    };
-  }, []);
+  // Los anuncios se recuerdan entre pantallas (ver lib/cacheCliente.ts): casi siempre ya están cargados.
+  const { datos: anunciosCargados, cargando: cargandoAnuncios, error: errorAnuncios } = useCargaConCache<Anuncio[]>(
+    "anuncios:lista",
+    fetchAnuncios,
+    30_000
+  );
+  const anuncios = anunciosCargados ?? [];
 
   const anunciosPostulados = anuncios.filter(
     (a) => a.postulantesAsociadosIds.includes(postulanteId) || String(a.id) in procesosPostulacion
@@ -101,6 +94,11 @@ export function PostulacionesTab({
   };
 
   const handleDecisionFinal = async (anuncioId: string, cargo: string, estado: "CONTRATADO" | "DESCARTADO") => {
+    if (estado === "CONTRATADO") {
+      // Contratar pide los datos de la contratación (ingreso, tipo de contrato, salario): se abre su ventana.
+      setContratando({ anuncioId, cargo });
+      return;
+    }
     const confirmado = window.confirm(
       `¿Confirmas marcar la postulación a "${cargo}" como "${ESTILOS_ESTADO[estado].label}"?`
     );
@@ -118,7 +116,24 @@ export function PostulacionesTab({
   };
 
   if (cargandoAnuncios) {
-    return <p className="py-6 text-center text-sm text-gray-400">Cargando postulaciones…</p>;
+    return (
+      <div aria-hidden className="space-y-4">
+        {[1, 2].map((i) => (
+          <div key={i} className="space-y-4 rounded-lg border border-gray-100 p-4">
+            <div className="flex items-start justify-between">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-56" />
+                <Skeleton className="h-3.5 w-40" />
+                <Skeleton className="h-3 w-64" />
+              </div>
+              <Skeleton className="h-6 w-16 rounded-full" />
+            </div>
+            <Skeleton className="h-8 w-full" />
+            <Skeleton className="h-12 w-full" />
+          </div>
+        ))}
+      </div>
+    );
   }
 
   if (errorAnuncios) {
@@ -218,6 +233,21 @@ export function PostulacionesTab({
           );
         })}
       </ul>
+
+      {contratando && (
+        <ContratacionModal
+          postulanteId={postulanteId}
+          anuncioId={Number(contratando.anuncioId)}
+          cargoSugerido={contratando.cargo}
+          nombrePostulante={nombrePostulante}
+          onCerrar={() => setContratando(null)}
+          onGuardada={() => {
+            setContratando(null);
+            mostrarToast(`Contratación registrada: "${contratando.cargo}" pasó a "Contratado"`, "success");
+            onContratado?.();
+          }}
+        />
+      )}
 
       <ToastContainer toasts={toasts} />
     </div>

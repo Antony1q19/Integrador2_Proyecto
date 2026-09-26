@@ -6,8 +6,11 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
+import Link from "next/link";
 import {
+  BadgeCheck,
   Briefcase,
+  CalendarClock,
   ClipboardCheck,
   Timer,
   Trophy,
@@ -22,11 +25,13 @@ import { DashboardDatos, FiltrosDashboard as Filtros } from "../types/dashboard"
 import { useDashboard } from "../hooks/useDashboard";
 import { aTexto, formatoCompleto, sumarDias } from "../utils/fechas";
 import { descargarReporteCsv } from "../utils/exportarCsv";
+import { formatoFecha, formatoFechaHora } from "@/lib/fechasLima";
 import { FiltrosDashboard } from "./FiltrosDashboard";
 import { KpiCard } from "./KpiCard";
 import { EmbudoSeleccion } from "./EmbudoSeleccion";
 import { SerieTemporal } from "./SerieTemporal";
 import { CompetenciasBarras, ListaActividad, TablaAnuncios, TablaEmpresas } from "./TablasDashboard";
+import { DashboardSkeleton, TarjetasDashboardSkeleton } from "./DashboardSkeleton";
 
 // La fecha de hoy solo existe en el navegador (en el servidor podría ser otro día por la zona
 // horaria); con useSyncExternalStore el servidor no la dibuja y se evita un desajuste al cargar.
@@ -134,6 +139,91 @@ export function IndicadoresDashboard({
         />
       </div>
 
+      {/* Entrevistas y seguimiento post-ingreso */}
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
+        <KpiCard
+          titulo="Entrevistas de hoy"
+          valor={String(r.entrevistasHoy)}
+          detalle={`${r.entrevistasProximas} en los próximos 7 días`}
+          icono={CalendarClock}
+          color="from-cyan-500 to-blue-500"
+          ayuda="Entrevistas programadas (foto de hoy, no depende del rango de fechas)."
+        />
+        <KpiCard
+          titulo="Entrevistas realizadas"
+          valor={String(r.entrevistasRealizadas)}
+          detalle="Dentro del rango de fechas"
+          icono={ClipboardCheck}
+          color="from-teal-500 to-emerald-400"
+        />
+        <KpiCard
+          titulo="Ingresos por iniciar"
+          valor={String(r.ingresosPorIniciar)}
+          detalle="Contratados que aún no ingresan"
+          icono={BadgeCheck}
+          color="from-lime-500 to-green-500"
+        />
+        <KpiCard
+          titulo="Controles post-ingreso"
+          valor={String(r.seguimientosPendientes)}
+          detalle={r.seguimientosVencidos > 0 ? `${r.seguimientosVencidos} vencido${r.seguimientosVencidos === 1 ? "" : "s"}` : "Ninguno vencido"}
+          icono={Hourglass}
+          color={r.seguimientosVencidos > 0 ? "from-rose-500 to-pink-400" : "from-slate-400 to-slate-500"}
+          ayuda="Controles a los 30, 60 y 90 días de personas contratadas que aún están pendientes."
+        />
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <Tarjeta titulo="Próximas entrevistas" subtitulo="Las siguientes entrevistas programadas">
+          {datos.agenda.proximasEntrevistas.length === 0 ? (
+            <p className="py-6 text-center text-sm text-slate-400">No hay entrevistas programadas.</p>
+          ) : (
+            <ul className="divide-y divide-slate-50">
+              {datos.agenda.proximasEntrevistas.map((e) => (
+                <li key={e.id} className="flex items-start justify-between gap-3 py-3">
+                  <div className="min-w-0">
+                    <Link href={`/postulantes/${e.postulanteId}`} className="truncate text-sm font-semibold text-slate-800 hover:underline">
+                      {nombres[e.postulanteId] ?? "Postulante"}
+                    </Link>
+                    <p className="truncate text-xs text-slate-400">
+                      {e.cargo} · {e.empresa}
+                    </p>
+                  </div>
+                  <div className="shrink-0 text-right text-xs text-slate-500">
+                    <p className="font-medium text-slate-700">{formatoFechaHora(e.fechaHora)}</p>
+                    <p>{e.modalidad}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Tarjeta>
+        <Tarjeta titulo="Controles post-ingreso por hacer" subtitulo="Seguimiento a las personas contratadas">
+          {datos.agenda.seguimientosPorHacer.length === 0 ? (
+            <p className="py-6 text-center text-sm text-slate-400">No hay controles pendientes.</p>
+          ) : (
+            <ul className="divide-y divide-slate-50">
+              {datos.agenda.seguimientosPorHacer.map((s) => (
+                <li key={s.id} className="flex items-start justify-between gap-3 py-3">
+                  <div className="min-w-0">
+                    <Link href={`/postulantes/${s.postulanteId}`} className="truncate text-sm font-semibold text-slate-800 hover:underline">
+                      {nombres[s.postulanteId] ?? "Postulante"}
+                    </Link>
+                    <p className="truncate text-xs text-slate-400">
+                      Control a los {s.hitoDias} días · {s.cargo} · {s.empresa}
+                    </p>
+                  </div>
+                  <div className="shrink-0 text-right text-xs">
+                    <p className={s.vencido ? "font-medium text-rose-600" : "font-medium text-slate-700"}>{formatoFecha(s.fechaProgramada)}</p>
+                    {s.vencido && <p className="text-rose-500">Vencido</p>}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Tarjeta>
+      </div>
+
       {/* Gráficas */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Tarjeta titulo="Postulaciones y contrataciones" subtitulo="Cuántas postulaciones llegaron y cuántas contrataciones se cerraron en el tiempo" className="lg:col-span-2">
@@ -168,7 +258,7 @@ export function IndicadoresDashboard({
 export function DashboardView() {
   const hoy = useSyncExternalStore(suscribir, hoyDelNavegador, hoyDelServidor);
   if (hoy === "") {
-    return <div className="mx-auto w-full max-w-7xl p-6 md:p-8"><div className="h-40 animate-pulse rounded-2xl bg-slate-100" /></div>;
+    return <DashboardSkeleton />;
   }
   return <DashboardContenido hoy={hoy} />;
 }
@@ -177,7 +267,7 @@ function DashboardContenido({ hoy }: { hoy: string }) {
   // Por defecto: los últimos 30 días, todas las empresas que el usuario puede ver.
   const [filtros, setFiltros] = useState<Filtros>({ desde: sumarDias(hoy, -29), hasta: hoy, empresaId: null });
   const [empresas, setEmpresas] = useState<Empresa[]>([]);
-  const { datos, nombres, cargando, error } = useDashboard(filtros);
+  const { datos, nombres, actualizando, error } = useDashboard(filtros);
 
   // Las empresas del filtro salen de la base de datos (solo las que el usuario puede ver).
   useEffect(() => {
@@ -216,7 +306,7 @@ function DashboardContenido({ hoy }: { hoy: string }) {
         filtros={filtros}
         hoy={hoy}
         empresas={empresas}
-        cargando={cargando}
+        cargando={actualizando}
         puedeExportar={datos !== null && filtros.desde <= filtros.hasta}
         onCambiar={cambiarFiltros}
         onExportar={() => datos && descargarReporteCsv(datos, nombreEmpresa)}
@@ -228,15 +318,9 @@ function DashboardContenido({ hoy }: { hoy: string }) {
       )}
 
       {!datos || !r ? (
-        !error && (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="h-32 animate-pulse rounded-2xl bg-slate-100" />
-            ))}
-          </div>
-        )
+        !error && <TarjetasDashboardSkeleton />
       ) : (
-        <div className={`transition-opacity ${cargando ? "opacity-60" : ""}`}>
+        <div className={`transition-opacity ${actualizando ? "opacity-60" : ""}`}>
           <IndicadoresDashboard datos={datos} nombres={nombres} mostrarEmpresa={filtros.empresaId === null} />
         </div>
       )}

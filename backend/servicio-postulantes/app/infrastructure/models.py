@@ -85,14 +85,14 @@ class Documento(Base):
     postulante_id: Mapped[str] = mapped_column(ForeignKey("postulantes.id"), nullable=False)
     tipo: Mapped[str] = mapped_column(String(50), nullable=False)  # CV, DNI, certificado, etc.
     nombre_archivo: Mapped[str] = mapped_column(String(255), nullable=False)
-    # Dónde está guardado el archivo (el archivo en sí NO se guarda en la base de datos).
-    # Con Cloudinary, aquí va la URL https del archivo.
+    # Dónde está guardado el archivo (el archivo en sí NO se guarda en la base de datos):
+    # "<bucket>/<ruta>" dentro de Supabase Storage.
     referencia_almacenamiento: Mapped[str] = mapped_column(String(500), nullable=False)
 
-    # Datos de Cloudinary (vacíos en los documentos que no se subieron ahí, como el
-    # de prueba). Se guardan para poder BORRAR el archivo de Cloudinary después.
-    public_id: Mapped[str] = mapped_column(String(255), nullable=True)
-    tipo_recurso: Mapped[str] = mapped_column(String(20), nullable=True)  # "image" o "raw"
+    # Datos del archivo en Supabase Storage (vacíos en los documentos que no se subieron ahí, como el
+    # de prueba). La ruta sirve para DESCARGARLO y BORRARLO después.
+    ruta_archivo: Mapped[str] = mapped_column(String(255), nullable=True)  # ruta dentro del bucket
+    tipo_contenido: Mapped[str] = mapped_column(String(100), nullable=True)  # ej. "application/pdf"
     tamano_bytes: Mapped[int] = mapped_column(Integer, nullable=True)
 
     fecha_subida: Mapped[datetime] = mapped_column(

@@ -38,7 +38,7 @@ class SolicitudInvalida(ErrorDominio):
 
 
 class ServicioNoDisponible(ErrorDominio):
-    """Un servicio externo que necesitamos (ej. Cloudinary) no está configurado o
+    """Un servicio externo que necesitamos (ej. Supabase Storage) no está configurado o
     no respondió → HTTP 503."""
 
     status_code = status.HTTP_503_SERVICE_UNAVAILABLE

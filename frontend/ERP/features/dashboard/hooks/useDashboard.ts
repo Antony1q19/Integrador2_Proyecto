@@ -1,47 +1,44 @@
 // features/dashboard/hooks/useDashboard.ts
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useCargaConCache } from "@/lib/cacheCliente";
 import { DashboardDatos, FiltrosDashboard } from "../types/dashboard";
 import { fetchDashboard, fetchNombresPostulantes } from "../services/dashboardService";
 
 interface EstadoDashboard {
   datos: DashboardDatos | null;
   nombres: Record<string, string>;
-  cargando: boolean;
+  cargando: boolean; // true solo si todavía no hay NADA que mostrar (ni de un filtro anterior)
+  actualizando: boolean; // ya se muestra algo, pero se están pidiendo los datos del filtro actual
   error: string | null;
 }
 
-// Carga los indicadores cada vez que cambia un filtro. Si el usuario cambia de filtro mientras
-// se está cargando, se descarta la respuesta vieja (para no mostrar datos de un filtro anterior).
+// Carga los indicadores cada vez que cambia un filtro.
+//  - Cada combinación de filtros se recuerda: volver a una ya vista (o entrar de nuevo al Dashboard) se ve
+//    al instante y se actualiza en segundo plano.
+//  - Mientras llegan los datos de un filtro nuevo, se siguen mostrando los del anterior (atenuados) en vez de
+//    vaciar la pantalla.
+//  - Los nombres de los postulantes (solo para la "Actividad reciente") se piden aparte y NO hacen esperar
+//    al resto de la pantalla.
 export function useDashboard(filtros: FiltrosDashboard): EstadoDashboard {
-  const [estado, setEstado] = useState<EstadoDashboard>({ datos: null, nombres: {}, cargando: true, error: null });
   const { desde, hasta, empresaId } = filtros;
+  const clave = `dashboard:${desde}|${hasta}|${empresaId ?? "todas"}`;
 
-  useEffect(() => {
-    let cancelado = false;
-    // Se mantienen los datos anteriores en pantalla mientras llegan los nuevos.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setEstado((previo) => ({ ...previo, cargando: true, error: null }));
+  const { datos, error } = useCargaConCache<DashboardDatos>(clave, () => fetchDashboard({ desde, hasta, empresaId }), 10_000);
+  const { datos: nombres } = useCargaConCache<Record<string, string>>("postulantes:nombres", fetchNombresPostulantes, 60_000);
 
-    Promise.all([fetchDashboard({ desde, hasta, empresaId }), fetchNombresPostulantes().catch(() => ({}))])
-      .then(([datos, nombres]) => {
-        if (!cancelado) setEstado({ datos, nombres, cargando: false, error: null });
-      })
-      .catch((e) => {
-        if (!cancelado) {
-          setEstado((previo) => ({
-            ...previo,
-            cargando: false,
-            error: e instanceof Error ? e.message : "No se pudieron cargar los indicadores",
-          }));
-        }
-      });
+  // Últimos datos vistos (de cualquier filtro): se muestran mientras llegan los del filtro nuevo.
+  // (Se guarda "durante el render": es el patrón que React recomienda para esto.)
+  const [ultimos, setUltimos] = useState<DashboardDatos | null>(null);
+  if (datos !== undefined && datos !== ultimos) setUltimos(datos);
 
-    return () => {
-      cancelado = true;
-    };
-  }, [desde, hasta, empresaId]);
-
-  return estado;
+  const mostrados = datos ?? ultimos;
+  return {
+    datos: mostrados,
+    nombres: nombres ?? {},
+    cargando: mostrados === null && !error,
+    actualizando: datos === undefined && mostrados !== null,
+    error,
+  };
 }

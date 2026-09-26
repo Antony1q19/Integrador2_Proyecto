@@ -16,13 +16,14 @@ from datetime import date, datetime, timedelta
 from fastapi import APIRouter, Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from app.api.deps import requerir_rol
 from app.api.visibilidad import postulantes_ocultos
 from app.core.config import settings
-from app.core.database import obtener_sesion
+from app.core.database import obtener_sesion_lectura
 from app.domain.dashboard import MAXIMO_DIAS_DE_RANGO, ZONA_PERU, calcular_dashboard
-from app.infrastructure.models import Evaluacion, HistorialEstado, ProcesoPostulacion
+from app.infrastructure.models import Contratacion, Entrevista, Evaluacion, ProcesoPostulacion, SeguimientoPostingreso
 from shared_kernel.exceptions import RecursoNoEncontrado, SolicitudInvalida
 from shared_kernel.visibilidad import llamar_a_servicio
 
@@ -34,7 +35,7 @@ async def obtener_dashboard(
     desde: date | None = None,
     hasta: date | None = None,
     empresaId: int | None = None,
-    sesion: AsyncSession = Depends(obtener_sesion),
+    sesion: AsyncSession = Depends(obtener_sesion_lectura),
     usuario: dict = Depends(requerir_rol("Admin", "RRHH", "Supervisor")),
 ) -> dict:
     # PASO 1: el rango de fechas (por defecto, los últimos 30 días).
@@ -61,27 +62,17 @@ async def obtener_dashboard(
                 raise RecursoNoEncontrado("Empresa no encontrada")
     ids_anuncios = [a["id"] for a in anuncios]
 
-    # PASO 3: las postulaciones a esos anuncios y su historial de etapas.
+    # PASO 3: las postulaciones a esos anuncios y su historial de etapas, en UNA sola consulta
+    # (`joinedload` trae cada postulación junto con su historial: un viaje a la base en vez de dos).
     procesos_bd: list[ProcesoPostulacion] = []
-    eventos_bd: list[HistorialEstado] = []
     if ids_anuncios:
-        procesos_bd = list(
-            (await sesion.execute(select(ProcesoPostulacion).where(ProcesoPostulacion.anuncio_id.in_(ids_anuncios))))
-            .scalars()
-            .all()
+        resultado = await sesion.execute(
+            select(ProcesoPostulacion)
+            .options(joinedload(ProcesoPostulacion.historial))
+            .where(ProcesoPostulacion.anuncio_id.in_(ids_anuncios))
         )
-        if procesos_bd:
-            eventos_bd = list(
-                (
-                    await sesion.execute(
-                        select(HistorialEstado)
-                        .where(HistorialEstado.proceso_id.in_([p.id for p in procesos_bd]))
-                        .order_by(HistorialEstado.fecha)
-                    )
-                )
-                .scalars()
-                .all()
-            )
+        procesos_bd = list(resultado.unique().scalars().all())
+    eventos_bd = sorted((e for p in procesos_bd for e in p.historial), key=lambda e: e.fecha)
 
     procesos = [
         {
@@ -127,7 +118,35 @@ async def obtener_dashboard(
         for e in (await sesion.execute(consulta)).scalars().all()
     ]
 
-    # PASO 5: calcular y devolver.
+    # PASO 5: la agenda (entrevistas, controles post-ingreso y contrataciones) de esas mismas postulaciones.
+    entrevistas: list[dict] = []
+    contrataciones_registradas: list[dict] = []
+    seguimientos_pendientes: list[dict] = []
+    ids_procesos = [p["id"] for p in procesos]
+    if ids_procesos:
+        entrevistas = [
+            {"id": e.id, "procesoId": e.proceso_id, "fecha": e.fecha_hora, "estado": e.estado, "modalidad": e.modalidad}
+            for e in (
+                await sesion.execute(select(Entrevista).where(Entrevista.proceso_id.in_(ids_procesos)))
+            ).scalars().all()
+        ]
+        contratos = (
+            await sesion.execute(
+                select(Contratacion)
+                .options(joinedload(Contratacion.seguimientos))
+                .where(Contratacion.proceso_id.in_(ids_procesos))
+            )
+        ).unique().scalars().all()
+        for c in contratos:
+            contrataciones_registradas.append({"procesoId": c.proceso_id, "estado": c.estado})
+            if c.estado in ("Por ingresar", "Activo"):
+                seguimientos_pendientes += [
+                    {"id": s.id, "procesoId": c.proceso_id, "hitoDias": s.hito_dias, "fecha": s.fecha_programada}
+                    for s in c.seguimientos
+                    if s.estado == "Pendiente"
+                ]
+
+    # PASO 6: calcular y devolver.
     return calcular_dashboard(
         desde=desde,
         hasta=hasta,
@@ -136,4 +155,7 @@ async def obtener_dashboard(
         contrataciones=contrataciones,
         eventos=eventos,
         evaluaciones=evaluaciones,
+        entrevistas=entrevistas,
+        contrataciones_registradas=contrataciones_registradas,
+        seguimientos_pendientes=seguimientos_pendientes,
     )

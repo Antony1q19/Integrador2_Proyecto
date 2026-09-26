@@ -12,7 +12,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import requerir_rol
-from app.core.database import obtener_sesion
+from app.core.database import obtener_sesion_lectura
 from app.infrastructure.models import Anuncio, Empresa
 from app.schemas.empresa import EmpresaRespuesta
 
@@ -21,7 +21,7 @@ router = APIRouter(prefix="/empresas", tags=["empresas"])
 
 @router.get("", response_model=list[EmpresaRespuesta])
 async def listar_empresas(
-    sesion: AsyncSession = Depends(obtener_sesion),
+    sesion: AsyncSession = Depends(obtener_sesion_lectura),
     usuario: dict = Depends(requerir_rol("Admin", "RRHH", "Supervisor")),
 ) -> list[EmpresaRespuesta]:
     # Cuántos anuncios "no cerrados" tiene cada empresa (se calcula en la misma consulta).

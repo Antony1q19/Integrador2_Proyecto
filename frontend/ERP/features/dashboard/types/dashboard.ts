@@ -21,6 +21,12 @@ export interface ResumenDashboard {
   evaluaciones: number;
   puntajePromedio: number | null;
   porcentajeApto: number; // %
+  entrevistasHoy: number;
+  entrevistasProximas: number; // próximos 7 días
+  entrevistasRealizadas: number; // dentro del rango
+  seguimientosPendientes: number;
+  seguimientosVencidos: number;
+  ingresosPorIniciar: number;
 }
 
 export interface PuntoSerie {
@@ -63,6 +69,30 @@ export interface ActividadReciente {
   usuario: string;
 }
 
+export interface EntrevistaProxima {
+  id: number;
+  fechaHora: string; // ISO con hora
+  modalidad: string;
+  postulanteId: string;
+  cargo: string;
+  empresa: string;
+}
+
+export interface SeguimientoPorHacer {
+  id: number;
+  hitoDias: number;
+  fechaProgramada: string; // AAAA-MM-DD
+  vencido: boolean;
+  postulanteId: string;
+  cargo: string;
+  empresa: string;
+}
+
+export interface AgendaDashboard {
+  proximasEntrevistas: EntrevistaProxima[];
+  seguimientosPorHacer: SeguimientoPorHacer[];
+}
+
 export interface DashboardDatos {
   rango: { desde: string; hasta: string; granularidad: Granularidad };
   resumen: ResumenDashboard;
@@ -72,6 +102,7 @@ export interface DashboardDatos {
   porAnuncio: FilaAnuncio[];
   competencias: { clave: string; etiqueta: string; promedio: number | null }[];
   actividad: ActividadReciente[];
+  agenda: AgendaDashboard;
 }
 
 export interface FiltrosDashboard {

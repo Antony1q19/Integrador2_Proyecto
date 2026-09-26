@@ -6,6 +6,7 @@ import { KeyRound, Pencil } from "lucide-react";
 import { Empresa } from "@/features/empresas/types/empresa";
 import { fetchEmpresas } from "@/features/empresas/services/empresasApi";
 import { EstadoUsuario, Usuario } from "../types/usuario";
+import { Skeleton } from "@/components/shared/Skeleton";
 
 const ESTILOS_ROL: Record<Usuario["rol"], string> = {
   Admin: "bg-violet-100 text-violet-700",
@@ -59,7 +60,22 @@ export function UsuariosTable({
   }, []);
 
   if (cargando) {
-    return <p className="p-6 text-center text-sm text-slate-400">Cargando trabajadores...</p>;
+    return (
+      <div aria-hidden className="space-y-3 p-6">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="flex items-center gap-4">
+            <Skeleton className="h-9 w-9 shrink-0 rounded-full" />
+            <div className="space-y-1.5">
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-3 w-52" />
+            </div>
+            <Skeleton className="ml-auto h-6 w-24 rounded-full" />
+            <Skeleton className="h-4 w-28" />
+            <Skeleton className="h-8 w-20" />
+          </div>
+        ))}
+      </div>
+    );
   }
 
   if (usuarios.length === 0) {

@@ -20,7 +20,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import obtener_usuario_actual
 from app.core.config import settings
-from app.core.database import obtener_sesion
+from app.core import cache_empresas
+from app.core.database import obtener_sesion_lectura
 from app.core.http_client import cabeceras_firmadas, obtener_cliente
 from app.infrastructure.models import Usuario
 from shared_kernel.visibilidad import ROLES_CON_EMPRESAS_ASIGNADAS
@@ -38,6 +39,9 @@ _URL_POR_SERVICIO = {
     "procesos": settings.url_servicio_procesos_seleccion,               # servicio-procesos-seleccion
     "evaluaciones": settings.url_servicio_procesos_seleccion,           # servicio-procesos-seleccion
     "dashboard": settings.url_servicio_procesos_seleccion,              # servicio-procesos-seleccion (indicadores)
+    "entrevistas": settings.url_servicio_procesos_seleccion,            # servicio-procesos-seleccion
+    "contrataciones": settings.url_servicio_procesos_seleccion,         # servicio-procesos-seleccion
+    "seguimientos": settings.url_servicio_procesos_seleccion,           # servicio-procesos-seleccion
 }
 
 
@@ -53,7 +57,7 @@ async def reenviar(
     ruta: str,      # el resto de la dirección, ej. "/123/documentos" (o "" si no hay más)
     request: Request,
     usuario: dict = Depends(obtener_usuario_actual),  # PASO 2: comprueba el token
-    sesion: AsyncSession = Depends(obtener_sesion),
+    sesion: AsyncSession = Depends(obtener_sesion_lectura),
 ) -> Response:
     # PASO 3: ¿existe un microservicio con ese nombre?
     url_base = _URL_POR_SERVICIO.get(servicio)
@@ -76,12 +80,17 @@ async def reenviar(
         }
     )
 
-    # PASO 4b: RRHH y Supervisor solo ven las empresas que un Admin les asignó. La lista se
-    # lee de la base de datos EN CADA petición (no del token), así un cambio del Admin vale
-    # al instante y una cuenta suspendida o eliminada deja de ver empresas de inmediato.
+    # PASO 4b: RRHH y Supervisor solo ven las empresas que un Admin les asignó. La lista sale de la
+    # base de datos (no del token), así un cambio del Admin vale al instante y una cuenta suspendida o
+    # eliminada deja de ver empresas de inmediato. Para no viajar a la base en cada petición, se recuerda
+    # unos segundos (ver core/cache_empresas.py); cuando un Admin cambia algo, se olvida al momento.
     if usuario.get("rol") in ROLES_CON_EMPRESAS_ASIGNADAS:
-        cuenta = await sesion.get(Usuario, str(usuario.get("sub", "")))
-        ids = cuenta.empresas_visibles if cuenta is not None and cuenta.estado == "Activo" else []
+        usuario_id = str(usuario.get("sub", ""))
+        ids = cache_empresas.recordado(usuario_id)
+        if ids is None:
+            cuenta = await sesion.get(Usuario, usuario_id)
+            ids = cuenta.empresas_visibles if cuenta is not None and cuenta.estado == "Activo" else []
+            cache_empresas.recordar(usuario_id, ids)
         cabeceras["X-Usuario-Empresas"] = ",".join(str(i) for i in ids)
 
     # Reenviar la petición. La dirección final es  <url_base>/<servicio><ruta>,

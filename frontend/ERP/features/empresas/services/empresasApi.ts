@@ -5,6 +5,7 @@
 import { Empresa } from "../types/empresa";
 import { empresasMock } from "../data/mock_empresas";
 import { mensajeDeError, sesionVencida } from "@/lib/apiCliente";
+import { cargarConCache } from "@/lib/cacheCliente";
 
 // Interruptor mock/API (ver postulantesService.ts): con API se usan las rutas /api/... del ERP.
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -25,8 +26,12 @@ export function mapearEmpresaDeApi(dto: Record<string, unknown>): Empresa {
   };
 }
 
-// Lista de empresas (desde el navegador).
-export async function fetchEmpresas(): Promise<Empresa[]> {
+// Lista de empresas (desde el navegador). Se recuerda 60 s: se pide en muchas pantallas y casi no cambia.
+export function fetchEmpresas(): Promise<Empresa[]> {
+  return cargarConCache("empresas:lista", pedirEmpresas, 60_000);
+}
+
+async function pedirEmpresas(): Promise<Empresa[]> {
   if (API_URL) {
     const res = await fetch("/api/empresas");
     if (res.status === 401) throw new Error(sesionVencida());

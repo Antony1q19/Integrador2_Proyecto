@@ -18,7 +18,7 @@ import { SortableField } from "../hooks/usePostulantesList";
 import { EstadoBadge } from "./EstadoBadge";
 import { PostulantesEmptyState } from "./PostulantesEmptyState";
 import { PostulantesTableSkeleton } from "./PostulantesSkeleton";
-import { contarPostulaciones, postulanteTieneCuenta } from "../services/postulantesService";
+import { contarPostulaciones, postulanteTieneCuenta, prefetchPostulante } from "../services/postulantesService";
 
 // Dirección de la bolsa de trabajo donde el postulante crea su cuenta.
 const URL_ANUNCIOS = process.env.NEXT_PUBLIC_ANUNCIOS_URL ?? "http://localhost:3001";
@@ -182,7 +182,10 @@ export const PostulantesTable = memo(function PostulantesTable({
                   className={`transition-colors duration-150 ${
                     isHovered ? "bg-indigo-50/50" : "hover:bg-slate-50"
                   }`}
-                  onMouseEnter={() => setHoveredRow(postulante.id)}
+                  onMouseEnter={() => {
+                    setHoveredRow(postulante.id);
+                    prefetchPostulante(postulante.id); // adelanta la ficha para que abra al instante
+                  }}
                   onMouseLeave={() => setHoveredRow(null)}
                 >
                   {/* Postulante */}

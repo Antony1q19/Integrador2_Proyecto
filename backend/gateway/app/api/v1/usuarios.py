@@ -15,7 +15,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import obtener_usuario_actual, requerir_rol
-from app.core.database import obtener_sesion
+from app.core import cache_empresas
+from app.core.database import obtener_sesion, obtener_sesion_lectura
 from app.core.security import hash_password, verificar_password
 from app.domain.usuarios import (
     PASSWORD_POR_DEFECTO,
@@ -61,7 +62,7 @@ def _con_password_temporal(usuario: Usuario) -> UsuarioCreadoRespuesta:
 # ---------------------------------------------------------------------------
 @router.get("", response_model=list[UsuarioRespuesta])
 async def listar_usuarios(
-    sesion: AsyncSession = Depends(obtener_sesion),
+    sesion: AsyncSession = Depends(obtener_sesion_lectura),
     _usuario: dict = Depends(requerir_rol("Admin")),  # solo un Admin puede entrar
 ) -> list[UsuarioRespuesta]:
     # Los "Eliminados" no se muestran en la lista. No se borran de la base de
@@ -146,6 +147,7 @@ async def actualizar_usuario(
         usuario.empresas_visibles = cambios["empresasVisibles"]
 
     await sesion.commit()
+    cache_empresas.olvidar(usuario_id)  # sus empresas o su rol pudieron cambiar: que valga al instante
     await sesion.refresh(usuario)
     return usuario
 
@@ -181,5 +183,6 @@ async def cambiar_estado(
     usuario = await _obtener_o_404(sesion, usuario_id)
     usuario.estado = datos.estado
     await sesion.commit()
+    cache_empresas.olvidar(usuario_id)  # una cuenta suspendida o eliminada deja de ver empresas al instante
     await sesion.refresh(usuario)
     return usuario

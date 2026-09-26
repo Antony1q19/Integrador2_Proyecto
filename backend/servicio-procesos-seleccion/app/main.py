@@ -15,6 +15,7 @@ del Gateway).
 Para ver las rutas, con el backend encendido abre:
     http://localhost:8003/docs   (solo para depurar; en el uso normal se pasa por el Gateway)
 """
+import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -23,7 +24,7 @@ from app.api.v1.router import router as router_v1
 from app.core.config import settings
 from app.core.database import engine
 from app.infrastructure.seed import sembrar_datos_de_prueba
-from shared_kernel.database import Base
+from shared_kernel.database import calentar_conexiones, crear_tablas
 from shared_kernel.exceptions import registrar_manejadores_excepciones
 from shared_kernel.logging import configurar_logging
 
@@ -35,10 +36,12 @@ async def lifespan(app: FastAPI):
     # AL ENCENDER: en modo "desarrollo" crea las tablas que falten (leyendo las
     # clases de infrastructure/models.py) y siembra los datos de prueba.
     if settings.entorno == "desarrollo":
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
+        await crear_tablas(engine)
         await sembrar_datos_de_prueba()
+    # Abre las conexiones a la base ahora (en segundo plano) y no cuando llegue la primera petición.
+    tarea_calentamiento = asyncio.create_task(calentar_conexiones(engine))
     yield  # <- aquí el servidor queda funcionando
+    await tarea_calentamiento
 
 
 app = FastAPI(

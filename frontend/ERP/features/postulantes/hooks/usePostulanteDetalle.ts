@@ -19,6 +19,7 @@ import {
   updateEstado,
   actualizarEstadoPostulacion,
 } from "../services/postulantesService";
+import { marcarVencido } from "@/lib/cacheCliente";
 
 interface UsePostulanteDetalleResult {
   postulante: Postulante | null;
@@ -36,6 +37,9 @@ interface UsePostulanteDetalleResult {
     comentario?: string
   ) => Promise<void>;
   guardando: boolean;
+  // Vuelve a pedir la ficha SIN mostrar el esqueleto de carga (se usa cuando algo se cambió fuera de la ficha,
+  // ej. al programar una entrevista o registrar una contratación, que mueven la etapa del postulante).
+  refrescar: () => Promise<void>;
 }
 
 // TODO: reemplazar por el usuario real de la sesión (features/auth/hooks/useAuth)
@@ -66,6 +70,15 @@ export function usePostulanteDetalle(id: string): UsePostulanteDetalleResult {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     cargar();
   }, [cargar]);
+
+  const refrescar = async () => {
+    marcarVencido(`postulante:${id}`);
+    try {
+      setPostulante(await fetchPostulanteById(id));
+    } catch {
+      // Si falla, se conserva lo que ya se veía.
+    }
+  };
 
   const guardarDatosPersonales = async (datos: DatosPersonales) => {
     setGuardando(true);
@@ -173,5 +186,6 @@ export function usePostulanteDetalle(id: string): UsePostulanteDetalleResult {
     cambiarEstado,
     actualizarEstadoPostulacion: handleActualizarEstadoPostulacion,
     guardando,
+    refrescar,
   };
 }

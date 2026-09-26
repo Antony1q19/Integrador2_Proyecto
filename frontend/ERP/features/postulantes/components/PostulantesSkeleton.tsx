@@ -1,36 +1,36 @@
 // features/postulantes/components/PostulantesSkeleton.tsx
 "use client";
 
+import { Skeleton } from "@/components/shared/Skeleton";
+
+// Imita la tabla real (8 columnas): así, al llegar los datos, nada se mueve de lugar.
 export function PostulantesTableSkeleton() {
   return (
-    <div className="animate-pulse">
-      <div className="mb-4 flex items-center justify-between">
-        <div className="h-8 w-48 rounded bg-slate-200"></div>
-        <div className="h-8 w-32 rounded bg-slate-200"></div>
+    <div aria-hidden className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="flex gap-6 border-b border-slate-200 bg-slate-50 px-4 py-3">
+        {["w-24", "w-16", "w-20", "w-14", "w-12", "w-14", "w-14", "w-16"].map((ancho, i) => (
+          <Skeleton key={i} className={`h-3 ${ancho}`} />
+        ))}
       </div>
-      <div className="rounded-lg border border-slate-200 overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-slate-50">
-            <tr>
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
-                <th key={i} className="px-4 py-3">
-                  <div className="h-4 w-20 rounded bg-slate-200"></div>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {[1, 2, 3, 4, 5].map((i) => (
-              <tr key={i} className="border-t border-slate-100">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((j) => (
-                  <td key={j} className="px-4 py-3">
-                    <div className="h-4 w-full rounded bg-slate-100"></div>
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="divide-y divide-slate-100">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="flex items-center gap-6 px-4 py-3">
+            <div className="flex w-48 items-center gap-3">
+              <Skeleton className="h-9 w-9 shrink-0 rounded-full" />
+              <div className="space-y-1.5">
+                <Skeleton className="h-3.5 w-28" />
+                <Skeleton className="h-3 w-20" />
+              </div>
+            </div>
+            <Skeleton className="h-4 w-36" />
+            <Skeleton className="h-4 w-16" />
+            <Skeleton className="h-6 w-20 rounded-full" />
+            <Skeleton className="h-4 w-8" />
+            <Skeleton className="h-4 w-6" />
+            <Skeleton className="h-4 w-6" />
+            <Skeleton className="ml-auto h-7 w-14 rounded-lg" />
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -38,9 +38,9 @@ export function PostulantesTableSkeleton() {
 
 export function PostulantesFiltersSkeleton() {
   return (
-    <div className="animate-pulse flex flex-wrap gap-4">
+    <div aria-hidden className="flex flex-wrap gap-4">
       {[1, 2, 3, 4].map((i) => (
-        <div key={i} className="h-10 w-40 rounded-lg bg-slate-200"></div>
+        <Skeleton key={i} className="h-10 w-40 rounded-lg" />
       ))}
     </div>
   );

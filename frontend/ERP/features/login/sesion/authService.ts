@@ -7,6 +7,8 @@
 // para el detalle). No existe modo mock: si el backend no responde, esto
 // falla con un error real, no hay fallback simulado.
 
+import { vaciarCache } from '@/lib/cacheCliente';
+
 export type Role = 'Admin' | 'RRHH' | 'Supervisor';
 
 export interface User {
@@ -29,6 +31,8 @@ export const login = async (email: string, password: string): Promise<User> => {
     throw new Error(cuerpo?.error ?? 'Credenciales inválidas');
   }
 
+  // Nueva sesión: nada de lo que se guardó en memoria (de otra persona) debe verse.
+  vaciarCache();
   const { rol, nombre, empresasVisibles } = await res.json();
   // No tenemos un id numérico real acá (el JWT que lo trae nunca llega al
   // cliente); el email alcanza como identificador único de UI.
@@ -37,4 +41,5 @@ export const login = async (email: string, password: string): Promise<User> => {
 
 export async function cerrarSesionApi(): Promise<void> {
   await fetch('/api/auth/logout', { method: 'POST' });
+  vaciarCache();
 }

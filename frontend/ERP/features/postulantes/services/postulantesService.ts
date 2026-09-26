@@ -22,6 +22,7 @@ import { calcularPuntajeTotal, calcularResultado } from "../utils/evaluacion";
 import { anunciosMock } from "@/features/anuncios/data/mock-anuncios";
 import { fetchAnuncios } from "@/features/anuncios/services/anunciosApi";
 import { mensajeDeError, sesionVencida } from "@/lib/apiCliente";
+import { cargarConCache, marcarVencido } from "@/lib/cacheCliente";
 
 // Los anuncios se leen desde features/anuncios/services/anunciosApi.ts; se reexporta aquí para
 // que los hooks de postulantes sigan importándolo desde este servicio.
@@ -189,8 +190,8 @@ function mapearDocumentoDeApi(dto: Record<string, unknown>, postulanteId: string
     tipo: (["CV", "DNI", "CERTIFICADO"].includes(tipo) ? tipo : "OTRO") as DocumentoPostulante["tipo"],
     tamanioKb: Math.round(Number(dto.tamanioBytes ?? 0) / 1024),
     fechaCarga: dto.fechaSubida as string,
-    // El archivo NO se abre con el enlace público de Cloudinary (los PDF están bloqueados
-    // ahí); se pide a nuestro servidor, que lo entrega con la sesión del usuario.
+    // El archivo no tiene enlace público (el bucket de Storage es privado): se pide a nuestro
+    // servidor, que lo entrega con la sesión del usuario.
     url: dto.tieneArchivo
       ? `/api/postulantes/${encodeURIComponent(postulanteId)}/documentos/${encodeURIComponent(String(dto.id))}/archivo`
       : undefined,
@@ -234,7 +235,18 @@ function mapearEvaluacionDeApi(dto: Record<string, unknown>): Evaluacion {
   };
 }
 
-export async function fetchPostulanteById(id: string): Promise<Postulante> {
+// La ficha se recuerda 10 s: así, si se "adelantó" al pasar el mouse por la fila (ver `prefetchPostulante`),
+// se abre al instante. Cualquier cambio guardado (datos, documentos, evaluaciones, etapas) la marca como vencida.
+export function fetchPostulanteById(id: string): Promise<Postulante> {
+  return cargarConCache(`postulante:${id}`, () => pedirPostulante(id), 10_000);
+}
+
+// Pide la ficha en segundo plano (sin mostrar nada) para que abra más rápido cuando la persona haga clic.
+export function prefetchPostulante(id: string): void {
+  if (API_URL) fetchPostulanteById(id).catch(() => undefined);
+}
+
+async function pedirPostulante(id: string): Promise<Postulante> {
   if (API_URL) {
     // ---- MODO API (navegador -> rutas /api/... (Next.js) -> Gateway -> microservicios) ----
     // Se piden en paralelo: los datos del postulante (servicio-postulantes), sus
@@ -301,6 +313,8 @@ export async function updateDatosPersonales(
       }),
     });
     if (!res.ok) throw new Error(await mensajeDeError(res, "Error al actualizar datos personales"));
+    marcarVencido("postulantes:");
+    marcarVencido(`postulante:${id}`);
     return fetchPostulanteById(id);
   }
 
@@ -327,7 +341,7 @@ export async function addDocumento(
   tipo: DocumentoPostulante["tipo"]
 ): Promise<DocumentoPostulante> {
   if (API_URL) {
-    // ---- MODO API: el archivo viaja al backend, que lo sube a Cloudinary ----
+    // ---- MODO API: el archivo viaja al backend, que lo sube a Supabase Storage ----
     const formulario = new FormData();
     formulario.append("tipo", tipo);
     formulario.append("archivo", archivo);
@@ -336,6 +350,7 @@ export async function addDocumento(
       body: formulario, // sin "Content-Type": el navegador lo agrega solo, con su "boundary"
     });
     if (!res.ok) throw new Error(await mensajeDeError(res, "Error al subir el documento"));
+    marcarVencido(`postulante:${id}`);
     return mapearDocumentoDeApi(await res.json(), id);
   }
 
@@ -375,7 +390,7 @@ export async function replaceDocumento(
   archivo: File
 ): Promise<DocumentoPostulante> {
   if (API_URL) {
-    // ---- MODO API: se sube el archivo nuevo a Cloudinary y se borra el anterior ----
+    // ---- MODO API: se sube el archivo nuevo a Storage y se borra el anterior ----
     const formulario = new FormData();
     formulario.append("archivo", archivo);
     const res = await fetch(
@@ -383,6 +398,7 @@ export async function replaceDocumento(
       { method: "PUT", body: formulario }
     );
     if (!res.ok) throw new Error(await mensajeDeError(res, "Error al reemplazar el documento"));
+    marcarVencido(`postulante:${id}`);
     return mapearDocumentoDeApi(await res.json(), id);
   }
 
@@ -413,12 +429,13 @@ export async function replaceDocumento(
 
 export async function deleteDocumento(id: string, documentoId: string): Promise<void> {
   if (API_URL) {
-    // ---- MODO API: se elimina el documento y su archivo de Cloudinary ----
+    // ---- MODO API: se elimina el documento y su archivo del Storage ----
     const res = await fetch(
       `/api/postulantes/${encodeURIComponent(id)}/documentos/${encodeURIComponent(documentoId)}`,
       { method: "DELETE" }
     );
     if (!res.ok) throw new Error(await mensajeDeError(res, "Error al eliminar el documento"));
+    marcarVencido(`postulante:${id}`);
     return;
   }
 
@@ -450,6 +467,8 @@ export async function addEvaluacion(id: string, evaluacion: NuevaEvaluacion): Pr
       }),
     });
     if (!res.ok) throw new Error(await mensajeDeError(res, "Error al registrar la evaluación"));
+    marcarVencido(`postulante:${id}`);
+    marcarVencido("dashboard:");
     return mapearEvaluacionDeApi(await res.json());
   }
 
@@ -526,6 +545,9 @@ export async function actualizarEstadoPostulacion(
       }
     );
     if (!res.ok) throw new Error(await mensajeDeError(res, "Error al actualizar el estado de la postulación"));
+    marcarVencido(`postulante:${id}`);
+    marcarVencido("postulantes:");
+    marcarVencido("dashboard:");
     return mapearHistorialDeApi(await res.json());
   }
 
@@ -590,6 +612,8 @@ export async function crearPostulante(
       }),
     });
     if (!res.ok) throw new Error(await mensajeDeError(res, "Error al guardar el postulante"));
+    marcarVencido("postulantes:");
+    marcarVencido("dashboard:");
     const postulante = mapearPostulanteDeApi(await res.json());
 
     // El cargo y la empresa elegidos corresponden a un anuncio real: se registra su

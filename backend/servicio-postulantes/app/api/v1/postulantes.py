@@ -10,6 +10,7 @@ como /api/v1/postulantes...:
 Estas funciones son "delgadas" a propósito: reciben la petición, aplican la
 regla de negocio (domain/postulantes.py) y guardan/leen en la base de datos.
 """
+import asyncio
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, status
@@ -18,7 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import obtener_usuario_actual, requerir_rol
 from app.api.visibilidad import exigir_postulante_visible, postulantes_ocultos
-from app.core.database import obtener_sesion
+from app.core.database import obtener_sesion, obtener_sesion_lectura
 from app.domain.postulantes import validar_consentimiento_obligatorio
 from app.infrastructure.models import Postulante, Usuario
 from app.schemas.postulante import PostulanteActualizar, PostulanteCrear, PostulanteRespuesta
@@ -64,13 +65,17 @@ async def _obtener_o_404(sesion: AsyncSession, postulante_id: str) -> Postulante
     return postulante
 
 
-async def _ids_con_cuenta(sesion: AsyncSession, postulante_id: str | None = None) -> set[str]:
-    """Ids de los postulantes que ya tienen una cuenta activa en la tabla `usuarios`
-    (si se indica un id, solo se revisa ese). Una cuenta "Eliminada" no cuenta."""
-    consulta = select(Usuario.postulante_id).where(Usuario.estado != "Eliminado")
-    if postulante_id:
-        consulta = consulta.where(Usuario.postulante_id == postulante_id)
-    return set((await sesion.execute(consulta)).scalars().all())
+# "¿Tiene cuenta?" se calcula EN LA MISMA consulta que trae al postulante (un solo viaje a la base de
+# datos, que es lo que más tarda). Una cuenta "Eliminada" no cuenta.
+_TIENE_CUENTA = select(Usuario.id).where(Usuario.postulante_id == Postulante.id, Usuario.estado != "Eliminado").exists()
+
+
+async def _obtener_con_cuenta(sesion: AsyncSession, postulante_id: str) -> tuple[Postulante, bool]:
+    """Busca un postulante y a la vez si tiene cuenta; si no existe, responde 404."""
+    fila = (await sesion.execute(select(Postulante, _TIENE_CUENTA).where(Postulante.id == postulante_id))).first()
+    if fila is None:
+        raise RecursoNoEncontrado(f"Postulante {postulante_id} no encontrado")
+    return fila[0], bool(fila[1])
 
 
 # ---------------------------------------------------------------------------
@@ -78,23 +83,26 @@ async def _ids_con_cuenta(sesion: AsyncSession, postulante_id: str | None = None
 # ---------------------------------------------------------------------------
 @router.get("", response_model=list[PostulanteRespuesta])
 async def listar_postulantes(
-    sesion: AsyncSession = Depends(obtener_sesion),
+    sesion: AsyncSession = Depends(obtener_sesion_lectura),
     usuario: dict = Depends(requerir_rol("Admin", "RRHH", "Supervisor")),  # un Postulante NO puede ver a los demás
 ) -> list[PostulanteRespuesta]:
-    resultado = await sesion.execute(select(Postulante))  # equivale a: SELECT * FROM postulantes
-    con_cuenta = await _ids_con_cuenta(sesion)
-    ocultos = await postulantes_ocultos(usuario)  # los de empresas que este usuario no tiene asignadas
-    return [_a_respuesta(p, p.id in con_cuenta) for p in resultado.scalars().all() if p.id not in ocultos]
+    # La consulta a la base y la pregunta "¿cuáles debo ocultar?" (empresas que este usuario no tiene
+    # asignadas) no dependen entre sí: se hacen a la vez.
+    resultado, ocultos = await asyncio.gather(
+        sesion.execute(select(Postulante, _TIENE_CUENTA)),  # equivale a: SELECT * FROM postulantes
+        postulantes_ocultos(usuario),
+    )
+    return [_a_respuesta(p, tiene_cuenta) for p, tiene_cuenta in resultado.all() if p.id not in ocultos]
 
 
 @router.get("/{postulante_id}", response_model=PostulanteRespuesta, dependencies=[Depends(exigir_postulante_visible)])
 async def obtener_postulante(
     postulante_id: str,
-    sesion: AsyncSession = Depends(obtener_sesion),
+    sesion: AsyncSession = Depends(obtener_sesion_lectura),
     _usuario: dict = Depends(obtener_usuario_actual),
 ) -> PostulanteRespuesta:
-    postulante = await _obtener_o_404(sesion, postulante_id)
-    return _a_respuesta(postulante, postulante_id in await _ids_con_cuenta(sesion, postulante_id))
+    postulante, tiene_cuenta = await _obtener_con_cuenta(sesion, postulante_id)
+    return _a_respuesta(postulante, tiene_cuenta)
 
 
 # ---------------------------------------------------------------------------
@@ -148,8 +156,8 @@ async def crear_postulante(
 
     # PASO 3: guardarlo en la base de datos.
     sesion.add(postulante)
-    await sesion.commit()          # "commit" = confirmar y guardar de verdad
-    await sesion.refresh(postulante)  # vuelve a leerlo (trae id y fecha generados)
+    await sesion.commit()  # "commit" = confirmar y guardar de verdad
+    # (el id y la fecha de registro ya quedaron puestos en el objeto: no hace falta volver a leerlo)
     return _a_respuesta(postulante)
 
 
@@ -163,7 +171,7 @@ async def actualizar_postulante(
     sesion: AsyncSession = Depends(obtener_sesion),
     _usuario: dict = Depends(requerir_rol("Admin", "RRHH", "Supervisor")),
 ) -> PostulanteRespuesta:
-    postulante = await _obtener_o_404(sesion, postulante_id)
+    postulante, tiene_cuenta = await _obtener_con_cuenta(sesion, postulante_id)
 
     # Solo los campos que realmente se enviaron (lo demás queda como estaba).
     cambios = datos.model_dump(exclude_unset=True)
@@ -181,5 +189,4 @@ async def actualizar_postulante(
         setattr(postulante, nombre_de_columna.get(campo, campo), valor)
 
     await sesion.commit()
-    await sesion.refresh(postulante)
-    return _a_respuesta(postulante, postulante_id in await _ids_con_cuenta(sesion, postulante_id))
+    return _a_respuesta(postulante, tiene_cuenta)

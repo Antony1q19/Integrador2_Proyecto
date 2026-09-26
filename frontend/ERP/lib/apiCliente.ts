@@ -3,9 +3,12 @@
 // Utilidades comunes de las pantallas (código que corre en el NAVEGADOR) para hablar con las
 // rutas /api/... del ERP.
 
+import { vaciarCache } from "@/lib/cacheCliente";
+
 // La sesión venció (el token dura 1 hora): se borran las cookies de pantalla y se manda al
 // login, en vez de dejar la pantalla mostrando un error. Devuelve el mensaje para el `throw`.
 export function sesionVencida(): string {
+  vaciarCache();
   if (typeof document !== "undefined") {
     for (const nombre of ["userRole", "userName", "userEmail", "userEmpresas"]) {
       document.cookie = `${nombre}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
