@@ -11,11 +11,14 @@ Qué NO se guarda aquí: qué postulantes se presentaron a cada anuncio. Esa
 relación (la "postulación") pertenece a servicio-procesos-seleccion, que se
 refiere al anuncio únicamente por su `id`. Así cada servicio es dueño de lo suyo.
 
-Solo es la TABLA: todavía no hay rutas que las usen.
+Borrado lógico: eliminar una empresa o anuncio no borra la fila, solo la marca
+con `eliminado = True`. Así, otros servicios que guardan una referencia por id
+(ej. una postulación con `anuncio_id`) nunca quedan apuntando a una fila que
+ya no existe.
 """
 from datetime import date, datetime, timezone
 
-from sqlalchemy import Date, DateTime, ForeignKey, Integer, Numeric, String, Text
+from sqlalchemy import Date, DateTime, ForeignKey, Integer, Boolean, Numeric, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from shared_kernel.database import Base
@@ -40,6 +43,10 @@ class Empresa(Base):
 
     sector: Mapped[str] = mapped_column(String(100), nullable=True)
     fecha_registro: Mapped[date] = mapped_column(Date, default=date.today)
+
+    # Borrado lógico: True = la empresa fue "eliminada" y no debe aparecer en
+    # listados ni poder editarse, pero la fila sigue existiendo en la base.
+    eliminado: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     # Relación: una empresa tiene MUCHOS anuncios.
     anuncios: Mapped[list["Anuncio"]] = relationship(back_populates="empresa")
@@ -69,5 +76,8 @@ class Anuncio(Base):
     fecha_creacion: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
+
+    # Borrado lógico: mismo criterio que en Empresa.
+    eliminado: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     empresa: Mapped[Empresa] = relationship(back_populates="anuncios")

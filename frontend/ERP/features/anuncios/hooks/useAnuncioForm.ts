@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -29,12 +30,20 @@ export function useAnuncioForm({
     },
   });
 
+  const [errorEnvio, setErrorEnvio] = useState<string | null>(null);
+
   const handleSubmit = form.handleSubmit(async (data) => {
-    await onSubmitValido(data);
+    setErrorEnvio(null);
+    try {
+      await onSubmitValido(data);
+    } catch (err) {
+      setErrorEnvio(err instanceof Error ? err.message : "Ocurrió un error al guardar");
+    }
   });
 
   return {
     ...form,
     handleSubmit,
+    errorEnvio,
   };
 }

@@ -1,4 +1,4 @@
-"use client";
+/*"use client";
 
 import Link from "next/link";
 import { Anuncio } from "@/features/anuncios/types/anuncio";
@@ -73,6 +73,76 @@ export default function AnunciosPage() {
             />
 
             <AnunciosView anuncios={anunciosFiltrados} />
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+*/
+
+"use client";
+
+import Link from "next/link";
+import { useAnuncios } from "@/features/anuncios/hooks/useAnuncios";
+import { useAnunciosFilters } from "@/features/anuncios/hooks/useAnunciosFilters";
+import { useEmpresas } from "@/features/empresas/hooks/useEmpresas";
+import AnunciosFiltros from "@/features/anuncios/components/AnunciosFiltros";
+import AnunciosView from "@/features/anuncios/components/AnunciosView";
+
+export default function AnunciosPage() {
+  const { anuncios, cargando, error, eliminar } = useAnuncios();
+  const { empresas } = useEmpresas();
+  const {
+    filtros,
+    actualizarFiltro,
+    limpiarFiltros,
+    cargosDisponibles,
+    anunciosFiltrados,
+  } = useAnunciosFilters(anuncios);
+
+  return (
+    <div className="min-h-screen bg-slate-50 p-8">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-slate-900">Anuncios</h1>
+            <p className="mt-1 text-sm text-slate-500">
+              {cargando
+                ? "Cargando..."
+                : `${anunciosFiltrados.length} de ${anuncios.length} anuncios`}
+            </p>
+          </div>
+          <Link
+            href="/anuncios/nuevo"
+            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 transition-colors"
+          >
+            + Nuevo Anuncio
+          </Link>
+        </div>
+
+        {cargando && (
+          <div className="rounded-xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+            <p className="text-sm text-slate-400">Cargando anuncios...</p>
+          </div>
+        )}
+
+        {error && !cargando && (
+          <div className="rounded-xl border border-red-200 bg-red-50 p-8 text-center shadow-sm">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
+
+        {!cargando && !error && (
+          <>
+            <AnunciosFiltros
+              filtros={filtros}
+              actualizarFiltro={actualizarFiltro}
+              limpiarFiltros={limpiarFiltros}
+              cargosDisponibles={cargosDisponibles}
+              empresas={empresas}
+            />
+            <AnunciosView anuncios={anunciosFiltrados} onEliminar={eliminar} />
           </>
         )}
       </div>

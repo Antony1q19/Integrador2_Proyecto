@@ -1,27 +1,41 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import { Empresa } from "@/features/empresas/types/empresa";
+import ConfirmacionModal from "@/components/shared/ConfirmacionModal";
 
-export function EmpresasView({ empresas }: { empresas: Empresa[] }) {
+interface EmpresasViewProps {
+  empresas: Empresa[];
+  onEliminar: (id: number) => Promise<void>;
+}
+
+export function EmpresasView({ empresas, onEliminar }: EmpresasViewProps) {
+    const [empresaAEliminar, setEmpresaAEliminar] = useState<Empresa | null>(null);
+    const [eliminando, setEliminando] = useState(false);
+    const [errorPorFila, setErrorPorFila] = useState<Record<number, string>>({});
+
+    const confirmarEliminacion = async () => {
+      if (!empresaAEliminar) return;
+
+      setEliminando(true);
+      try {
+        await onEliminar(empresaAEliminar.id);
+        setEmpresaAEliminar(null);
+      } catch (err) {
+        setErrorPorFila((prev) => ({
+          ...prev,
+          [empresaAEliminar.id]: err instanceof Error ? err.message : "No se pudo eliminar",
+        }));
+        setEmpresaAEliminar(null);
+      } finally {
+        setEliminando(false);
+      }
+    };
+
      return (
     <div className="min-h-screen bg-slate-50 p-8">
       <div className="mx-auto max-w-6xl">
-        {/* Encabezado */}
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-900">
-              Empresas Clientes
-            </h1>
-            <p className="mt-1 text-sm text-slate-500">
-              {empresas.length} empresas registradas
-            </p>
-          </div>
-          <Link
-            href="/empresas/nueva"
-            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 transition-colors"
-          >
-            + Nueva Empresa
-          </Link>
-        </div>
 
         {/* Tabla */}
         <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -42,6 +56,9 @@ export function EmpresasView({ empresas }: { empresas: Empresa[] }) {
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-600">
                   Anuncios Activos
+                </th>
+                <th className="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-600">
+                  Acciones
                 </th>
               </tr>
             </thead>
@@ -78,12 +95,50 @@ export function EmpresasView({ empresas }: { empresas: Empresa[] }) {
                   <td className="px-6 py-4 text-center text-sm font-semibold text-slate-800">
                     {empresa.anunciosActivos}
                   </td>
+                  <td className="px-6 py-4 text-center">
+                    <button
+                      type="button"
+                      onClick={() => setEmpresaAEliminar(empresa)}
+                      title="Eliminar empresa"
+                      className="inline-flex items-center justify-center rounded-lg p-2 text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={1.8}
+                        className="h-5 w-5"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M6 7h12M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m2 0-.7 12.1a2 2 0 0 1-2 1.9H8.7a2 2 0 0 1-2-1.9L6 7h12Z"
+                        />
+                      </svg>
+                    </button>
+                    {errorPorFila[empresa.id] && (
+                      <p className="mt-1 max-w-[160px] text-xs text-red-500">
+                        {errorPorFila[empresa.id]}
+                      </p>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </div>
+      
+      {empresaAEliminar && (
+        <ConfirmacionModal
+          titulo="Eliminar empresa"
+          mensaje={`¿Eliminar la empresa "${empresaAEliminar.razonSocial}"? Esta acción no se puede deshacer.`}
+          confirmando={eliminando}
+          onConfirmar={confirmarEliminacion}
+          onCancelar={() => setEmpresaAEliminar(null)}
+        />
+      )}
     </div>
   );
 }

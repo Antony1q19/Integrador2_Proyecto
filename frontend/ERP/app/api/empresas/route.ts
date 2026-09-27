@@ -13,3 +13,16 @@ export async function GET(request: NextRequest) {
   const cuerpo = await respuesta.text();
   return new NextResponse(cuerpo, { status: respuesta.status, headers: { "Content-Type": "application/json" } });
 }
+
+export async function POST(request: NextRequest) {
+  const token = request.cookies.get("authToken")?.value;
+  if (!token) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+
+  const cuerpoPeticion = await request.text();
+  const respuesta = await reenviarAlGateway(token, "/empresas", {
+    method: "POST",
+    body: cuerpoPeticion,
+  });
+  const cuerpo = await respuesta.text();
+  return new NextResponse(cuerpo, { status: respuesta.status, headers: { "Content-Type": "application/json" } });
+}

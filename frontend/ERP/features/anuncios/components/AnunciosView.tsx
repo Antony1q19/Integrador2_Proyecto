@@ -1,12 +1,40 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import { Anuncio } from "@/features/anuncios/types/anuncio";
 import { colorEstado } from "@/features/anuncios/utils/estado";
+import ConfirmacionModal from "@/components/shared/ConfirmacionModal";
 
 interface AnunciosViewProps {
     anuncios: Anuncio[];
+    onEliminar: (id: number) => Promise<void>;
 }
 
-export default function AnunciosView({ anuncios }: AnunciosViewProps) {
+export default function AnunciosView({ anuncios, onEliminar }: AnunciosViewProps) {
+    
+    const [anuncioAEliminar, setAnuncioAEliminar] = useState<Anuncio | null>(null);
+    const [eliminando, setEliminando] = useState(false);
+    const [errorPorFila, setErrorPorFila] = useState<Record<number, string>>({});
+
+    const confirmarEliminacion = async () => {
+        if (!anuncioAEliminar) return;
+
+        setEliminando(true);
+        try {
+        await onEliminar(anuncioAEliminar.id);
+        setAnuncioAEliminar(null);
+        } catch (err) {
+        setErrorPorFila((prev) => ({
+            ...prev,
+            [anuncioAEliminar.id]: err instanceof Error ? err.message : "No se pudo eliminar",
+        }));
+        setAnuncioAEliminar(null);
+        } finally {
+        setEliminando(false);
+        }
+    };
+
     if (anuncios.length === 0) {
         return (
             <div className="rounded-xl border border-slate-200 bg-white p-8 text-center shadow-sm">
@@ -36,6 +64,9 @@ export default function AnunciosView({ anuncios }: AnunciosViewProps) {
                         </th>
                         <th className="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-600">
                             Estado
+                        </th>
+                        <th className="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-600">
+                            Acciones
                         </th>
                     </tr>
                 </thead>
@@ -68,10 +99,48 @@ export default function AnunciosView({ anuncios }: AnunciosViewProps) {
                                     {anuncio.estado}
                                 </span>
                             </td>
+                            <td className="px-6 py-4 text-center">
+                                <button
+                                    type="button"
+                                    onClick={() => setAnuncioAEliminar(anuncio)}
+                                    title="Eliminar anuncio"
+                                    className="inline-flex items-center justify-center rounded-lg p-2 text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth={1.8}
+                                        className="h-5 w-5"
+                                    >
+                                        <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M6 7h12M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m2 0-.7 12.1a2 2 0 0 1-2 1.9H8.7a2 2 0 0 1-2-1.9L6 7h12Z"
+                                        />
+                                    </svg>
+                                </button>
+                                {errorPorFila[anuncio.id] && (
+                                    <p className="mt-1 max-w-[160px] text-xs text-red-500">
+                                        {errorPorFila[anuncio.id]}
+                                    </p>
+                                )}
+                            </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
+
+            {anuncioAEliminar && (
+                <ConfirmacionModal
+                titulo="Eliminar anuncio"
+                mensaje={`¿Eliminar el anuncio "${anuncioAEliminar.cargo}"? Esta acción no se puede deshacer.`}
+                confirmando={eliminando}
+                onConfirmar={confirmarEliminacion}
+                onCancelar={() => setAnuncioAEliminar(null)}
+                />
+            )}
         </div>
     );
 }

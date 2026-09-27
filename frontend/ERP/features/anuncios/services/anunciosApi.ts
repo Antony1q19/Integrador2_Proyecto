@@ -26,7 +26,7 @@ export function mapearAnuncioDeApi(dto: Record<string, unknown>): Anuncio {
     empresaId: dto.empresaId as number,
     empresaRazonSocial: dto.empresaRazonSocial as string,
     fechaCreacion: dto.fechaCreacion as string,
-    postulantesAsociadosIds: [],
+    //postulantesAsociadosIds: [],
   };
 }
 

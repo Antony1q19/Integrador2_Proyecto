@@ -10,7 +10,7 @@ export default function EmpresaForm({
   submitLabel,
   cancelHref,
 }: EmpresaFormProps) {
-  const { formData, errors, enviando, handleChange, handleSubmit } =
+  const { formData, errors, enviando, errorEnvio, handleChange, handleSubmit } =
     useEmpresaForm({ initialData, onSubmitValido });
 
   return (
@@ -18,6 +18,12 @@ export default function EmpresaForm({
       onSubmit={handleSubmit}
       className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-5"
     >
+      {errorEnvio && (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+          {errorEnvio}
+        </div>
+      )}
+      
       <div>
         <label
           htmlFor="razonSocial"

@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+/*import { notFound } from "next/navigation";
 import AnuncioFicha from "@/features/anuncios/components/AnuncioFicha";
 import { mapearAnuncioDeApi } from "@/features/anuncios/services/anunciosApi";
 import { mapearPostulanteDeApi } from "@/features/postulantes/services/postulantesService";
@@ -34,5 +34,72 @@ export default async function AnuncioDetallePage({
   });
 
   const anuncio = { ...mapearAnuncioDeApi(dto), postulantesAsociadosIds: idsAsociados };
+  return <AnuncioFicha anuncio={anuncio} postulantes={postulantes} />;
+}
+*/
+
+"use client";
+
+import { use, useEffect, useState } from "react";
+import { notFound } from "next/navigation";
+import { useAnuncio } from "@/features/anuncios/hooks/useAnuncio";
+import { fetchPostulantes } from "@/features/postulantes/services/postulantesService";
+import { Postulante } from "@/features/postulantes/types/postulante.types";
+import AnuncioFicha from "@/features/anuncios/components/AnuncioFicha";
+
+export default function AnuncioDetallePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = use(params);
+  const anuncioId = Number(id);
+  const { anuncio, cargando, error, noEncontrado } = useAnuncio(anuncioId);
+
+  const [postulantes, setPostulantes] = useState<Postulante[]>([]);
+
+  useEffect(() => {
+    let cancelado = false;
+    fetchPostulantes()
+      .then((datos) => {
+        if (!cancelado) setPostulantes(datos);
+      })
+      .catch(() => {
+        // Falla "de mejor esfuerzo": si no cargan los postulantes, el
+        // detalle del anuncio igual se muestra, solo sin ese listado.
+      });
+    return () => {
+      cancelado = true;
+    };
+  }, []);
+  
+  if (noEncontrado) {
+    notFound();
+  }
+
+  if (cargando) {
+    return (
+      <div className="min-h-screen bg-slate-50 p-8">
+        <div className="mx-auto max-w-4xl">
+          <p className="text-sm text-slate-400">Cargando anuncio...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !anuncio) {
+    return (
+      <div className="min-h-screen bg-slate-50 p-8">
+        <div className="mx-auto max-w-4xl rounded-xl border border-red-200 bg-red-50 p-8 text-center">
+          <p className="text-sm text-red-600">
+            {error ?? "No se pudo cargar el anuncio"}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // TODO: postulantes reales pendientes de conectar con servicio-procesos-seleccion.
+  // Ver nota en AnuncioFicha.tsx.
   return <AnuncioFicha anuncio={anuncio} postulantes={postulantes} />;
 }
