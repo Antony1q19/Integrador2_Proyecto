@@ -2,7 +2,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CompetenciasEvaluacion, Evaluacion } from "../types/postulante.types";
+import { CompetenciasEvaluacion, Evaluacion, NuevaEvaluacion } from "../types/postulante.types";
 import { COMPETENCIAS, calcularPuntajeTotal, calcularResultado } from "../utils/evaluacion";
 
 const COMPETENCIAS_INICIALES: CompetenciasEvaluacion = {
@@ -17,7 +17,7 @@ const COMPETENCIAS_INICIALES: CompetenciasEvaluacion = {
 interface EvaluacionesTabProps {
   evaluaciones: Evaluacion[];
   guardando: boolean;
-  onRegistrar: (evaluacion: Omit<Evaluacion, "id">) => Promise<void>;
+  onRegistrar: (evaluacion: NuevaEvaluacion) => Promise<void>;
 }
 
 function ResultadoBadge({ resultado }: { resultado: Evaluacion["resultado"] }) {
@@ -36,9 +36,9 @@ function ResultadoBadge({ resultado }: { resultado: Evaluacion["resultado"] }) {
 
 export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: EvaluacionesTabProps) {
   const [mostrarForm, setMostrarForm] = useState(false);
-  const [form, setForm] = useState({
-    evaluador: "",
-    fecha: new Date().toISOString().slice(0, 10),
+  const [error, setError] = useState<string | null>(null);
+  // El evaluador (la cuenta con sesión iniciada) y la fecha los pone el sistema al guardar.
+  const [form, setForm] = useState<NuevaEvaluacion>({
     competencias: COMPETENCIAS_INICIALES,
     comentarios: "",
   });
@@ -48,20 +48,14 @@ export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: Evalua
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onRegistrar({
-      evaluador: form.evaluador,
-      fecha: form.fecha,
-      competencias: form.competencias,
-      puntajeTotal: puntajePreview,
-      resultado: resultadoPreview,
-      comentarios: form.comentarios,
-    });
-    setForm({
-      evaluador: "",
-      fecha: new Date().toISOString().slice(0, 10),
-      competencias: COMPETENCIAS_INICIALES,
-      comentarios: "",
-    });
+    setError(null);
+    try {
+      await onRegistrar(form);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No se pudo guardar la evaluación.");
+      return; // se conserva lo escrito para poder reintentar
+    }
+    setForm({ competencias: COMPETENCIAS_INICIALES, comentarios: "" });
     setMostrarForm(false);
   };
 
@@ -92,28 +86,9 @@ export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: Evalua
           onSubmit={handleSubmit}
           className="space-y-4 rounded-lg border border-gray-100 bg-slate-50/60 p-4"
         >
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label className="mb-1 block text-xs font-medium text-gray-500">Evaluador</label>
-              <input
-                required
-                value={form.evaluador}
-                onChange={(e) => setForm({ ...form, evaluador: e.target.value })}
-                className="w-full rounded-md border border-gray-200 px-3 py-1.5 text-sm focus:border-[#1D2B53] focus:outline-none focus:ring-1 focus:ring-[#1D2B53]"
-                placeholder="Nombre del evaluador"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-gray-500">Fecha</label>
-              <input
-                type="date"
-                required
-                value={form.fecha}
-                onChange={(e) => setForm({ ...form, fecha: e.target.value })}
-                className="w-full rounded-md border border-gray-200 px-3 py-1.5 text-sm focus:border-[#1D2B53] focus:outline-none focus:ring-1 focus:ring-[#1D2B53]"
-              />
-            </div>
-          </div>
+          <p className="text-xs text-gray-400">
+            El evaluador es tu cuenta y la fecha es la de hoy: se registran automáticamente al guardar.
+          </p>
 
           <div>
             <p className="mb-2 text-xs font-medium text-gray-500">Competencias evaluadas (1 a 5)</p>
@@ -165,6 +140,8 @@ export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: Evalua
             <ResultadoBadge resultado={resultadoPreview} />
           </div>
 
+          {error && <p className="text-xs text-red-600">{error}</p>}
+
           <button
             type="submit"
             disabled={guardando}
@@ -186,7 +163,7 @@ export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: Evalua
               <div className="flex items-start justify-between">
                 <div>
                   <p className="font-mono text-[11px] text-gray-400">
-                    {ev.evaluador} · {new Date(ev.fecha).toLocaleDateString("es-PE")}
+                    {ev.evaluador} · {new Date(`${ev.fecha}T00:00:00`).toLocaleDateString("es-PE")}
                   </p>
                   <p className="mt-0.5 text-sm font-medium text-gray-800">{ev.puntajeTotal}/100</p>
                 </div>

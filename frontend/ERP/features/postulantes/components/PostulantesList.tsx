@@ -52,7 +52,7 @@ export const PostulantesList = memo(function PostulantesList() {
   // FILTROS - Estable con useCallback
   // ============================================================
   const handleFilterChange = useCallback(
-    (key: "estado" | "cargo" | "empresa" | "fechaInicio" | "fechaFin", value: string) => {
+    (key: "estado" | "cargo" | "empresa", value: string) => {
       actualizarFiltro(key, value);
     },
     [actualizarFiltro]
@@ -124,8 +124,6 @@ export const PostulantesList = memo(function PostulantesList() {
             estado: filtros.estado,
             cargo: filtros.cargo,
             empresa: filtros.empresa,
-            fechaInicio: filtros.fechaInicio,
-            fechaFin: filtros.fechaFin,
           }}
           onFilterChange={handleFilterChange}
           onClearFilters={limpiarFiltros}

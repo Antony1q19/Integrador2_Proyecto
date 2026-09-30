@@ -1,6 +1,6 @@
 "use client";
 
-import { empresasMock } from "@/features/empresas/data/mock_empresas";
+import { Empresa } from "@/features/empresas/types/empresa";
 import { EstadoAnuncio } from "@/features/anuncios/types/anuncio";
 import { FiltrosAnuncios } from "@/features/anuncios/hooks/useAnunciosFilters";
 
@@ -12,6 +12,7 @@ interface AnunciosFiltrosProps {
   ) => void;
   limpiarFiltros: () => void;
   cargosDisponibles: string[];
+  empresas: Empresa[]; // las empresas que el usuario puede ver
 }
 
 const estilosSelect =
@@ -22,6 +23,7 @@ export default function AnunciosFiltros({
   actualizarFiltro,
   limpiarFiltros,
   cargosDisponibles,
+  empresas,
 }: AnunciosFiltrosProps) {
   return (
     <div className="mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -47,7 +49,7 @@ export default function AnunciosFiltros({
           className={estilosSelect}
         >
           <option value="todas">Todas las empresas</option>
-          {empresasMock.map((empresa) => (
+          {empresas.map((empresa) => (
             <option key={empresa.id} value={empresa.id}>
               {empresa.razonSocial}
             </option>

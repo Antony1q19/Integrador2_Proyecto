@@ -12,12 +12,14 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Anuncio } from "@/features/anuncios/types/anuncio";
-import { anunciosMock } from "@/features/anuncios/data/mock-anuncios";
 import { EstadoProceso, Postulante } from "../types/postulante.types";
 import { ESTILOS_ESTADO } from "./EstadoBadge";
 import { OPCIONES_ESTADO } from "./EstadoSelector";
 import { usePostulantesPipeline } from "../hooks/usePostulantesPipeline";
+import { prefetchPostulante } from "../services/postulantesService";
+import { ContratacionModal } from "@/features/contrataciones/components/ContratacionModal";
 import { useToast, ToastContainer } from "@/components/shared/Toast";
+import { Skeleton } from "@/components/shared/Skeleton";
 
 const TODAS_LAS_EMPRESAS = "TODAS";
 const TODOS_LOS_PUESTOS = "TODOS";
@@ -37,19 +39,26 @@ interface Tarjeta {
 }
 
 export function PostulantesPipeline() {
-  const { postulantes, loading, error, moviendoId, moverEstadoPostulacion } = usePostulantesPipeline();
+  const { postulantes, anuncios, loading, error, moviendoId, moverEstadoPostulacion, recargar } = usePostulantesPipeline();
+  // Soltar una tarjeta en "Contratado" pide antes los datos de la contratación (ingreso, contrato, salario).
+  const [contratando, setContratando] = useState<Tarjeta | null>(null);
   const { toasts, mostrarToast } = useToast();
   const [columnaSobre, setColumnaSobre] = useState<EstadoProceso | null>(null);
   const [empresaFiltro, setEmpresaFiltro] = useState<string>(TODAS_LAS_EMPRESAS);
   const [puestoFiltro, setPuestoFiltro] = useState<string>(TODOS_LOS_PUESTOS);
 
   // Una tarjeta por cada postulación (postulante + anuncio al que se
-  // presentó), no una por postulante.
+  // presentó), no una por postulante. Una postulación existe si figura en
+  // `procesosPostulacion` (datos reales) o, en modo mock, en `postulantesAsociadosIds`.
   const tarjetas: Tarjeta[] = useMemo(
     () =>
       postulantes.flatMap((postulante) =>
-        anunciosMock
-          .filter((anuncio) => anuncio.postulantesAsociadosIds.includes(postulante.id))
+        anuncios
+          .filter(
+            (anuncio) =>
+              anuncio.postulantesAsociadosIds.includes(postulante.id) ||
+              String(anuncio.id) in postulante.procesosPostulacion
+          )
           .map((anuncio) => ({
             id: `${postulante.id}:${anuncio.id}`,
             postulante,
@@ -57,15 +66,23 @@ export function PostulantesPipeline() {
             estado: postulante.procesosPostulacion[String(anuncio.id)]?.estadoActual ?? "POSTULADO",
           }))
       ),
-    [postulantes]
+    [postulantes, anuncios]
   );
 
+  // Los dos desplegables se ajustan entre sí: si eliges un puesto, "Empresa" solo ofrece
+  // las empresas que tienen ese puesto...
   const empresas = useMemo(
-    () => Array.from(new Set(tarjetas.map((t) => t.anuncio.empresaRazonSocial))).sort((a, b) => a.localeCompare(b)),
-    [tarjetas]
+    () =>
+      Array.from(
+        new Set(
+          tarjetas
+            .filter((t) => puestoFiltro === TODOS_LOS_PUESTOS || t.anuncio.cargo === puestoFiltro)
+            .map((t) => t.anuncio.empresaRazonSocial)
+        )
+      ).sort((a, b) => a.localeCompare(b)),
+    [tarjetas, puestoFiltro]
   );
-  // Los puestos se acotan a la empresa seleccionada: si eliges una empresa,
-  // el dropdown de puesto solo debe ofrecer los puestos que existen en ella.
+  // ...y si eliges una empresa, "Puesto" solo ofrece los puestos que existen en ella.
   const puestos = useMemo(
     () =>
       Array.from(
@@ -113,6 +130,10 @@ export function PostulantesPipeline() {
   const handleDrop = async (tarjeta: Tarjeta, estadoDestino: EstadoProceso) => {
     setColumnaSobre(null);
     if (tarjeta.estado === estadoDestino) return;
+    if (estadoDestino === "CONTRATADO") {
+      setContratando(tarjeta);
+      return;
+    }
     try {
       await moverEstadoPostulacion(tarjeta.postulante.id, String(tarjeta.anuncio.id), estadoDestino);
       mostrarToast(
@@ -126,11 +147,35 @@ export function PostulantesPipeline() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-6xl animate-pulse space-y-4 p-6">
-        <div className="h-8 w-64 rounded-lg bg-gray-100" />
-        <div className="flex gap-4">
-          {OPCIONES_ESTADO.map((op) => (
-            <div key={op.value} className="h-96 w-64 shrink-0 rounded-xl bg-gray-100" />
+      <div aria-hidden className="mx-auto max-w-6xl space-y-4 p-6">
+        <div className="space-y-2">
+          <Skeleton className="h-6 w-56" />
+          <Skeleton className="h-4 w-full max-w-2xl" />
+        </div>
+        <div className="flex items-end gap-3 rounded-lg border border-gray-100 bg-white p-3">
+          <Skeleton className="h-9 w-44" />
+          <Skeleton className="h-9 w-44" />
+        </div>
+        <div className="flex gap-4 overflow-hidden pb-4">
+          {OPCIONES_ESTADO.map((op, columna) => (
+            <div key={op.value} className="flex w-64 shrink-0 flex-col gap-3 rounded-xl bg-slate-50/60 p-3">
+              <div className="flex items-center justify-between px-1">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-5 w-6 rounded-full" />
+              </div>
+              {Array.from({ length: columna % 3 === 0 ? 2 : 1 }).map((_, i) => (
+                <div key={i} className="space-y-2 rounded-lg border border-gray-100 bg-white p-3 shadow-sm">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-7 w-7 rounded-full" />
+                    <div className="space-y-1.5">
+                      <Skeleton className="h-3.5 w-28" />
+                      <Skeleton className="h-3 w-20" />
+                    </div>
+                  </div>
+                  <Skeleton className="h-3 w-32" />
+                </div>
+              ))}
+            </div>
           ))}
         </div>
       </div>
@@ -238,7 +283,11 @@ export function PostulantesPipeline() {
                       moviendoId === t.id ? "opacity-50" : ""
                     }`}
                   >
-                    <Link href={`/postulantes/${t.postulante.id}`} className="block">
+                    <Link
+                      href={`/postulantes/${t.postulante.id}`}
+                      className="block"
+                      onMouseEnter={() => prefetchPostulante(t.postulante.id)}
+                    >
                       <div className="flex items-center gap-2">
                         <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1D2B53] text-[10px] font-semibold text-white">
                           {iniciales(t.postulante.datosPersonales.nombres, t.postulante.datosPersonales.apellidos)}
@@ -265,6 +314,21 @@ export function PostulantesPipeline() {
           );
         })}
       </div>
+
+      {contratando && (
+        <ContratacionModal
+          postulanteId={contratando.postulante.id}
+          anuncioId={contratando.anuncio.id}
+          cargoSugerido={contratando.anuncio.cargo}
+          nombrePostulante={`${contratando.postulante.datosPersonales.nombres} ${contratando.postulante.datosPersonales.apellidos}`}
+          onCerrar={() => setContratando(null)}
+          onGuardada={() => {
+            setContratando(null);
+            mostrarToast(`Contratación registrada: "${contratando.anuncio.cargo}" pasó a "Contratado"`, "success");
+            void recargar();
+          }}
+        />
+      )}
 
       <ToastContainer toasts={toasts} />
     </div>

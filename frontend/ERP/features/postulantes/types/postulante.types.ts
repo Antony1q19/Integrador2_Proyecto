@@ -14,6 +14,10 @@ export type EstadoProceso =
   | "CONTRATADO"
   | "DESCARTADO";
 
+// Estado de un POSTULANTE (no de una postulación): es el de su postulación más reciente, o
+// "NUEVO" si todavía no ha postulado a ningún anuncio. "NUEVO" no es una etapa del pipeline.
+export type EstadoPostulante = EstadoProceso | "NUEVO";
+
 export const ORDEN_PIPELINE: EstadoProceso[] = [
   "POSTULADO",
   "EN_EVALUACION",
@@ -42,8 +46,15 @@ export interface DocumentoPostulante {
   tipo: "CV" | "DNI" | "CERTIFICADO" | "OTRO";
   tamanioKb: number;
   fechaCarga: string; // ISO datetime
-  url?: string; // vendrá del backend/storage real
+  // Dirección desde la que se obtiene el archivo para verlo/descargarlo. En modo API es
+  // una ruta propia del ERP (pasa por el Gateway, con la sesión); si el documento no
+  // tiene archivo real (dato de ejemplo), queda vacía y "Ver/Descargar" se deshabilitan.
+  url?: string;
 }
+
+// Lo único que el usuario aporta al registrar una evaluación. El evaluador (quien
+// tiene la sesión), la fecha, el puntaje y el resultado los decide el sistema.
+export type NuevaEvaluacion = Pick<Evaluacion, "competencias" | "comentarios">;
 
 // Datos que el propio postulante completa al crear su perfil en la bolsa de
 // trabajo (ver la app ANUNCIOS). RRHH solo los visualiza aquí, en la ficha.
@@ -133,7 +144,7 @@ export interface ConsentimientosPostulante {
 export interface Postulante {
   id: string;
   datosPersonales: DatosPersonales;
-  estadoActual: EstadoProceso;
+  estadoActual: EstadoPostulante;
   documentos: DocumentoPostulante[];
   evaluaciones: Evaluacion[];
   historialEstados: HistorialEstado[];
@@ -148,6 +159,10 @@ export interface Postulante {
   // PostulacionesTab.tsx).
   procesosPostulacion: Record<string, ProcesoPostulacion>;
   consentimientos: ConsentimientosPostulante;
+  // ¿Ya tiene cuenta de acceso a ANUNCIOS? Lo informa el backend. En el modo mock
+  // (sin backend) no viene: ahí se usa `consentimientos.tratamientoDatos`, que solo
+  // es true cuando el postulante creó su propia cuenta (ver `postulanteTieneCuenta`).
+  tieneCuenta?: boolean;
 }
 
 // ============================================================

@@ -1,32 +1,24 @@
-"use client";
-
-import { use } from "react";
-import { useRouter, notFound } from "next/navigation";
 import Link from "next/link";
-import EmpresaForm from "@/features/empresas/components/EmpresaForm";
-import { EmpresaFormData } from "@/features/empresas/types/formData";
-import { empresasMock } from "@/features/empresas/data/mock_empresas";
-import { actualizarEmpresa } from "@/features/empresas/services/empresasService";
+import { notFound } from "next/navigation";
+import EditarEmpresaForm from "@/features/empresas/components/EditarEmpresaForm";
+import { mapearEmpresaDeApi } from "@/features/empresas/services/empresasApi";
+import { obtenerDelGateway } from "@/lib/datosServidor";
 
-export default function EditarEmpresaPage({
+export default async function EditarEmpresaPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = use(params);
-  const router = useRouter();
-
+  const { id } = await params;
   const empresaId = Number(id);
-  const empresaExistente = empresasMock.find((e) => e.id === empresaId);
+
+  // Solo llegan las empresas que este usuario puede ver: si no está asignada, da 404.
+  const empresasApi = (await obtenerDelGateway<Record<string, unknown>[]>("/empresas")) ?? [];
+  const empresaExistente = empresasApi.map(mapearEmpresaDeApi).find((e) => e.id === empresaId);
 
   if (!empresaExistente) {
     notFound();
   }
-
-  const handleActualizar = async (data: EmpresaFormData) => {
-    await actualizarEmpresa(empresaId, data);
-    router.push(`/empresas/${empresaId}`);
-  };
 
   return (
     <div className="min-h-screen bg-slate-50 p-8">
@@ -42,19 +34,7 @@ export default function EditarEmpresaPage({
           Editar Empresa
         </h1>
 
-        <EmpresaForm
-          initialData={{
-            razonSocial: empresaExistente.razonSocial,
-            ruc: empresaExistente.ruc,
-            contactoNombre: empresaExistente.contactoNombre,
-            contactoEmail: empresaExistente.contactoEmail,
-            contactoTelefono: empresaExistente.contactoTelefono,
-            sector: empresaExistente.sector,
-          }}
-          onSubmitValido={handleActualizar}
-          submitLabel="Guardar Cambios"
-          cancelHref={`/empresas/${empresaId}`}
-        />
+        <EditarEmpresaForm empresa={empresaExistente} />
       </div>
     </div>
   );

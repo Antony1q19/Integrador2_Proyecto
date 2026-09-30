@@ -30,6 +30,7 @@ export function useEmpresaForm({
   );
   const [errors, setErrors] = useState<EmpresaFormErrors>({});
   const [enviando, setEnviando] = useState(false);
+  const [errorEnvio, setErrorEnvio] = useState<string | null>(null);
 
   const validarFormulario = (): EmpresaFormErrors => {
     const nuevosErrores: EmpresaFormErrors = {};
@@ -82,14 +83,21 @@ export function useEmpresaForm({
     }
 
     setEnviando(true);
-    await onSubmitValido(formData);
-    setEnviando(false);
+    setErrorEnvio(null);
+    try {
+      await onSubmitValido(formData);
+    } catch (err) {
+      setErrorEnvio(err instanceof Error ? err.message : "Ocurrió un error al guardar");
+    } finally {
+      setEnviando(false);
+    }
   };
 
   return {
     formData,
     errors,
     enviando,
+    errorEnvio,
     handleChange,
     handleSubmit,
   };

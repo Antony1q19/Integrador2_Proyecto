@@ -1,0 +1,17 @@
+// app/api/usuarios/[id]/estado/route.ts — Activo | Suspendido | Eliminado (Admin).
+import { NextRequest, NextResponse } from "next/server";
+import { reenviarAlGateway } from "@/lib/gatewayProxy";
+
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const token = request.cookies.get("authToken")?.value;
+  if (!token) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+
+  const cuerpoPeticion = await request.text();
+  const respuesta = await reenviarAlGateway(token, `/usuarios/${id}/estado`, {
+    method: "PATCH",
+    body: cuerpoPeticion,
+  });
+  const cuerpo = await respuesta.text();
+  return new NextResponse(cuerpo, { status: respuesta.status, headers: { "Content-Type": "application/json" } });
+}

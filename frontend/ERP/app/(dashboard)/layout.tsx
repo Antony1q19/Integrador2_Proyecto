@@ -67,17 +67,19 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* SIDEBAR */}
-      <Sidebar
-        role={userRole}
-        open={sidebarOpen}
-        setOpen={setSidebarOpen}
-      />
+      {/* SIDEBAR (no se imprime) */}
+      <div className="print:hidden">
+        <Sidebar
+          role={userRole}
+          open={sidebarOpen}
+          setOpen={setSidebarOpen}
+        />
+      </div>
 
       {/* CONTENIDO PRINCIPAL */}
-      <div className="lg:pl-72">
-        {/* HEADER */}
-        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200 bg-white/90 px-6 shadow-sm backdrop-blur-md">
+      <div className="lg:pl-72 print:pl-0">
+        {/* HEADER (no se imprime) */}
+        <header className="sticky top-0 z-30 print:hidden flex h-20 items-center justify-between border-b border-slate-200 bg-white/90 px-6 shadow-sm backdrop-blur-md">
           {/* IZQUIERDA */}
           <div className="flex items-center gap-4">
             <button

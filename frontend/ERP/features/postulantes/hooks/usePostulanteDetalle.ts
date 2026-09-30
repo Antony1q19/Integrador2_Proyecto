@@ -6,7 +6,7 @@ import {
   Postulante,
   DatosPersonales,
   DocumentoPostulante,
-  Evaluacion,
+  NuevaEvaluacion,
   EstadoProceso,
 } from "../types/postulante.types";
 import {
@@ -19,6 +19,7 @@ import {
   updateEstado,
   actualizarEstadoPostulacion,
 } from "../services/postulantesService";
+import { marcarVencido } from "@/lib/cacheCliente";
 
 interface UsePostulanteDetalleResult {
   postulante: Postulante | null;
@@ -28,7 +29,7 @@ interface UsePostulanteDetalleResult {
   subirDocumento: (archivo: File, tipo: DocumentoPostulante["tipo"]) => Promise<void>;
   reemplazarDocumento: (documentoId: string, archivo: File) => Promise<void>;
   eliminarDocumento: (documentoId: string) => Promise<void>;
-  registrarEvaluacion: (evaluacion: Omit<Evaluacion, "id">) => Promise<void>;
+  registrarEvaluacion: (evaluacion: NuevaEvaluacion) => Promise<void>;
   cambiarEstado: (estado: EstadoProceso, comentario?: string) => Promise<void>;
   actualizarEstadoPostulacion: (
     anuncioId: string,
@@ -36,6 +37,9 @@ interface UsePostulanteDetalleResult {
     comentario?: string
   ) => Promise<void>;
   guardando: boolean;
+  // Vuelve a pedir la ficha SIN mostrar el esqueleto de carga (se usa cuando algo se cambió fuera de la ficha,
+  // ej. al programar una entrevista o registrar una contratación, que mueven la etapa del postulante).
+  refrescar: () => Promise<void>;
 }
 
 // TODO: reemplazar por el usuario real de la sesión (features/auth/hooks/useAuth)
@@ -66,6 +70,15 @@ export function usePostulanteDetalle(id: string): UsePostulanteDetalleResult {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     cargar();
   }, [cargar]);
+
+  const refrescar = async () => {
+    marcarVencido(`postulante:${id}`);
+    try {
+      setPostulante(await fetchPostulanteById(id));
+    } catch {
+      // Si falla, se conserva lo que ya se veía.
+    }
+  };
 
   const guardarDatosPersonales = async (datos: DatosPersonales) => {
     setGuardando(true);
@@ -108,7 +121,7 @@ export function usePostulanteDetalle(id: string): UsePostulanteDetalleResult {
     );
   };
 
-  const registrarEvaluacion = async (evaluacion: Omit<Evaluacion, "id">) => {
+  const registrarEvaluacion = async (evaluacion: NuevaEvaluacion) => {
     setGuardando(true);
     try {
       const nueva = await addEvaluacion(id, evaluacion);
@@ -173,5 +186,6 @@ export function usePostulanteDetalle(id: string): UsePostulanteDetalleResult {
     cambiarEstado,
     actualizarEstadoPostulacion: handleActualizarEstadoPostulacion,
     guardando,
+    refrescar,
   };
 }

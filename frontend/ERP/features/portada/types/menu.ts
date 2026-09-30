@@ -1,4 +1,6 @@
 import {
+    BadgeCheck,
+    CalendarClock,
     LayoutDashboard,
     MessageCircle,
     Megaphone,
@@ -8,7 +10,7 @@ import {
     type LucideIcon,
 } from "lucide-react";
 
-// 1. Cambiamos los tipos para que coincidan con mockAuth.ts
+// 1. Cambiamos los tipos para que coincidan con authService.ts
 export type Role = "Admin" | "RRHH" | "Supervisor";
 
 export interface MenuSubItem {
@@ -40,6 +42,18 @@ export const menuItems: MenuItem[] = [
             { name: "Listado", href: "/postulantes" },
             { name: "Pipeline", href: "/postulantes/pipeline" },
         ],
+    },
+    {
+        name: "Entrevistas",
+        href: "/entrevistas",
+        icon: CalendarClock,
+        roles: ["Admin", "RRHH", "Supervisor"],
+    },
+    {
+        name: "Contrataciones",
+        href: "/contrataciones",
+        icon: BadgeCheck,
+        roles: ["Admin", "RRHH", "Supervisor"],
     },
     {
         name: "Comunicaciones",

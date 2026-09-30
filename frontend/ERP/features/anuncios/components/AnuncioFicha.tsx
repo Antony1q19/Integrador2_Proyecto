@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { Anuncio } from "@/features/anuncios/types/anuncio";
+import { Postulante } from "@/features/postulantes/types/postulante.types";
 import { colorEstado } from "@/features/anuncios/utils/estado";
 import PostulantesAsociados from "@/features/anuncios/components/PostulantesAsociados";
 
 interface AnuncioFichaProps {
     anuncio: Anuncio;
+    postulantes: Postulante[];
 }
 
-export default function AnuncioFicha({ anuncio }: AnuncioFichaProps) {
+export default function AnuncioFicha({ anuncio, postulantes }: AnuncioFichaProps) {
     return (
         <div className="min-h-screen bg-slate-50 p-8">
             <div className="mx-auto max-w-4xl">
@@ -40,6 +42,13 @@ export default function AnuncioFicha({ anuncio }: AnuncioFichaProps) {
                             {anuncio.empresaRazonSocial}
                         </Link>
                     </div>
+                    <Link
+                            href={`/anuncios/${anuncio.id}/editar`}
+                            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
+                        >
+                            Editar
+                    </Link>
+
                 </div>
 
                 {/* Datos generales */}
@@ -54,8 +63,9 @@ export default function AnuncioFicha({ anuncio }: AnuncioFichaProps) {
                         <div>
                             <dt className="text-xs text-slate-400">Salario Referencial</dt>
                             <dd className="text-sm text-slate-800">
-                                S/ {anuncio.salarioMin.toLocaleString()} - S/{" "}
-                                {anuncio.salarioMax.toLocaleString()}
+                                {anuncio.salarioMin != null && anuncio.salarioMax != null
+                                ? `S/ ${anuncio.salarioMin.toLocaleString()} - S/ ${anuncio.salarioMax.toLocaleString()}`
+                                : "No especificado"}
                             </dd>
                         </div>
                         <div>
@@ -73,7 +83,7 @@ export default function AnuncioFicha({ anuncio }: AnuncioFichaProps) {
                         Descripción del Puesto
                     </h2>
                     <p className="text-sm leading-relaxed text-slate-700">
-                        {anuncio.descripcion}
+                        {anuncio.descripcion ?? "Sin descripción registrada."}
                     </p>
                 </div>
 
@@ -83,14 +93,19 @@ export default function AnuncioFicha({ anuncio }: AnuncioFichaProps) {
                         Requisitos
                     </h2>
                     <p className="text-sm leading-relaxed text-slate-700">
-                        {anuncio.requisitos}
+                        {anuncio.requisitos ?? "Sin requisitos registrados."}
                     </p>
                 </div>
 
-                {/* Postulantes asociados */}
+                {/* Postulantes asociados 
+                    NOTA: esta relación vive en servicio-procesos-seleccion (otro
+                    microservicio, aún no conectado desde este frontend). Por ahora,
+                    PostulantesAsociados arranca vacío y su estado es solo local
+                    (se pierde al recargar) — no hay persistencia real todavía. */}
                 <div className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
                     <PostulantesAsociados
-                        postulantesAsociadosIds={anuncio.postulantesAsociadosIds}
+                        postulantesAsociadosIds={[]}
+                        postulantes={postulantes}
                     />
                 </div>
             </div>

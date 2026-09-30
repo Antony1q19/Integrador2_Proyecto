@@ -1,22 +1,28 @@
 // features/postulantes/components/PostulacionesTab.tsx
 //
-// Muestra a qué anuncios/vacantes está asociado el postulante (relación
-// definida en `Anuncio.postulantesAsociadosIds`, la misma que gestiona
-// PostulantesAsociados.tsx desde el lado del anuncio) y el pipeline
+// Muestra a qué anuncios/vacantes se presentó el postulante y el pipeline
 // COMPLETO de cada postulación por separado: un mismo postulante puede
 // estar en "Entrevista" para un anuncio y ya "Contratado" en otro al mismo
 // tiempo, cada uno con su propia línea de tiempo e historial.
+//
+// Un anuncio se muestra si el postulante tiene una postulación a él (clave en
+// `procesosPostulacion`, que en modo API viene de servicio-procesos-seleccion)
+// o, en modo mock, si figura en `Anuncio.postulantesAsociadosIds`. Los datos del
+// anuncio (cargo, empresa, fechas) se piden con `fetchAnuncios()`.
 "use client";
 
 import { useState } from "react";
 import Link from "next/link";
-import { anunciosMock } from "@/features/anuncios/data/mock-anuncios";
-import { EstadoAnuncio } from "@/features/anuncios/types/anuncio";
+import { Anuncio, EstadoAnuncio } from "@/features/anuncios/types/anuncio";
 import { EstadoProceso, HistorialEstado, ProcesoPostulacion } from "../types/postulante.types";
+import { fetchAnuncios } from "../services/postulantesService";
 import { EstadoBadge, ESTILOS_ESTADO } from "./EstadoBadge";
 import { EstadoSelector } from "./EstadoSelector";
 import { Timeline } from "./Timeline";
 import { useToast, ToastContainer } from "@/components/shared/Toast";
+import { ContratacionModal } from "@/features/contrataciones/components/ContratacionModal";
+import { Skeleton } from "@/components/shared/Skeleton";
+import { useCargaConCache } from "@/lib/cacheCliente";
 
 const ESTILOS_ESTADO_ANUNCIO: Record<EstadoAnuncio, string> = {
   Abierto: "bg-emerald-50 text-emerald-700",
@@ -31,6 +37,9 @@ interface PostulacionesTabProps {
   procesosPostulacion: Record<string, ProcesoPostulacion>;
   guardando: boolean;
   onActualizarEstado: (anuncioId: string, estado: EstadoProceso, comentario?: string) => Promise<void>;
+  nombrePostulante?: string;
+  // Se llama después de registrar una contratación (cambia la etapa de la postulación en el servidor).
+  onContratado?: () => void;
 }
 
 function HistorialPostulacion({ historial }: { historial: HistorialEstado[] }) {
@@ -56,12 +65,22 @@ export function PostulacionesTab({
   procesosPostulacion,
   guardando,
   onActualizarEstado,
+  nombrePostulante,
+  onContratado,
 }: PostulacionesTabProps) {
+  const [contratando, setContratando] = useState<{ anuncioId: string; cargo: string } | null>(null);
   const { toasts, mostrarToast } = useToast();
   const [comentarios, setComentarios] = useState<Record<string, string>>({});
+  // Los anuncios se recuerdan entre pantallas (ver lib/cacheCliente.ts): casi siempre ya están cargados.
+  const { datos: anunciosCargados, cargando: cargandoAnuncios, error: errorAnuncios } = useCargaConCache<Anuncio[]>(
+    "anuncios:lista",
+    fetchAnuncios,
+    30_000
+  );
+  const anuncios = anunciosCargados ?? [];
 
-  const anunciosPostulados = anunciosMock.filter((a) =>
-    a.postulantesAsociadosIds.includes(postulanteId)
+  const anunciosPostulados = anuncios.filter(
+    (a) => a.postulantesAsociadosIds.includes(postulanteId) || String(a.id) in procesosPostulacion
   );
 
   const handleCambiarEstado = async (anuncioId: string, cargo: string, estado: EstadoProceso) => {
@@ -75,6 +94,11 @@ export function PostulacionesTab({
   };
 
   const handleDecisionFinal = async (anuncioId: string, cargo: string, estado: "CONTRATADO" | "DESCARTADO") => {
+    if (estado === "CONTRATADO") {
+      // Contratar pide los datos de la contratación (ingreso, tipo de contrato, salario): se abre su ventana.
+      setContratando({ anuncioId, cargo });
+      return;
+    }
     const confirmado = window.confirm(
       `¿Confirmas marcar la postulación a "${cargo}" como "${ESTILOS_ESTADO[estado].label}"?`
     );
@@ -90,6 +114,31 @@ export function PostulacionesTab({
       mostrarToast("No se pudo revertir la decisión. Intenta nuevamente.", "error");
     }
   };
+
+  if (cargandoAnuncios) {
+    return (
+      <div aria-hidden className="space-y-4">
+        {[1, 2].map((i) => (
+          <div key={i} className="space-y-4 rounded-lg border border-gray-100 p-4">
+            <div className="flex items-start justify-between">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-56" />
+                <Skeleton className="h-3.5 w-40" />
+                <Skeleton className="h-3 w-64" />
+              </div>
+              <Skeleton className="h-6 w-16 rounded-full" />
+            </div>
+            <Skeleton className="h-8 w-full" />
+            <Skeleton className="h-12 w-full" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (errorAnuncios) {
+    return <p className="py-6 text-center text-sm text-red-500">{errorAnuncios}</p>;
+  }
 
   if (anunciosPostulados.length === 0) {
     return (
@@ -184,6 +233,21 @@ export function PostulacionesTab({
           );
         })}
       </ul>
+
+      {contratando && (
+        <ContratacionModal
+          postulanteId={postulanteId}
+          anuncioId={Number(contratando.anuncioId)}
+          cargoSugerido={contratando.cargo}
+          nombrePostulante={nombrePostulante}
+          onCerrar={() => setContratando(null)}
+          onGuardada={() => {
+            setContratando(null);
+            mostrarToast(`Contratación registrada: "${contratando.cargo}" pasó a "Contratado"`, "success");
+            onContratado?.();
+          }}
+        />
+      )}
 
       <ToastContainer toasts={toasts} />
     </div>

@@ -1,3 +1,14 @@
+/*import EmpresasFicha from "@/features/empresas/components/EmpresasFicha";
+
+export default function EmpresaDetallePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return <EmpresasFicha params={params} />;
+}
+*/
+
 import EmpresasFicha from "@/features/empresas/components/EmpresasFicha";
 
 export default function EmpresaDetallePage({
@@ -7,4 +18,3 @@ export default function EmpresaDetallePage({
 }) {
   return <EmpresasFicha params={params} />;
 }
-

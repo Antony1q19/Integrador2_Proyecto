@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 
 import { menuItems, Role } from "@/features/portada/types/menu";
+import { cerrarSesionApi } from "@/features/login/sesion/authService";
 
 interface SidebarProps {
     role: Role;
@@ -28,11 +29,17 @@ export default function Sidebar({
     const router = useRouter();
     const [submenusManuales, setSubmenusManuales] = useState<Record<string, boolean>>({});
 
-    const handleLogout = () => {
-        // 2. Borramos AMBAS cookies al salir (rol y nombre)
+    const handleLogout = async () => {
+        // Borramos las cookies de sesión al salir: rol y nombre acá mismo;
+        // el JWT (cookie httpOnly, JS no puede tocarla) lo borra el propio
+        // servidor en /api/auth/logout -ver
+        // features/login/sesion/authService.ts -> cerrarSesionApi()-.
         document.cookie = "userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
         document.cookie = "userName=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-        
+        document.cookie = "userEmail=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = "userEmpresas=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        await cerrarSesionApi().catch(() => {});
+
         router.push("/login");
         router.refresh();
     };

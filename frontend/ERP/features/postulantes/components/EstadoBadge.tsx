@@ -1,5 +1,5 @@
 // features/postulantes/components/EstadoBadge.tsx
-import { EstadoProceso } from "../types/postulante.types";
+import { EstadoPostulante, EstadoProceso } from "../types/postulante.types";
 
 const ESTILOS_ESTADO: Record<EstadoProceso, { bg: string; text: string; label: string }> = {
   POSTULADO: { bg: "bg-slate-100", text: "text-slate-600", label: "Postulado" },
@@ -10,8 +10,12 @@ const ESTILOS_ESTADO: Record<EstadoProceso, { bg: string; text: string; label: s
   DESCARTADO: { bg: "bg-red-50", text: "text-red-700", label: "Descartado" },
 };
 
-export function EstadoBadge({ estado }: { estado: EstadoProceso }) {
-  const estilo = ESTILOS_ESTADO[estado];
+// "Nuevo" solo existe para el postulante que aún no ha postulado a nada; por eso va aparte y no
+// entre las etapas del pipeline (ESTILOS_ESTADO).
+const ESTILO_NUEVO = { bg: "bg-sky-50", text: "text-sky-700", label: "Nuevo" };
+
+export function EstadoBadge({ estado }: { estado: EstadoPostulante }) {
+  const estilo = estado === "NUEVO" ? ESTILO_NUEVO : ESTILOS_ESTADO[estado];
   return (
     <span
       className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${estilo.bg} ${estilo.text}`}

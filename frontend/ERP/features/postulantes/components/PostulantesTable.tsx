@@ -16,22 +16,25 @@ import {
 
 import { Postulante } from "../types/postulante.types";
 import { SortableField } from "../hooks/usePostulantesList";
+import { EstadoBadge } from "./EstadoBadge";
 import { PostulantesEmptyState } from "./PostulantesEmptyState";
 import { PostulantesTableSkeleton } from "./PostulantesSkeleton";
-import { anunciosMock } from "@/features/anuncios/data/mock-anuncios";
+import { contarPostulaciones, postulanteTieneCuenta, prefetchPostulante } from "../services/postulantesService";
 
-// Cuántas evaluaciones tiene el postulante y su puntaje promedio (mismo
-// criterio que "Puntaje promedio" en EvaluacionesTab).
-function calcularPuntajePromedio(postulante: Postulante): number | null {
-  if (postulante.evaluaciones.length === 0) return null;
-  const suma = postulante.evaluaciones.reduce((acc, e) => acc + e.puntajeTotal, 0);
-  return Math.round(suma / postulante.evaluaciones.length);
-}
+// Dirección de la bolsa de trabajo donde el postulante crea su cuenta.
+const URL_ANUNCIOS = process.env.NEXT_PUBLIC_ANUNCIOS_URL ?? "http://localhost:3001";
 
-// A cuántos anuncios está asociado (ver Anuncio.postulantesAsociadosIds,
-// la misma relación que consume PostulacionesTab en la ficha).
-function contarPostulaciones(postulanteId: string): number {
-  return anunciosMock.filter((a) => a.postulantesAsociadosIds.includes(postulanteId)).length;
+// "Solicitar" abre el correo del usuario con un mensaje listo para invitar al postulante
+// a crear su cuenta (el sistema todavía no envía correos por sí mismo).
+function enlaceSolicitarCuenta(postulante: Postulante): string {
+  const { nombres, email } = postulante.datosPersonales;
+  const asunto = "Crea tu cuenta para seguir tu postulación";
+  const cuerpo =
+    `Hola ${nombres},\n\n` +
+    `Para que puedas revisar el avance de tus postulaciones, te invitamos a crear tu cuenta ` +
+    `en nuestra bolsa de trabajo:\n${URL_ANUNCIOS}\n\n` +
+    `Usa este mismo correo (${email}) al registrarte.\n\nSaludos.`;
+  return `mailto:${email}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
 }
 
 function ConsentimientoIcono({ aceptado }: { aceptado: boolean }) {
@@ -143,14 +146,20 @@ export const PostulantesTable = memo(function PostulantesTable({
                 Correo
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Puntaje
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                 Postulaciones
               </th>
-              <SortableHeader {...sortHeaderProps} field="fechaRegistro">
-                Fecha Registro
-              </SortableHeader>
+              <th
+                className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
+                title="Etapa de su postulación más reciente; «Nuevo» si aún no ha postulado a nada"
+              >
+                Estado
+              </th>
+              <th
+                className="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider"
+                title="Cuenta de acceso del postulante a la bolsa de trabajo (ANUNCIOS)"
+              >
+                Cuenta
+              </th>
               <th className="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider" title="Tratamiento de datos personales (obligatorio para crear la cuenta)">
                 Términos 1
               </th>
@@ -166,8 +175,7 @@ export const PostulantesTable = memo(function PostulantesTable({
             {postulantes.map((postulante) => {
               const nombreCompleto = `${postulante.datosPersonales.nombres} ${postulante.datosPersonales.apellidos}`;
               const isHovered = hoveredRow === postulante.id;
-              const puntajePromedio = calcularPuntajePromedio(postulante);
-              const totalPostulaciones = contarPostulaciones(postulante.id);
+              const totalPostulaciones = contarPostulaciones(postulante);
 
               return (
                 <tr
@@ -175,7 +183,10 @@ export const PostulantesTable = memo(function PostulantesTable({
                   className={`transition-colors duration-150 ${
                     isHovered ? "bg-indigo-50/50" : "hover:bg-slate-50"
                   }`}
-                  onMouseEnter={() => setHoveredRow(postulante.id)}
+                  onMouseEnter={() => {
+                    setHoveredRow(postulante.id);
+                    prefetchPostulante(postulante.id); // adelanta la ficha para que abra al instante
+                  }}
                   onMouseLeave={() => setHoveredRow(null)}
                 >
                   {/* Postulante */}
@@ -201,13 +212,6 @@ export const PostulantesTable = memo(function PostulantesTable({
                     <p className="text-sm text-slate-600">{postulante.datosPersonales.email}</p>
                   </td>
 
-                  {/* Puntaje promedio de sus evaluaciones */}
-                  <td className="px-4 py-3">
-                    <p className="text-sm text-slate-700">
-                      {puntajePromedio !== null ? `${puntajePromedio}/100` : "—"}
-                    </p>
-                  </td>
-
                   {/* Cantidad de anuncios a los que postuló */}
                   <td className="px-4 py-3">
                     <p className="text-sm text-slate-700">
@@ -215,15 +219,24 @@ export const PostulantesTable = memo(function PostulantesTable({
                     </p>
                   </td>
 
-                  {/* Fecha Registro */}
+                  {/* Estado: etapa de su postulación más reciente, o "Nuevo" si no ha postulado a nada */}
                   <td className="px-4 py-3">
-                    <p className="text-sm text-slate-600">
-                      {new Date(postulante.fechaRegistro).toLocaleDateString('es-PE', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric'
-                      })}
-                    </p>
+                    <EstadoBadge estado={postulante.estadoActual} />
+                  </td>
+
+                  {/* Cuenta: un check si ya tiene usuario; si no, el botón para solicitarle que la cree */}
+                  <td className="px-4 py-3 text-center">
+                    {postulanteTieneCuenta(postulante) ? (
+                      <Check className="mx-auto h-4 w-4 text-emerald-600" aria-label="Tiene cuenta" />
+                    ) : (
+                      <a
+                        href={enlaceSolicitarCuenta(postulante)}
+                        title={`Enviar un correo a ${postulante.datosPersonales.email} para que cree su cuenta`}
+                        className="inline-flex items-center rounded-lg bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-100"
+                      >
+                        Solicitar
+                      </a>
+                    )}
                   </td>
 
                   {/* Términos 1: tratamiento de datos (obligatorio) */}

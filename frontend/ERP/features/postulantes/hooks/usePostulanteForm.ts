@@ -1,7 +1,7 @@
 // features/postulantes/hooks/usePostulanteForm.ts
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 //import { 
 //  PostulanteFormData, 
@@ -12,9 +12,8 @@ import {
   PostulanteFormData, 
   PostulanteFormErrors
 } from "../types/postulante.types";
-import { crearPostulante } from "../services/postulantesService";
-import { empresasMock } from "@/features/empresas/data/mock_empresas";
-import { anunciosMock } from "@/features/anuncios/data/mock-anuncios";
+import { crearPostulante, fetchAnuncios } from "../services/postulantesService";
+import { Anuncio } from "@/features/anuncios/types/anuncio";
 
 // ============================================================
 // VALIDADORES
@@ -69,9 +68,50 @@ export function usePostulanteForm() {
   
   const [errors, setErrors] = useState<PostulanteFormErrors>({});
 
-  // Obtener opciones para selects dinámicos
-  const empresasOptions = empresasMock.map((e) => e.razonSocial);
-  const cargosOptions = [...new Set(anunciosMock.map((a) => a.cargo))];
+  // ============================================================
+  // OPCIONES DE EMPRESA Y CARGO (vienen de los anuncios de la base de datos)
+  // ============================================================
+  const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
+  const [cargandoOpciones, setCargandoOpciones] = useState(true);
+  const [errorOpciones, setErrorOpciones] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Los setState van dentro de las respuestas de la promesa; `cancelado` evita
+    // actualizar el estado si se sale de la página antes de que llegue la respuesta.
+    let cancelado = false;
+    fetchAnuncios()
+      .then((lista) => {
+        // Un anuncio cerrado ya no recibe postulantes.
+        if (!cancelado) setAnuncios(lista.filter((a) => a.estado !== "Cerrado"));
+      })
+      .catch((e) => {
+        if (!cancelado) setErrorOpciones(e instanceof Error ? e.message : "No se pudieron cargar las opciones");
+      })
+      .finally(() => {
+        if (!cancelado) setCargandoOpciones(false);
+      });
+    return () => {
+      cancelado = true;
+    };
+  }, []);
+
+  // Las dos listas se ajustan entre sí: si ya elegiste una empresa, "Cargo" solo ofrece
+  // los anuncios de ESA empresa; si aún no, ofrece todos los cargos.
+  const empresasOptions = useMemo(
+    () => [...new Set(anuncios.map((a) => a.empresaRazonSocial))].sort((a, b) => a.localeCompare(b)),
+    [anuncios]
+  );
+  const cargosOptions = useMemo(
+    () =>
+      [
+        ...new Set(
+          anuncios
+            .filter((a) => !formData.empresaCliente || a.empresaRazonSocial === formData.empresaCliente)
+            .map((a) => a.cargo)
+        ),
+      ].sort((a, b) => a.localeCompare(b)),
+    [anuncios, formData.empresaCliente]
+  );
 
   // ============================================================
   // VALIDACIÓN POR SECCIÓN
@@ -151,13 +191,30 @@ export function usePostulanteForm() {
     field: keyof PostulanteFormData,
     value: string
   ) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    
+    setFormData((prev) => {
+      const siguiente = { ...prev, [field]: value };
+
+      if (field === "empresaCliente" && siguiente.cargoPostulado) {
+        // Si el cargo elegido no existe en la nueva empresa, se limpia.
+        const existe = anuncios.some(
+          (a) => a.cargo === siguiente.cargoPostulado && (!value || a.empresaRazonSocial === value)
+        );
+        if (!existe) siguiente.cargoPostulado = "";
+      }
+
+      if (field === "cargoPostulado" && value && !siguiente.empresaCliente) {
+        // Si solo UNA empresa tiene ese cargo, se elige sola.
+        const empresasConCargo = [...new Set(anuncios.filter((a) => a.cargo === value).map((a) => a.empresaRazonSocial))];
+        if (empresasConCargo.length === 1) siguiente.empresaCliente = empresasConCargo[0];
+      }
+      return siguiente;
+    });
+
     // Limpiar error del campo
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
-  }, [errors]);
+  }, [errors, anuncios]);
 
   // ============================================================
   // NAVEGACIÓN
@@ -190,9 +247,11 @@ export function usePostulanteForm() {
       setIsSuccess(true);
     } catch (error) {
       console.error("Error al crear postulante:", error);
+      // Se muestra el motivo real que dio el servidor (ej. "Ya existe un postulante con ese
+      // correo"); si no hay uno legible, un mensaje genérico.
       setErrors((prev) => ({
         ...prev,
-        general: "Error al guardar el postulante. Intenta nuevamente.",
+        general: error instanceof Error ? error.message : "Error al guardar el postulante. Intenta nuevamente.",
       }));
     } finally {
       setIsLoading(false);
@@ -225,6 +284,8 @@ export function usePostulanteForm() {
     currentSection,
     empresasOptions,
     cargosOptions,
+    cargandoOpciones,
+    errorOpciones,
     handleChange,
     handleSubmit,
     irASiguienteSeccion,
