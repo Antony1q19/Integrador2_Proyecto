@@ -1,4 +1,5 @@
 // features/comunicaciones/components/ChatPanel.tsx
+// Panel principal del chat
 "use client";
 
 import { RefObject } from "react";

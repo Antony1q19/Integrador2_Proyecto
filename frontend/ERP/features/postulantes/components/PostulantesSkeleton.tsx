@@ -1,4 +1,5 @@
 // features/postulantes/components/PostulantesSkeleton.tsx
+// Loading mientras cargan datos
 "use client";
 
 export function PostulantesTableSkeleton() {

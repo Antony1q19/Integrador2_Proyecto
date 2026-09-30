@@ -1,4 +1,5 @@
 // features/postulantes/components/PostulantesFilters.tsx
+//Filtros principales para la búsqueda por estado, cargo, empresa y fechas
 "use client";
 
 //import { useState, useEffect } from "react";

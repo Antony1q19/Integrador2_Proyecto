@@ -1,4 +1,5 @@
 // features/postulantes/components/PostulanteForm/SectionNavigation.tsx
+// Botones y progreso entre secciones
 "use client";
 
 import { ChevronLeft, ChevronRight, Check } from "lucide-react";

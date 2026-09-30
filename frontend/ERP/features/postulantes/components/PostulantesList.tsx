@@ -1,4 +1,5 @@
 // features/postulantes/components/PostulantesList.tsx
+//Componente principal que maneja el apartado visual
 "use client";
 
 import { useRouter } from "next/navigation";

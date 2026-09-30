@@ -1,4 +1,5 @@
 // features/comunicaciones/components/MessageTemplates.tsx
+// Plantillas predefinidas
 "use client";
 
 import { useState } from "react";

@@ -1,4 +1,5 @@
 // features/comunicaciones/components/NotificacionToast.tsx
+// Toast de nuevo mensaje
 "use client";
 
 //import { useEffect } from "react";

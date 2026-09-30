@@ -1,4 +1,5 @@
 // features/postulantes/components/PostulanteForm/DatosContactoSection.tsx
+// Sección 2 del formulario
 "use client";
 
 import { PostulanteFormData, PostulanteFormErrors } from "../../types/postulante.types";

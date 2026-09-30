@@ -1,4 +1,5 @@
 // features/postulantes/components/PostulanteForm/DatosPostulacionSection.tsx
+// Sección 3 con selects dinámicos
 "use client";
 
 import { PostulanteFormData, PostulanteFormErrors, FUENTES_RECLUTAMIENTO } from "../../types/postulante.types";

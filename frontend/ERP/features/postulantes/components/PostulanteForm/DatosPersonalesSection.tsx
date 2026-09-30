@@ -1,4 +1,5 @@
 // features/postulantes/components/PostulanteForm/DatosPersonalesSection.tsx
+// Sección 1 del formulario
 "use client";
 
 import { PostulanteFormData, PostulanteFormErrors, TIPOS_DOCUMENTO } from "../../types/postulante.types";

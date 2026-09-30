@@ -1,5 +1,6 @@
 
 // features/postulantes/components/PostulantesSearch.tsx
+//Buscador con debounce para la ejecución correcta
 "use client";
 
 import { useState, useEffect } from "react";

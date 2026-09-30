@@ -1,4 +1,5 @@
 // features/comunicaciones/components/ConversationList.tsx
+// Lista de contactos con búsqueda
 "use client";
 
 import { Contacto } from "../types/comunicaciones.types";

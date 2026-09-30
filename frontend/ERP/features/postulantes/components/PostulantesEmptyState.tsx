@@ -1,4 +1,5 @@
 // features/postulantes/components/PostulantesEmptyState.tsx
+// Estado cuando no hay resultados
 "use client";
 
 import { Users, FilterX } from "lucide-react";

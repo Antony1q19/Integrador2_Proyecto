@@ -1,4 +1,5 @@
 // features/postulantes/hooks/usePostulantesList.ts
+// Maneja filtros, ordenamiento, paginación y opciones dinámicas
 "use client";
 
 //import { useState, useEffect, useCallback, useMemo, useRef } from "react";

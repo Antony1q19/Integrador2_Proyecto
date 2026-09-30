@@ -1,4 +1,5 @@
 // features/comunicaciones/components/ConversationItem.tsx
+// Cada contacto de la lista
 "use client";
 
 import { Contacto } from "../types/comunicaciones.types";

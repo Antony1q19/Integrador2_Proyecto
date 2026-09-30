@@ -1,4 +1,5 @@
 // features/comunicaciones/components/ChatInput.tsx
+// 	Input de texto y envío
 "use client";
 
 import { useState, KeyboardEvent } from "react";

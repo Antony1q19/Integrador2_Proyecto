@@ -1,4 +1,5 @@
 // features/comunicaciones/components/ChatMessages.tsx
+// Burbujas de mensajes (tipo WhatsApp)
 "use client";
 
 import { RefObject } from "react";

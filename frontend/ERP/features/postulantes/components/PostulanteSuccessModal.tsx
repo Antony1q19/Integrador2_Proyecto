@@ -1,4 +1,5 @@
 // features/postulantes/components/PostulanteSuccessModal.tsx
+// Modal de confirmación y redirección
 "use client";
 
 import { useEffect } from "react";

@@ -1,4 +1,5 @@
 // features/comunicaciones/components/NotificacionesContainer.tsx
+// Contenedor de notificaciones
 "use client";
 
 import { NotificacionToast } from "./NotificacionToast";

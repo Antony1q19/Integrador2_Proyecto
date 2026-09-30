@@ -1,4 +1,5 @@
 // features/postulantes/components/PostulantesTable.tsx
+//Tabla con ordenamiento y paginación
 "use client";
 
 import Link from "next/link";
