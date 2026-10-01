@@ -9,7 +9,7 @@ import { registrarCuenta } from '@/features/perfil/services/perfilService';
 import { TipoDocumento } from '@/features/perfil/types';
 
 const inputClass =
-  'w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent';
+  'w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent';
 const labelClass = 'block text-sm font-medium text-gray-700 mb-1';
 
 interface FormState {
@@ -254,11 +254,11 @@ export default function RegistroPage() {
                 required
                 checked={form.aceptaTratamientoDatos}
                 onChange={(e) => set('aceptaTratamientoDatos', e.target.checked)}
-                className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-purple-700 focus:ring-purple-500"
+                className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
               />
               <span>
                 He leído y acepto la{' '}
-                <Link href="/legal/privacidad" target="_blank" className="text-purple-700 underline hover:text-purple-900">
+                <Link href="/legal/privacidad" target="_blank" className="text-primary-600 underline hover:text-primary-800">
                   Política de Privacidad y los Términos y Condiciones
                 </Link>
                 , y autorizo el tratamiento de mis datos personales para fines del proceso de
@@ -272,7 +272,7 @@ export default function RegistroPage() {
                 type="checkbox"
                 checked={form.aceptaComunicaciones}
                 onChange={(e) => set('aceptaComunicaciones', e.target.checked)}
-                className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-purple-700 focus:ring-purple-500"
+                className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
               />
               <span>
                 Acepto recibir correos, llamadas y mensajes sobre nuevas ofertas laborales.{' '}
@@ -286,7 +286,7 @@ export default function RegistroPage() {
           <button
             type="submit"
             disabled={enviando}
-            className="w-full bg-purple-800 hover:bg-purple-900 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium py-2.5 rounded-md transition-colors"
+            className="w-full bg-primary-700 hover:bg-primary-800 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium py-2.5 rounded-lg transition-colors"
           >
             {enviando ? 'Creando cuenta...' : 'Crear cuenta'}
           </button>
@@ -294,7 +294,7 @@ export default function RegistroPage() {
 
         <p className="text-center text-sm text-gray-500 mt-6">
           ¿Ya tienes cuenta?{' '}
-          <Link href="/login" className="text-purple-700 hover:text-purple-900 font-medium">
+          <Link href="/login" className="text-primary-600 hover:text-primary-800 font-medium">
             Inicia sesión
           </Link>
         </p>

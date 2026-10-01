@@ -1,5 +1,12 @@
 // features/anuncios/components/JobDetailPanel.tsx
-import { MapPin, Briefcase, DollarSign, Bookmark, Share2 } from 'lucide-react';
+// 'use client' porque tiene botones con onClick y también se usa desde una página de servidor
+// (app/anuncios/[id]/page.tsx).
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { MapPin, Briefcase, DollarSign, Share2, Users, CalendarClock, Check } from 'lucide-react';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import { Anuncio } from '../types';
 import { formatearSalario } from '../utils/formatearSalario';
 import { formatearFechaRelativa } from '../utils/formatearFecha';
@@ -9,35 +16,74 @@ interface JobDetailPanelProps {
 }
 
 export default function JobDetailPanel({ anuncio }: JobDetailPanelProps) {
-  const { titulo, empresa, ubicacion, modalidad, salarioMin, salarioMax, descripcion, requisitos, fechaPublicacion } = anuncio;
+  const {
+    titulo, empresa, ubicacion, modalidad, salarioMin, salarioMax, descripcion, requisitos,
+    fechaPublicacion, numeroVacantes, fechaLimite,
+  } = anuncio;
+  const router = useRouter();
+  const { estaAutenticado } = useAuth();
+  const [aviso, setAviso] = useState<string | null>(null);
+  const [enlaceCopiado, setEnlaceCopiado] = useState(false);
+
+  // Sin sesión → al login, y de vuelta a ESTE anuncio al entrar.
+  // Con sesión → la postulación en línea todavía no existe en el backend: se avisa en pantalla.
+  const postular = () => {
+    if (!estaAutenticado) {
+      router.push(`/login?motivo=postular&siguiente=${encodeURIComponent(`/anuncios/${anuncio.id}`)}`);
+      return;
+    }
+    setAviso('La postulación en línea estará disponible muy pronto.');
+  };
+
+  // En celular abre el menú "Compartir" del sistema; en computadora copia el enlace.
+  const compartir = async () => {
+    const url = `${window.location.origin}/anuncios/${anuncio.id}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: `${titulo} - ${empresa.nombre}`, url });
+      } catch {
+        // La persona cerró el menú de compartir: no es un error.
+      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setEnlaceCopiado(true);
+      setTimeout(() => setEnlaceCopiado(false), 2000);
+    } catch {
+      setAviso(`Copia este enlace: ${url}`);
+    }
+  };
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
       <div className="mb-5">
         <h2 className="text-2xl font-bold text-gray-900 mb-1">{titulo}</h2>
-        <p className="text-purple-700 font-semibold mb-1">{empresa.nombre}</p>
-        <p className="text-sm text-gray-500 mb-4">{ubicacion}</p>
+        <p className="text-primary-700 font-semibold mb-1">{empresa.nombre}</p>
+        <p className="text-sm text-gray-500 mb-4">{ubicacion ?? empresa.rubro}</p>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <button
-            className="bg-purple-700 hover:bg-purple-800 text-white font-medium px-5 py-2.5 rounded-lg transition-colors shadow-sm"
-            onClick={() => alert('Funcionalidad de postulación pendiente de implementar')}
+            type="button"
+            className="bg-primary-600 hover:bg-primary-700 text-white font-medium px-5 py-2.5 rounded-lg transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+            onClick={postular}
           >
             Postularme a esta oferta
           </button>
           <button
-            className="p-2.5 border border-gray-300 rounded-lg hover:bg-purple-50 hover:border-purple-300 transition-colors"
-            aria-label="Guardar oferta"
+            type="button"
+            onClick={() => void compartir()}
+            className="inline-flex items-center gap-2 px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-primary-50 hover:border-primary-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
           >
-            <Bookmark size={18} className="text-gray-600" />
-          </button>
-          <button
-            className="p-2.5 border border-gray-300 rounded-lg hover:bg-purple-50 hover:border-purple-300 transition-colors"
-            aria-label="Compartir oferta"
-          >
-            <Share2 size={18} className="text-gray-600" />
+            {enlaceCopiado ? <Check size={18} className="text-emerald-600" /> : <Share2 size={18} className="text-gray-600" />}
+            {enlaceCopiado ? 'Enlace copiado' : 'Compartir'}
           </button>
         </div>
+        {aviso && (
+          <p role="status" className="mt-3 rounded-lg bg-primary-50 px-3 py-2 text-sm text-primary-800">
+            {aviso}
+          </p>
+        )}
       </div>
 
       <hr className="border-gray-200 mb-5" />
@@ -46,8 +92,8 @@ export default function JobDetailPanel({ anuncio }: JobDetailPanelProps) {
         <h3 className="text-base font-semibold text-gray-900 mb-4">Información del empleo</h3>
         <div className="space-y-4">
           <div className="flex items-start gap-3">
-            <div className="bg-purple-50 p-2 rounded-lg">
-              <DollarSign size={16} className="text-purple-700" />
+            <div className="bg-primary-50 p-2 rounded-lg">
+              <DollarSign size={16} className="text-primary-600" />
             </div>
             <div>
               <p className="text-xs text-gray-500 mb-1">Sueldo</p>
@@ -57,27 +103,62 @@ export default function JobDetailPanel({ anuncio }: JobDetailPanelProps) {
             </div>
           </div>
 
-          <div className="flex items-start gap-3">
-            <div className="bg-purple-50 p-2 rounded-lg">
-              <Briefcase size={16} className="text-purple-700" />
+          {modalidad && (
+            <div className="flex items-start gap-3">
+              <div className="bg-primary-50 p-2 rounded-lg">
+                <Briefcase size={16} className="text-primary-600" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 mb-1">Tipo de empleo</p>
+                <span className="inline-block text-sm bg-gray-100 text-gray-700 px-2 py-1 rounded capitalize">
+                  {modalidad}
+                </span>
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-gray-500 mb-1">Tipo de empleo</p>
-              <span className="inline-block text-sm bg-gray-100 text-gray-700 px-2 py-1 rounded capitalize">
-                {modalidad}
-              </span>
-            </div>
-          </div>
+          )}
 
-          <div className="flex items-start gap-3">
-            <div className="bg-purple-50 p-2 rounded-lg">
-              <MapPin size={16} className="text-purple-700" />
+          {ubicacion && (
+            <div className="flex items-start gap-3">
+              <div className="bg-primary-50 p-2 rounded-lg">
+                <MapPin size={16} className="text-primary-600" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 mb-1">Ubicación</p>
+                <p className="text-sm text-gray-700">{ubicacion}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-gray-500 mb-1">Ubicación</p>
-              <p className="text-sm text-gray-700">{ubicacion}</p>
+          )}
+
+          {numeroVacantes !== undefined && (
+            <div className="flex items-start gap-3">
+              <div className="bg-primary-50 p-2 rounded-lg">
+                <Users size={16} className="text-primary-600" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 mb-1">Vacantes</p>
+                <p className="text-sm text-gray-700">{numeroVacantes}</p>
+              </div>
             </div>
-          </div>
+          )}
+
+          {fechaLimite && (
+            <div className="flex items-start gap-3">
+              <div className="bg-primary-50 p-2 rounded-lg">
+                <CalendarClock size={16} className="text-primary-600" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 mb-1">Postula hasta</p>
+                <p className="text-sm text-gray-700">
+                  {/* "T00:00:00" para que la fecha no se corra un día por la zona horaria */}
+                  {new Date(`${fechaLimite}T00:00:00`).toLocaleDateString('es-PE', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -93,14 +174,14 @@ export default function JobDetailPanel({ anuncio }: JobDetailPanelProps) {
         <ul className="space-y-2">
           {requisitos.map((req, index) => (
             <li key={index} className="flex items-start gap-2 text-sm text-gray-700">
-              <span className="text-purple-400 mt-1">•</span>
+              <span className="text-primary-400 mt-1">•</span>
               {req}
             </li>
           ))}
         </ul>
       </div>
 
-      <p className="text-xs text-gray-400">{formatearFechaRelativa(fechaPublicacion)}</p>
+      <p className="text-xs text-gray-500">{formatearFechaRelativa(fechaPublicacion)}</p>
     </div>
   );
 }

@@ -71,7 +71,7 @@ export function EmpresasView({ empresas, onEliminar }: EmpresasViewProps) {
                   <td className="px-6 py-4">
                     <Link
                       href={`/empresas/${empresa.id}`}
-                      className="text-sm font-medium text-indigo-600 hover:underline"
+                      className="text-sm font-medium text-primary-600 hover:underline"
                     >
                       {empresa.razonSocial}
                     </Link>
@@ -135,6 +135,7 @@ export function EmpresasView({ empresas, onEliminar }: EmpresasViewProps) {
           titulo="Eliminar empresa"
           mensaje={`¿Eliminar la empresa "${empresaAEliminar.razonSocial}"? Esta acción no se puede deshacer.`}
           confirmando={eliminando}
+          labelConfirmando="Eliminando…"
           onConfirmar={confirmarEliminacion}
           onCancelar={() => setEmpresaAEliminar(null)}
         />

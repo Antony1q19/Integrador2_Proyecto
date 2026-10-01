@@ -1,4 +1,4 @@
-"""Formato de los datos de login y registro ("schemas").
+"""Formato de los datos del login del ERP ("schemas").
 
 Un schema describe qué campos debe traer un JSON. Si falta uno, o tiene el
 tipo equivocado (ej. un correo mal escrito), FastAPI responde error 422
@@ -14,14 +14,6 @@ class CredencialesLogin(BaseModel):
     password: str = Field(min_length=6)
 
 
-class UsuarioRegistro(BaseModel):
-    """Lo que envía ANUNCIOS para crear una cuenta de postulante."""
-
-    email: EmailStr
-    nombre: str
-    password: str = Field(min_length=6)
-
-
 class TokenRespuesta(BaseModel):
     """Lo que responde el login: el token y datos básicos para mostrar en pantalla."""
 
@@ -31,5 +23,5 @@ class TokenRespuesta(BaseModel):
     nombre: str
     email: str
     # Ids de las empresas que puede ver. El ERP los usa para filtrar /empresas.
-    # (Vacío para un Postulante; no le aplica.)
+    # (Vacío para un Admin: ve todas.)
     empresasVisibles: list[int] = []

@@ -71,7 +71,7 @@ export default function AnuncioForm({
           className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
             errors.cargo
               ? "border-red-400 focus:ring-red-200"
-              : "border-slate-300 focus:ring-indigo-200"
+              : "border-slate-300 focus:ring-primary-200"
           }`}
           placeholder="Ej: Desarrollador Full Stack Senior"
         />
@@ -95,7 +95,7 @@ export default function AnuncioForm({
           className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
             errors.descripcion
               ? "border-red-400 focus:ring-red-200"
-              : "border-slate-300 focus:ring-indigo-200"
+              : "border-slate-300 focus:ring-primary-200"
           }`}
           placeholder="Describe las responsabilidades del puesto..."
         />
@@ -121,7 +121,7 @@ export default function AnuncioForm({
           className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
             errors.requisitos
               ? "border-red-400 focus:ring-red-200"
-              : "border-slate-300 focus:ring-indigo-200"
+              : "border-slate-300 focus:ring-primary-200"
           }`}
           placeholder="Ej: 3+ años de experiencia, conocimientos en..."
         />
@@ -148,7 +148,7 @@ export default function AnuncioForm({
             className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
               errors.numeroVacantes
                 ? "border-red-400 focus:ring-red-200"
-                : "border-slate-300 focus:ring-indigo-200"
+                : "border-slate-300 focus:ring-primary-200"
             }`}
           />
           {errors.numeroVacantes && (
@@ -172,7 +172,7 @@ export default function AnuncioForm({
             className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
               errors.fechaLimite
                 ? "border-red-400 focus:ring-red-200"
-                : "border-slate-300 focus:ring-indigo-200"
+                : "border-slate-300 focus:ring-primary-200"
             }`}
           />
           {errors.fechaLimite && (
@@ -199,7 +199,7 @@ export default function AnuncioForm({
             className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
               errors.salarioMin
                 ? "border-red-400 focus:ring-red-200"
-                : "border-slate-300 focus:ring-indigo-200"
+                : "border-slate-300 focus:ring-primary-200"
             }`}
           />
           {errors.salarioMin && (
@@ -223,7 +223,7 @@ export default function AnuncioForm({
             className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
               errors.salarioMax
                 ? "border-red-400 focus:ring-red-200"
-                : "border-slate-300 focus:ring-indigo-200"
+                : "border-slate-300 focus:ring-primary-200"
             }`}
           />
           {errors.salarioMax && (
@@ -245,7 +245,7 @@ export default function AnuncioForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? "Guardando..." : submitLabel}
         </button>

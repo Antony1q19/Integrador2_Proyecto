@@ -76,7 +76,7 @@ export default function AnunciosView({ anuncios, onEliminar }: AnunciosViewProps
                             <td className="px-6 py-4">
                                 <Link
                                     href={`/anuncios/${anuncio.id}`}
-                                    className="text-sm font-medium text-indigo-600 hover:underline"
+                                    className="text-sm font-medium text-primary-600 hover:underline"
                                 >
                                     {anuncio.cargo}
                                 </Link>
@@ -137,6 +137,7 @@ export default function AnunciosView({ anuncios, onEliminar }: AnunciosViewProps
                 titulo="Eliminar anuncio"
                 mensaje={`¿Eliminar el anuncio "${anuncioAEliminar.cargo}"? Esta acción no se puede deshacer.`}
                 confirmando={eliminando}
+                labelConfirmando="Eliminando…"
                 onConfirmar={confirmarEliminacion}
                 onCancelar={() => setAnuncioAEliminar(null)}
                 />

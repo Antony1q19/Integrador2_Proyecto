@@ -75,7 +75,7 @@ export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: Evalua
         </div>
         <button
           onClick={() => setMostrarForm((v) => !v)}
-          className="rounded-md bg-[#1D2B53] px-3 py-1.5 text-sm font-medium text-white hover:bg-[#16224A]"
+          className="rounded-lg bg-primary-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-700"
         >
           {mostrarForm ? "Cancelar" : "+ Registrar evaluación"}
         </button>
@@ -107,9 +107,9 @@ export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: Evalua
                             competencias: { ...form.competencias, [clave]: valor },
                           })
                         }
-                        className={`h-7 w-7 rounded-md text-xs font-semibold transition-colors ${
+                        className={`h-7 w-7 rounded-lg text-xs font-semibold transition-colors ${
                           form.competencias[clave] === valor
-                            ? "bg-[#1D2B53] text-white"
+                            ? "bg-primary-600 text-white"
                             : "bg-white text-gray-500 border border-gray-200 hover:bg-gray-50"
                         }`}
                       >
@@ -128,12 +128,12 @@ export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: Evalua
               value={form.comentarios}
               onChange={(e) => setForm({ ...form, comentarios: e.target.value })}
               rows={2}
-              className="w-full rounded-md border border-gray-200 px-3 py-1.5 text-sm focus:border-[#1D2B53] focus:outline-none focus:ring-1 focus:ring-[#1D2B53]"
+              className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
               placeholder="Observaciones de la evaluación"
             />
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-gray-100 bg-white px-3 py-2">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-gray-100 bg-white px-3 py-2">
             <span className="text-xs text-gray-500">
               Resultado automático · Puntaje {puntajePreview}/100
             </span>
@@ -145,7 +145,7 @@ export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: Evalua
           <button
             type="submit"
             disabled={guardando}
-            className="rounded-md bg-[#1D2B53] px-4 py-2 text-sm font-medium text-white hover:bg-[#16224A] disabled:opacity-50"
+            className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 disabled:opacity-50"
           >
             {guardando ? "Guardando…" : "Guardar evaluación"}
           </button>
@@ -176,7 +176,7 @@ export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: Evalua
                     <span className="w-44 shrink-0 text-xs text-gray-500">{etiqueta}</span>
                     <div className="h-1.5 w-full rounded-full bg-gray-100">
                       <div
-                        className="h-1.5 rounded-full bg-[#1D2B53]"
+                        className="h-1.5 rounded-full bg-primary-600"
                         style={{ width: `${(ev.competencias[clave] / 5) * 100}%` }}
                       />
                     </div>

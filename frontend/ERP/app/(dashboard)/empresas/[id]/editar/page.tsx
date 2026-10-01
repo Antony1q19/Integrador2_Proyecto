@@ -25,7 +25,7 @@ export default async function EditarEmpresaPage({
       <div className="mx-auto max-w-2xl">
         <Link
           href={`/empresas/${empresaId}`}
-          className="mb-6 inline-flex items-center text-sm text-slate-500 hover:text-indigo-600"
+          className="mb-6 inline-flex items-center text-sm text-slate-500 hover:text-primary-600"
         >
           ← Volver al Detalle
         </Link>

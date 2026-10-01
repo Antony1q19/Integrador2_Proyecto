@@ -8,7 +8,7 @@ const COLOR_BARRA: Record<EstadoProceso, string> = {
   POSTULADO: "bg-slate-400",
   EN_EVALUACION: "bg-amber-400",
   ENTREVISTA: "bg-blue-500",
-  PRESELECCIONADO: "bg-violet-500",
+  PRESELECCIONADO: "bg-primary-500",
   CONTRATADO: "bg-emerald-500",
   DESCARTADO: "bg-rose-400",
 };

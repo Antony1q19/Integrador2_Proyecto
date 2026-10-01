@@ -48,7 +48,7 @@ export function ChatInput({
         />
 
         {/* Input de texto */}
-        <div className="flex flex-1 items-end rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2">
+        <div className="flex flex-1 items-end rounded-xl border border-slate-200 bg-slate-50 px-4 py-2">
           <textarea
             value={texto}
             onChange={(e) => setTexto(e.target.value)}
@@ -71,7 +71,7 @@ export function ChatInput({
           type="button"
           onClick={handleSend}
           disabled={!texto.trim() || enviando}
-          className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+          className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary-600 text-white transition-colors hover:bg-primary-700 disabled:cursor-not-allowed disabled:bg-slate-300"
         >
           {enviando ? (
             <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />

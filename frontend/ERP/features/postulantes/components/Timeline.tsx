@@ -36,9 +36,9 @@ export function Timeline({ estadoActual }: { estadoActual: EstadoProceso }) {
                 className={[
                   "flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-semibold transition-colors",
                   completado
-                    ? "bg-[#1D2B53] text-white"
+                    ? "bg-primary-600 text-white"
                     : activo
-                    ? "border-2 border-[#1D2B53] bg-white text-[#1D2B53]"
+                    ? "border-2 border-primary-600 bg-white text-primary-600"
                     : "border border-gray-200 bg-white text-gray-300",
                 ].join(" ")}
               >
@@ -54,7 +54,7 @@ export function Timeline({ estadoActual }: { estadoActual: EstadoProceso }) {
             </div>
             {!esUltimo && (
               <div
-                className={`mx-2 mb-4 h-px flex-1 ${completado ? "bg-[#1D2B53]" : "bg-gray-200"}`}
+                className={`mx-2 mb-4 h-px flex-1 ${completado ? "bg-primary-600" : "bg-gray-200"}`}
               />
             )}
           </div>

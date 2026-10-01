@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Zap } from "lucide-react";
 import { login } from "@/features/login/sesion/authService";
+import { Button } from "@/components/shared/Button";
+
+const claseInput =
+  "w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -42,104 +47,92 @@ export default function LoginForm() {
   };
 
   return (
-    // Contenedor principal de la tarjeta (shadow, bordes redondeados y ocultar desbordamiento)
-    <div className="flex w-full max-w-4xl bg-white rounded-[2rem] shadow-2xl overflow-hidden flex-col md:flex-row">
-      
-      {/* ===== PANEL IZQUIERDO: DISEÑO GRÁFICO ===== */}
-      {/* Se oculta en móviles y se muestra en pantallas medianas en adelante */}
-      <div className="hidden md:flex md:w-1/2 relative bg-gradient-to-br from-indigo-800 via-violet-600 to-purple-500 p-10 flex-col justify-between overflow-hidden">
-        
-        {/* Logo de TalentERP */}
+    <div className="flex w-full max-w-4xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl md:flex-row">
+      {/* ===== PANEL IZQUIERDO: MARCA (solo desde pantallas medianas) ===== */}
+      <div className="relative hidden flex-col justify-between overflow-hidden bg-gradient-to-br from-primary-900 via-primary-700 to-primary-500 p-10 md:flex md:w-1/2">
         <div className="relative z-10 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-400 to-violet-500 text-white shadow-lg">
-            {/* Ícono del rayito */}
-            <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-            </svg>
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/15 text-white ring-1 ring-white/20">
+            <Zap size={22} strokeWidth={2.5} />
           </div>
           <div>
-            <h1 className="text-2xl font-extrabold text-white leading-none tracking-tight">Talent<span className="text-violet-200 opacity-80">ERP</span></h1>
-            <p className="text-white/70 text-xs mt-1">Recursos Humanos</p>
+            <p className="text-2xl font-extrabold leading-none tracking-tight text-white">
+              Talent<span className="text-primary-200">ERP</span>
+            </p>
+            <p className="mt-1 text-xs text-white/75">Recursos Humanos</p>
           </div>
         </div>
 
-        {/* Figuras geométricas decorativas (Tailwind puro) */}
-        {/* Cápsula superior izquierda */}
-        <div className="absolute top-20 -left-12 w-64 h-16 bg-gradient-to-r from-orange-300/40 to-pink-400/40 rounded-full rotate-45 backdrop-blur-sm shadow-xl"></div>
-        {/* Círculo superior derecho */}
-        <div className="absolute top-10 right-10 w-24 h-24 bg-gradient-to-tr from-blue-300 to-violet-300 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.3)]"></div>
-        {/* Cápsula central */}
-        <div className="absolute top-1/2 left-10 w-72 h-20 bg-gradient-to-r from-purple-400/50 to-indigo-400/50 rounded-full -rotate-45 backdrop-blur-md"></div>
-        {/* Círculo inferior izquierdo */}
-        <div className="absolute bottom-16 -left-4 w-32 h-32 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.4)] z-0"></div>
-        {/* Cápsula inferior */}
-        <div className="absolute -bottom-10 right-0 w-64 h-24 bg-gradient-to-r from-blue-500/40 to-cyan-400/40 rounded-full -rotate-45 backdrop-blur-sm"></div>
+        <div className="relative z-10">
+          <p className="text-xl font-semibold leading-snug text-white">
+            Todo el proceso de selección, en un solo lugar.
+          </p>
+          <p className="mt-2 text-sm text-white/75">
+            Postulantes, entrevistas, contrataciones y empresas clientes.
+          </p>
+        </div>
+
+        {/* Formas decorativas, en tonos de la marca */}
+        <div aria-hidden className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-primary-400/30 blur-2xl" />
+        <div aria-hidden className="absolute -bottom-20 -left-10 h-64 w-64 rounded-full bg-primary-300/20 blur-2xl" />
+        <div aria-hidden className="absolute right-10 top-1/3 h-24 w-24 rounded-full border border-white/20" />
       </div>
 
       {/* ===== PANEL DERECHO: FORMULARIO ===== */}
-      <div className="w-full md:w-1/2 p-10 md:p-14 flex flex-col justify-center bg-white relative">
-        
-        {/* Los 3 puntitos de la esquina superior derecha */}
-        <div className="absolute top-8 right-8 flex gap-1.5">
-          <div className="w-3 h-3 rounded-full bg-red-400"></div>
-          <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-          <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-        </div>
+      <div className="flex w-full flex-col justify-center p-8 sm:p-10 md:w-1/2 md:p-14">
+        {/* En celular el panel de marca no se ve: se muestra el nombre aquí */}
+        <p className="mb-6 text-center text-xl font-extrabold tracking-tight text-slate-900 md:hidden">
+          Talent<span className="text-primary-600">ERP</span>
+        </p>
 
-        <h2 className="text-3xl font-black text-center text-gray-900 mb-8 tracking-widest mt-4">LOGIN</h2>
+        <h1 className="text-2xl font-bold text-slate-900">Iniciar sesión</h1>
+        <p className="mt-1 text-sm text-slate-500">Ingresa con tu cuenta de trabajador.</p>
 
-        {/* Mensaje de error (si las credenciales fallan) */}
         {error && (
-          <div className="mb-6 text-center p-3 text-sm text-red-500 bg-red-50 rounded-full border border-red-100 font-medium">
+          <div role="alert" className="mt-6 rounded-lg border border-red-200 bg-red-50 p-3 text-sm font-medium text-red-700">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          
-          {/* Input: Username / Correo */}
+        <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
           <div>
-            <input 
+            <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-slate-700">
+              Correo electrónico
+            </label>
+            <input
               id="email"
-              type="email" 
+              type="email"
+              autoComplete="username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required 
-              placeholder="Username / Correo"
-              className="w-full px-6 py-3.5 bg-[#dbeafe] text-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-blue-300 font-medium transition-all text-sm"
+              required
+              placeholder="nombre@empresa.com"
+              className={claseInput}
             />
           </div>
 
-          {/* Input: Password */}
           <div>
-            <input 
+            <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-slate-700">
+              Contraseña
+            </label>
+            <input
               id="password"
-              type="password" 
+              type="password"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required 
-              placeholder="Password"
-              className="w-full px-6 py-3.5 bg-[#dbeafe] text-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-blue-300 font-medium transition-all text-sm"
+              required
+              className={claseInput}
             />
           </div>
 
-          {/* Enlace: Forgot Password */}
-          <div className="flex justify-end pr-2">
-            <a href="#" className="text-[11px] text-gray-400 hover:text-blue-500 transition-colors font-medium">
-              Forgot Password?
-            </a>
-          </div>
+          <Button type="submit" tamano="lg" cargando={isLoading} textoCargando="Ingresando…" className="mt-2 w-full">
+            Ingresar
+          </Button>
 
-          {/* Botón de Login */}
-          <div className="flex justify-center mt-2">
-            <button 
-              type="submit" 
-              disabled={isLoading}
-              className="w-3/5 px-8 py-3 text-white font-bold text-sm tracking-wider rounded-full bg-gradient-to-r from-violet-500 to-blue-500 hover:from-violet-600 hover:to-blue-600 transition-all shadow-[0_8px_20px_rgba(99,102,241,0.4)] hover:shadow-[0_10px_25px_rgba(99,102,241,0.6)] disabled:opacity-70 disabled:cursor-not-allowed"
-            >
-              {isLoading ? "CARGANDO..." : "LOGIN"}
-            </button>
-          </div>
+          {/* No hay recuperación automática: un Admin restablece la clave desde "Mi perfil". */}
+          <p className="text-center text-xs text-slate-500">
+            ¿Olvidaste tu contraseña? Pídele a un administrador que la restablezca.
+          </p>
         </form>
       </div>
     </div>

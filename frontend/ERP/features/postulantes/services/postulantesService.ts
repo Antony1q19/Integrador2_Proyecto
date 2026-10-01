@@ -22,7 +22,7 @@ import { calcularPuntajeTotal, calcularResultado } from "../utils/evaluacion";
 import { anunciosMock } from "@/features/anuncios/data/mock-anuncios";
 import { fetchAnuncios } from "@/features/anuncios/services/anunciosApi";
 import { mensajeDeError, sesionVencida } from "@/lib/apiCliente";
-import { cargarConCache, marcarVencido } from "@/lib/cacheCliente";
+import { cargarConCache, guardarCache, marcarVencido } from "@/lib/cacheCliente";
 
 // Los anuncios se leen desde features/anuncios/services/anunciosApi.ts; se reexporta aquí para
 // que los hooks de postulantes sigan importándolo desde este servicio.
@@ -142,11 +142,22 @@ export function postulanteTieneCuenta(postulante: Postulante): boolean {
   return postulante.tieneCuenta ?? postulante.consentimientos.tratamientoDatos;
 }
 
+// "Solicitar cuenta": el backend le envía al postulante (con Mailjet) un correo para que cree su
+// cuenta en ANUNCIOS. Devuelve el correo al que se envió. Solo funciona con backend.
+export async function solicitarCuenta(postulanteId: string): Promise<string> {
+  if (!API_URL) throw new Error("El envío de correos necesita el backend (NEXT_PUBLIC_API_URL)");
+  const res = await fetch(`/api/postulantes/${encodeURIComponent(postulanteId)}/solicitar-cuenta`, { method: "POST" });
+  if (res.status === 401) throw new Error(sesionVencida());
+  if (!res.ok) throw new Error(await mensajeDeError(res, "No se pudo enviar la invitación"));
+  const { enviadoA } = (await res.json()) as { enviadoA: string };
+  return enviadoA;
+}
+
 // A cuántos anuncios se ha postulado. Con backend son sus postulaciones reales
 // (servicio-procesos-seleccion); en modo mock, los anuncios de ejemplo que lo tienen asociado.
 export function contarPostulaciones(postulante: Postulante): number {
   if (API_URL) return Object.keys(postulante.procesosPostulacion).length;
-  return anunciosMock.filter((a) => a.postulantesAsociadosIds.includes(postulante.id)).length;
+  return anunciosMock.filter((a) => a.postulantesAsociadosIds?.includes(postulante.id)).length;
 }
 
 export async function fetchPostulantes(): Promise<Postulante[]> {
@@ -314,8 +325,11 @@ export async function updateDatosPersonales(
     });
     if (!res.ok) throw new Error(await mensajeDeError(res, "Error al actualizar datos personales"));
     marcarVencido("postulantes:");
-    marcarVencido(`postulante:${id}`);
-    return fetchPostulanteById(id);
+    // Se pide la ficha con una petición NUEVA (no fetchPostulanteById): si había una lectura en curso
+    // que empezó ANTES de guardar (ej. el "adelanto" al pasar el mouse), reutilizarla traería los datos viejos.
+    const actualizado = await pedirPostulante(id);
+    guardarCache(`postulante:${id}`, actualizado);
+    return actualizado;
   }
 
   // ---- MODO MOCK ----

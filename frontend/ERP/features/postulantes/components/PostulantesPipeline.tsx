@@ -25,7 +25,7 @@ const TODAS_LAS_EMPRESAS = "TODAS";
 const TODOS_LOS_PUESTOS = "TODOS";
 
 const selectFiltroClass =
-  "rounded-md border border-gray-200 px-3 py-1.5 text-sm text-gray-700 focus:border-[#1D2B53] focus:outline-none focus:ring-1 focus:ring-[#1D2B53]";
+  "rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-700 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600";
 
 function iniciales(nombres: string, apellidos: string) {
   return `${nombres[0] ?? ""}${apellidos[0] ?? ""}`.toUpperCase();
@@ -56,7 +56,7 @@ export function PostulantesPipeline() {
         anuncios
           .filter(
             (anuncio) =>
-              anuncio.postulantesAsociadosIds.includes(postulante.id) ||
+              anuncio.postulantesAsociadosIds?.includes(postulante.id) ||
               String(anuncio.id) in postulante.procesosPostulacion
           )
           .map((anuncio) => ({
@@ -235,7 +235,7 @@ export function PostulantesPipeline() {
         {hayFiltrosActivos && (
           <button
             onClick={limpiarFiltros}
-            className="rounded-md px-2 py-1.5 text-xs font-medium text-gray-400 hover:bg-gray-50 hover:text-gray-600"
+            className="rounded-lg px-2 py-1.5 text-xs font-medium text-gray-400 hover:bg-gray-50 hover:text-gray-600"
           >
             Limpiar filtros
           </button>
@@ -262,7 +262,7 @@ export function PostulantesPipeline() {
               }}
               className={`flex w-64 shrink-0 flex-col gap-3 rounded-xl border p-3 transition-colors ${
                 columnaSobre === op.value
-                  ? "border-[#1D2B53] bg-[#1D2B53]/5"
+                  ? "border-primary-600 bg-primary-600/5"
                   : "border-transparent bg-slate-50/60"
               }`}
             >
@@ -289,7 +289,7 @@ export function PostulantesPipeline() {
                       onMouseEnter={() => prefetchPostulante(t.postulante.id)}
                     >
                       <div className="flex items-center gap-2">
-                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1D2B53] text-[10px] font-semibold text-white">
+                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-600 text-[10px] font-semibold text-white">
                           {iniciales(t.postulante.datosPersonales.nombres, t.postulante.datosPersonales.apellidos)}
                         </div>
                         <div className="min-w-0">

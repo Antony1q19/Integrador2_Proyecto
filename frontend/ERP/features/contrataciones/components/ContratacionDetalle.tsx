@@ -12,6 +12,9 @@ import { Contratacion, Seguimiento } from "../types/contratacion.types";
 import { EstadoContratacionBadge, ValoracionBadge } from "./ContratacionBadges";
 import { ContratacionModal } from "./ContratacionModal";
 import { SeguimientoModal } from "./SeguimientoModal";
+import ConfirmacionModal from "@/components/shared/ConfirmacionModal";
+
+type EstadoFinal = "Finalizado" | "Cancelado";
 
 interface ContratacionDetalleProps {
   contratacion: Contratacion;
@@ -33,6 +36,8 @@ export function ContratacionDetalle({ contratacion: c, etiquetaVacante, puedeEdi
   const [agregando, setAgregando] = useState(false);
   const [dias, setDias] = useState("15");
   const [ocupado, setOcupado] = useState(false);
+  // Finalizar/cancelar piden confirmación antes (ver ConfirmacionModal al final).
+  const [confirmandoEstado, setConfirmandoEstado] = useState<EstadoFinal | null>(null);
 
   const viva = c.estado === "Por ingresar" || c.estado === "Activo";
 
@@ -49,12 +54,10 @@ export function ContratacionDetalle({ contratacion: c, etiquetaVacante, puedeEdi
     }
   };
 
-  const cambiarEstado = (estado: "Activo" | "Finalizado" | "Cancelado", pregunta?: string) => {
-    if (pregunta && !window.confirm(pregunta)) return;
-    void ejecutar(() => actualizarContratacion(c, { estado }), `Contratación ${estado === "Activo" ? "marcada como activa" : estado.toLowerCase()}`);
-  };
+  const cambiarEstado = (estado: "Activo" | EstadoFinal) =>
+    ejecutar(() => actualizarContratacion(c, { estado }), `Contratación ${estado === "Activo" ? "marcada como activa" : estado.toLowerCase()}`);
 
-  const estiloBoton = "rounded-md px-2.5 py-1 text-xs font-medium disabled:opacity-40";
+  const estiloBoton = "rounded-lg px-2.5 py-1 text-xs font-medium disabled:opacity-40";
   return (
     <div className="space-y-5">
       {/* Datos */}
@@ -85,14 +88,14 @@ export function ContratacionDetalle({ contratacion: c, etiquetaVacante, puedeEdi
           <dd className="font-medium text-slate-700">{c.creadoPor}</dd>
         </div>
       </dl>
-      {c.observaciones && <p className="rounded-md bg-slate-50 px-3 py-2 text-sm text-slate-600">{c.observaciones}</p>}
+      {c.observaciones && <p className="rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-600">{c.observaciones}</p>}
 
       {/* Línea de tiempo de controles */}
       <div>
         <div className="mb-3 flex items-center justify-between">
           <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Seguimiento post-ingreso</h4>
           {puedeEditar && viva && !agregando && (
-            <button onClick={() => setAgregando(true)} className="inline-flex items-center gap-1 text-xs font-medium text-[#1D2B53] hover:underline">
+            <button onClick={() => setAgregando(true)} className="inline-flex items-center gap-1 text-xs font-medium text-primary-600 hover:underline">
               <Plus size={13} /> Agregar control
             </button>
           )}
@@ -109,9 +112,9 @@ export function ContratacionDetalle({ contratacion: c, etiquetaVacante, puedeEdi
             }}
           >
             <span className="text-xs text-slate-600">Control a los</span>
-            <input type="number" min={1} max={730} value={dias} onChange={(e) => setDias(e.target.value)} className="w-20 rounded-md border border-slate-200 px-2 py-1 text-sm" />
+            <input type="number" min={1} max={730} value={dias} onChange={(e) => setDias(e.target.value)} className="w-20 rounded-lg border border-slate-200 px-2 py-1 text-sm" />
             <span className="text-xs text-slate-600">días del ingreso</span>
-            <button type="submit" disabled={ocupado} className={`${estiloBoton} bg-[#1D2B53] text-white`}>
+            <button type="submit" disabled={ocupado} className={`${estiloBoton} bg-primary-600 text-white`}>
               Agregar
             </button>
             <button type="button" onClick={() => setAgregando(false)} className={`${estiloBoton} text-slate-500`}>
@@ -185,21 +188,21 @@ export function ContratacionDetalle({ contratacion: c, etiquetaVacante, puedeEdi
             Editar datos
           </button>
           {c.estado === "Por ingresar" && (
-            <button onClick={() => cambiarEstado("Activo")} disabled={ocupado} className={`${estiloBoton} bg-emerald-50 text-emerald-700 hover:bg-emerald-100`}>
+            <button onClick={() => void cambiarEstado("Activo")} disabled={ocupado} className={`${estiloBoton} bg-emerald-50 text-emerald-700 hover:bg-emerald-100`}>
               Marcar ingreso
             </button>
           )}
           {viva && (
             <>
               <button
-                onClick={() => cambiarEstado("Finalizado", "¿Finalizar esta contratación? Los controles pendientes se omitirán.")}
+                onClick={() => setConfirmandoEstado("Finalizado")}
                 disabled={ocupado}
                 className={`${estiloBoton} border border-slate-200 text-slate-600 hover:bg-slate-50`}
               >
                 Finalizar
               </button>
               <button
-                onClick={() => cambiarEstado("Cancelado", "¿Cancelar esta contratación? Los controles pendientes se omitirán.")}
+                onClick={() => setConfirmandoEstado("Cancelado")}
                 disabled={ocupado}
                 className={`${estiloBoton} text-slate-400 hover:bg-red-50 hover:text-red-600`}
               >
@@ -218,6 +221,19 @@ export function ContratacionDetalle({ contratacion: c, etiquetaVacante, puedeEdi
             setEditando(false);
             onCambio("Contratación actualizada");
           }}
+        />
+      )}
+      {confirmandoEstado && (
+        <ConfirmacionModal
+          titulo={confirmandoEstado === "Finalizado" ? "¿Finalizar esta contratación?" : "¿Cancelar esta contratación?"}
+          mensaje="Los controles de seguimiento que estén pendientes se omitirán."
+          labelConfirmar={confirmandoEstado === "Finalizado" ? "Finalizar" : "Cancelar contratación"}
+          labelCancelar="Volver"
+          labelConfirmando="Guardando…"
+          variante={confirmandoEstado === "Cancelado" ? "peligro" : "primario"}
+          confirmando={ocupado}
+          onConfirmar={() => void cambiarEstado(confirmandoEstado).then(() => setConfirmandoEstado(null))}
+          onCancelar={() => setConfirmandoEstado(null)}
         />
       )}
       {registrando && (

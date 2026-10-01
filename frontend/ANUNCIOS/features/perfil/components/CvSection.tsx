@@ -66,7 +66,7 @@ export function CvSection({ cv, onSubir, onEliminar }: CvSectionProps) {
       {cv && !subiendo ? (
         <div className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 p-3">
           <div className="flex min-w-0 items-center gap-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-purple-50 text-purple-700">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-600">
               <FileText size={18} />
             </span>
             <div className="min-w-0">
@@ -82,20 +82,20 @@ export function CvSection({ cv, onSubir, onEliminar }: CvSectionProps) {
                 href={cv.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-md px-2.5 py-1.5 text-xs font-medium text-gray-500 transition-colors duration-150 hover:bg-gray-50"
+                className="rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-500 transition-colors duration-150 hover:bg-gray-50"
               >
                 Ver
               </a>
             )}
             <button
               onClick={() => inputRef.current?.click()}
-              className="rounded-md px-2.5 py-1.5 text-xs font-medium text-purple-700 transition-colors duration-150 hover:bg-purple-50 active:scale-[0.97]"
+              className="rounded-lg px-2.5 py-1.5 text-xs font-medium text-primary-600 transition-colors duration-150 hover:bg-primary-50 active:scale-[0.97]"
             >
               Reemplazar
             </button>
             <button
               onClick={onEliminar}
-              className="flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-gray-400 transition-colors duration-150 hover:bg-red-50 hover:text-red-600 active:scale-[0.97]"
+              className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-400 transition-colors duration-150 hover:bg-red-50 hover:text-red-600 active:scale-[0.97]"
             >
               <Trash2 size={13} />
             </button>
@@ -118,7 +118,7 @@ export function CvSection({ cv, onSubir, onEliminar }: CvSectionProps) {
           onClick={() => !subiendo && inputRef.current?.click()}
           className={[
             'flex cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed px-6 py-8 text-center transition-colors duration-150',
-            arrastrando ? 'border-purple-500 bg-purple-50/50' : 'border-gray-300 hover:border-gray-400',
+            arrastrando ? 'border-primary-500 bg-primary-50/50' : 'border-gray-300 hover:border-gray-400',
             subiendo ? 'pointer-events-none opacity-70' : '',
           ].join(' ')}
         >
@@ -148,7 +148,7 @@ export function CvSection({ cv, onSubir, onEliminar }: CvSectionProps) {
         <div className="mt-3">
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
             <div
-              className="h-1.5 rounded-full bg-purple-700 transition-[width] duration-150 ease-out"
+              className="h-1.5 rounded-full bg-primary-600 transition-[width] duration-150 ease-out"
               style={{ width: `${Math.min(Math.round(progreso), 100)}%` }}
             />
           </div>

@@ -61,7 +61,7 @@ export function ContratacionesView() {
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {tarjetas.map(({ titulo, valor, icono: Icono, color }) => (
-          <div key={titulo} className="flex items-center justify-between rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+          <div key={titulo} className="flex items-center justify-between rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
             <div>
               <p className="text-xs font-medium text-slate-500">{titulo}</p>
               {cargando ? <Skeleton className="mt-2 h-7 w-10" /> : <p className="text-2xl font-black text-slate-800">{valor}</p>}
@@ -79,7 +79,7 @@ export function ContratacionesView() {
             key={f}
             onClick={() => setFiltro(f)}
             className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
-              filtro === f ? "bg-[#1D2B53] text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
+              filtro === f ? "bg-primary-600 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
             }`}
           >
             {f === "todas" ? "Todas" : f}
@@ -137,7 +137,7 @@ export function ContratacionesView() {
                 {estaAbierta && (
                   <div className="space-y-4 border-t border-slate-100 p-4">
                     <ContratacionDetalle contratacion={c} etiquetaVacante={etiqueta} puedeEditar={puedeEditar} onCambio={alCambiar} />
-                    <Link href={`/postulantes/${c.postulanteId}`} className="inline-block text-xs font-medium text-[#1D2B53] hover:underline">
+                    <Link href={`/postulantes/${c.postulanteId}`} className="inline-block text-xs font-medium text-primary-600 hover:underline">
                       Ver ficha del postulante →
                     </Link>
                   </div>

@@ -75,7 +75,7 @@ export function UsuarioFormModal({ usuarioExistente, onGuardado, onCerrar }: Usu
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
         <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
           <h3 className="text-lg font-bold text-slate-800">
             {esEdicion ? "Editar Trabajador" : "Crear Nuevo Trabajador"}
@@ -83,7 +83,7 @@ export function UsuarioFormModal({ usuarioExistente, onGuardado, onCerrar }: Usu
           <button
             type="button"
             onClick={onCerrar}
-            className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-1 rounded-md transition-colors"
+            className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-1 rounded-lg transition-colors"
           >
             <X size={20} />
           </button>
@@ -98,7 +98,7 @@ export function UsuarioFormModal({ usuarioExistente, onGuardado, onCerrar }: Usu
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
               placeholder="Ej: Juan Pérez"
-              className="w-full p-3 rounded-xl text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+              className="w-full p-3 rounded-xl text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
             />
           </div>
 
@@ -111,7 +111,7 @@ export function UsuarioFormModal({ usuarioExistente, onGuardado, onCerrar }: Usu
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="juan@test.com"
-              className="w-full p-3 rounded-xl text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 disabled:bg-slate-100 disabled:text-slate-400"
+              className="w-full p-3 rounded-xl text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 disabled:bg-slate-100 disabled:text-slate-400"
             />
             {esEdicion && (
               <p className="mt-1 text-[11px] text-slate-400">El correo no se puede cambiar una vez creada la cuenta.</p>
@@ -124,7 +124,7 @@ export function UsuarioFormModal({ usuarioExistente, onGuardado, onCerrar }: Usu
               required
               value={rol}
               onChange={(e) => setRol(e.target.value as RolInterno)}
-              className="w-full p-3 rounded-xl text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 bg-white"
+              className="w-full p-3 rounded-xl text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 bg-white"
             >
               {ROLES_INTERNOS.map((r) => (
                 <option key={r} value={r}>
@@ -151,7 +151,7 @@ export function UsuarioFormModal({ usuarioExistente, onGuardado, onCerrar }: Usu
                       type="checkbox"
                       checked={empresasVisibles.includes(empresa.id)}
                       onChange={() => alternarEmpresa(empresa.id)}
-                      className="rounded border-slate-300 text-violet-600 focus:ring-violet-500"
+                      className="rounded border-slate-300 text-primary-600 focus:ring-primary-500"
                     />
                     {empresa.razonSocial}
                   </label>
@@ -163,7 +163,7 @@ export function UsuarioFormModal({ usuarioExistente, onGuardado, onCerrar }: Usu
             </div>
           )}
           {rol === "Admin" && (
-            <p className="text-xs text-violet-600 bg-violet-50 border border-violet-100 rounded-lg p-3">
+            <p className="text-xs text-primary-600 bg-primary-50 border border-primary-100 rounded-lg p-3">
               Un Administrador ve todas las empresas automáticamente, no hace falta asignarle ninguna.
             </p>
           )}
@@ -188,7 +188,7 @@ export function UsuarioFormModal({ usuarioExistente, onGuardado, onCerrar }: Usu
             <button
               type="submit"
               disabled={guardando}
-              className="flex-1 py-3 bg-violet-600 text-white rounded-xl text-sm font-semibold hover:bg-violet-700 shadow-md shadow-violet-200 transition-all disabled:opacity-60"
+              className="flex-1 py-3 bg-primary-600 text-white rounded-xl text-sm font-semibold hover:bg-primary-700 shadow-md shadow-primary-200 transition-all disabled:opacity-60"
             >
               {guardando ? "Guardando..." : "Guardar"}
             </button>

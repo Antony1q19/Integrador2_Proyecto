@@ -95,7 +95,7 @@ export function DocumentosTab({
           <select
             value={tipoSeleccionado}
             onChange={(e) => setTipoSeleccionado(e.target.value as DocumentoPostulante["tipo"])}
-            className="rounded-md border border-gray-200 px-3 py-1.5 text-sm text-gray-700 focus:border-[#1D2B53] focus:outline-none focus:ring-1 focus:ring-[#1D2B53]"
+            className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-700 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
           >
             <option value="CV">Curriculum Vitae</option>
             <option value="DNI">Documento de identidad</option>
@@ -160,7 +160,7 @@ export function DocumentosTab({
                       onClick={() => setDocumentoAbierto(doc)}
                       disabled={!doc.url}
                       title={doc.url ? "Ver documento" : "Sin archivo disponible (dato de ejemplo)"}
-                      className="rounded-md px-2 py-1 text-xs font-medium text-gray-500 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
+                      className="rounded-lg px-2 py-1 text-xs font-medium text-gray-500 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
                     >
                       Ver
                     </button>
@@ -168,21 +168,21 @@ export function DocumentosTab({
                       onClick={() => handleDescargar(doc)}
                       disabled={!doc.url}
                       title={doc.url ? "Descargar documento" : "Sin archivo disponible (dato de ejemplo)"}
-                      className="rounded-md px-2 py-1 text-xs font-medium text-gray-500 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
+                      className="rounded-lg px-2 py-1 text-xs font-medium text-gray-500 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
                     >
                       Descargar
                     </button>
                     <button
                       onClick={() => abrirSelectorReemplazo(doc.id)}
                       disabled={activo || guardando}
-                      className="rounded-md px-2 py-1 text-xs font-medium text-gray-500 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30"
+                      className="rounded-lg px-2 py-1 text-xs font-medium text-gray-500 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30"
                     >
                       Reemplazar
                     </button>
                     <button
                       onClick={() => onEliminar(doc.id)}
                       disabled={activo || guardando}
-                      className="rounded-md px-2 py-1 text-xs font-medium text-gray-400 hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-30"
+                      className="rounded-lg px-2 py-1 text-xs font-medium text-gray-400 hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-30"
                     >
                       Eliminar
                     </button>
@@ -193,7 +193,7 @@ export function DocumentosTab({
                   <div className="mt-2">
                     <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
                       <div
-                        className="h-1.5 rounded-full bg-[#1D2B53] transition-all duration-150 ease-out"
+                        className="h-1.5 rounded-full bg-primary-600 transition-all duration-150 ease-out"
                         style={{ width: `${progreso}%` }}
                       />
                     </div>

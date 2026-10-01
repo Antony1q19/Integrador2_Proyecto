@@ -34,7 +34,7 @@ export default function EmpresasPage() {
           </div>
           <Link
             href="/empresas/nueva"
-            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 transition-colors"
+            className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 transition-colors"
           >
             + Nueva Empresa
           </Link>

@@ -32,9 +32,9 @@ export function SectionNavigation({
             key={index}
             className={`h-2 rounded-full transition-all ${
               index === currentSection
-                ? "w-8 bg-indigo-600"
+                ? "w-8 bg-primary-600"
                 : index < currentSection
-                ? "w-4 bg-indigo-300"
+                ? "w-4 bg-primary-300"
                 : "w-4 bg-slate-200"
             }`}
           />
@@ -58,7 +58,7 @@ export function SectionNavigation({
             type="button"
             onClick={onSubmit}
             disabled={isLoading}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-8 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700 disabled:opacity-70 disabled:cursor-not-allowed"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary-600 px-8 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <>
@@ -79,7 +79,7 @@ export function SectionNavigation({
           <button
             type="button"
             onClick={onNext}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700"
           >
             Siguiente
             <ChevronRight className="h-4 w-4" />

@@ -40,7 +40,7 @@ export default function EmpresaForm({
           className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
             errors.razonSocial
               ? "border-red-400 focus:ring-red-200"
-              : "border-slate-300 focus:ring-indigo-200"
+              : "border-slate-300 focus:ring-primary-200"
           }`}
           placeholder="Ej: Consultora Andina S.A.C."
         />
@@ -66,7 +66,7 @@ export default function EmpresaForm({
           className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
             errors.ruc
               ? "border-red-400 focus:ring-red-200"
-              : "border-slate-300 focus:ring-indigo-200"
+              : "border-slate-300 focus:ring-primary-200"
           }`}
           placeholder="11 dígitos, ej: 20481234567"
         />
@@ -88,7 +88,7 @@ export default function EmpresaForm({
           name="contactoNombre"
           value={formData.contactoNombre}
           onChange={handleChange}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
           placeholder="Ej: María Gutiérrez"
         />
       </div>
@@ -110,7 +110,7 @@ export default function EmpresaForm({
             className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
               errors.contactoEmail
                 ? "border-red-400 focus:ring-red-200"
-                : "border-slate-300 focus:ring-indigo-200"
+                : "border-slate-300 focus:ring-primary-200"
             }`}
             placeholder="nombre@empresa.com"
           />
@@ -137,7 +137,7 @@ export default function EmpresaForm({
             className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
               errors.contactoTelefono
                 ? "border-red-400 focus:ring-red-200"
-                : "border-slate-300 focus:ring-indigo-200"
+                : "border-slate-300 focus:ring-primary-200"
             }`}
             placeholder="+51 987 654 321"
           />
@@ -161,7 +161,7 @@ export default function EmpresaForm({
           name="sector"
           value={formData.sector}
           onChange={handleChange}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-200"
         >
           <option value="">Selecciona un sector</option>
           <option value="Tecnología">Tecnología</option>
@@ -183,7 +183,7 @@ export default function EmpresaForm({
         <button
           type="submit"
           disabled={enviando}
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {enviando ? "Guardando..." : submitLabel}
         </button>

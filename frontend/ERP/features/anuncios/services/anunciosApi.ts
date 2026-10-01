@@ -10,7 +10,7 @@ import { cargarConCache } from "@/lib/cacheCliente";
 // Interruptor mock/API (ver postulantesService.ts): con API se usan las rutas /api/... del ERP.
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// Un anuncio de servicio-empresas-vacantes. `postulantesAsociadosIds` va vacío porque
+// Un anuncio de servicio-empresas-vacantes. `postulantesAsociadosIds` no se llena porque
 // esa relación ahora vive en las postulaciones (servicio-procesos-seleccion).
 export function mapearAnuncioDeApi(dto: Record<string, unknown>): Anuncio {
   return {
@@ -26,7 +26,6 @@ export function mapearAnuncioDeApi(dto: Record<string, unknown>): Anuncio {
     empresaId: dto.empresaId as number,
     empresaRazonSocial: dto.empresaRazonSocial as string,
     fechaCreacion: dto.fechaCreacion as string,
-    //postulantesAsociadosIds: [],
   };
 }
 

@@ -47,7 +47,7 @@ export default function ComunicacionesPage() {
           <p className="text-sm text-red-600">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="mt-4 rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700"
+            className="mt-4 rounded-lg bg-primary-600 px-4 py-2 text-sm text-white hover:bg-primary-700"
           >
             Reintentar
           </button>
@@ -68,7 +68,7 @@ export default function ComunicacionesPage() {
                 value={queryBusqueda}
                 onChange={(e) => buscarContactos(e.target.value)}
                 placeholder="Buscar contacto..."
-                className="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                className="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200"
               />
             </div>
 

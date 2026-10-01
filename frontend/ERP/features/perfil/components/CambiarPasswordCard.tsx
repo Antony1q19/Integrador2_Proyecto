@@ -43,9 +43,9 @@ export function CambiarPasswordCard() {
   };
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
       <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-        <Key className="text-violet-500" size={20} /> Seguridad
+        <Key className="text-primary-500" size={20} /> Seguridad
       </h2>
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div>
@@ -56,7 +56,7 @@ export function CambiarPasswordCard() {
             value={passwordActual}
             onChange={(e) => setPasswordActual(e.target.value)}
             placeholder="••••••••"
-            className="w-full p-3 rounded-lg text-sm border border-slate-200 focus:outline-none focus:border-violet-500"
+            className="w-full p-3 rounded-lg text-sm border border-slate-200 focus:outline-none focus:border-primary-500"
           />
         </div>
         <div>
@@ -68,7 +68,7 @@ export function CambiarPasswordCard() {
             value={passwordNuevo}
             onChange={(e) => setPasswordNuevo(e.target.value)}
             placeholder="••••••••"
-            className="w-full p-3 rounded-lg text-sm border border-slate-200 focus:outline-none focus:border-violet-500"
+            className="w-full p-3 rounded-lg text-sm border border-slate-200 focus:outline-none focus:border-primary-500"
           />
         </div>
         <div>
@@ -80,7 +80,7 @@ export function CambiarPasswordCard() {
             value={passwordConfirmar}
             onChange={(e) => setPasswordConfirmar(e.target.value)}
             placeholder="••••••••"
-            className="w-full p-3 rounded-lg text-sm border border-slate-200 focus:outline-none focus:border-violet-500"
+            className="w-full p-3 rounded-lg text-sm border border-slate-200 focus:outline-none focus:border-primary-500"
           />
         </div>
 
@@ -93,7 +93,7 @@ export function CambiarPasswordCard() {
         <button
           type="submit"
           disabled={guardando}
-          className="w-full mt-2 py-3 bg-violet-600 text-white rounded-lg text-sm font-semibold hover:bg-violet-700 transition disabled:opacity-60"
+          className="w-full mt-2 py-3 bg-primary-600 text-white rounded-lg text-sm font-semibold hover:bg-primary-700 transition disabled:opacity-60"
         >
           {guardando ? "Actualizando..." : "Actualizar Contraseña"}
         </button>

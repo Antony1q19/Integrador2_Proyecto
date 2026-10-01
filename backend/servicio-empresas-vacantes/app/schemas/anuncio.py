@@ -105,3 +105,22 @@ class AnuncioCambiarEstado(BaseModel):
     """Datos que llegan al hacer PATCH /anuncios/{id}/estado."""
 
     estado: Literal["Abierto", "En proceso", "Cerrado"]
+
+class AnuncioPublico(BaseModel):
+    """Un anuncio tal como lo ve CUALQUIER persona en la app ANUNCIOS (sin iniciar sesión).
+
+    Es una lista blanca: solo lleva lo que se puede publicar. NO incluye el RUC ni los datos
+    de contacto de la empresa, ni el estado interno, ni ids de empresa. Si mañana se agrega
+    una columna nueva a la tabla, NO aparece aquí sola: hay que añadirla a propósito."""
+
+    id: int
+    cargo: str
+    empresaNombre: str
+    empresaSector: str | None = None
+    descripcion: str | None = None
+    requisitos: str | None = None
+    numeroVacantes: int
+    salarioMin: float | None = None
+    salarioMax: float | None = None
+    fechaLimite: date
+    fechaPublicacion: datetime

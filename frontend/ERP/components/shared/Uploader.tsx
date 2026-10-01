@@ -71,7 +71,7 @@ export function Uploader({
         onClick={() => !bloqueado && inputRef.current?.click()}
         className={[
           "flex cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed px-6 py-8 text-center transition-colors",
-          arrastrando ? "border-[#1D2B53] bg-slate-50" : "border-gray-200 hover:border-gray-300",
+          arrastrando ? "border-primary-600 bg-slate-50" : "border-gray-200 hover:border-gray-300",
           bloqueado ? "pointer-events-none opacity-60" : "",
         ].join(" ")}
       >
@@ -107,7 +107,7 @@ export function Uploader({
         <div className="mt-2">
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
             <div
-              className="h-1.5 rounded-full bg-[#1D2B53] transition-all duration-150 ease-out"
+              className="h-1.5 rounded-full bg-primary-600 transition-all duration-150 ease-out"
               style={{ width: `${progreso}%` }}
             />
           </div>

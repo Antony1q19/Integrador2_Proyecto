@@ -88,7 +88,7 @@ export default function AsociarPostulantesModal({
                 type="checkbox"
                 checked={seleccionTemporal.includes(postulante.id)}
                 onChange={() => toggleSeleccion(postulante.id)}
-                className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-200"
+                className="h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-200"
               />
               <div>
                 <p className="text-sm font-medium text-slate-800">
@@ -114,7 +114,7 @@ export default function AsociarPostulantesModal({
           <button
             type="button"
             onClick={() => onConfirmar(seleccionTemporal)}
-            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
+            className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 transition-colors"
           >
             Confirmar ({seleccionTemporal.length})
           </button>

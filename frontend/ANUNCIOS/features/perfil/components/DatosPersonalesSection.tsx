@@ -13,7 +13,7 @@ interface DatosPersonalesSectionProps {
 }
 
 const inputClass =
-  'w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-900 transition-colors duration-150 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30';
+  'w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-900 transition-colors duration-150 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30';
 
 const labelClass = 'mb-1 block text-xs font-medium text-gray-500';
 
@@ -53,7 +53,7 @@ export function DatosPersonalesSection({
         !editando && (
           <button
             onClick={handleEditar}
-            className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-purple-700 transition-colors duration-150 hover:bg-purple-50 active:scale-[0.97]"
+            className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-primary-600 transition-colors duration-150 hover:bg-primary-50 active:scale-[0.97]"
           >
             <Pencil size={13} /> Editar
           </button>
@@ -145,14 +145,14 @@ export function DatosPersonalesSection({
             <button
               type="submit"
               disabled={guardando}
-              className="rounded-md bg-purple-800 px-4 py-2 text-sm font-medium text-white transition-[background-color,transform] duration-150 ease-out hover:bg-purple-900 active:scale-[0.97] disabled:opacity-50"
+              className="rounded-lg bg-primary-700 px-4 py-2 text-sm font-medium text-white transition-[background-color,transform] duration-150 ease-out hover:bg-primary-800 active:scale-[0.97] disabled:opacity-50"
             >
               {guardando ? 'Guardando…' : 'Guardar cambios'}
             </button>
             <button
               type="button"
               onClick={() => setEditando(false)}
-              className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 transition-colors duration-150 hover:bg-gray-50 active:scale-[0.97]"
+              className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 transition-colors duration-150 hover:bg-gray-50 active:scale-[0.97]"
             >
               Cancelar
             </button>

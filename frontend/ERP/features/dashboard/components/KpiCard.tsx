@@ -17,7 +17,7 @@ export function KpiCard({ titulo, valor, detalle, icono: Icono, color, progreso,
   return (
     <div
       title={ayuda}
-      className="relative flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white p-5 shadow-sm print:break-inside-avoid"
+      className="relative flex flex-col overflow-hidden rounded-xl border border-slate-100 bg-white p-5 shadow-sm print:break-inside-avoid"
     >
       <div className="mb-3 flex items-start justify-between gap-3">
         <div>

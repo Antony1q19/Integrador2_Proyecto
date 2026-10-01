@@ -98,3 +98,9 @@ class PostulanteRespuesta(BaseModel):
     tieneCuenta: bool = False
 
     model_config = {"from_attributes": True}
+
+
+class SolicitudCuentaRespuesta(BaseModel):
+    """Respuesta de POST /postulantes/{id}/solicitar-cuenta."""
+
+    enviadoA: str  # correo al que se envió la invitación

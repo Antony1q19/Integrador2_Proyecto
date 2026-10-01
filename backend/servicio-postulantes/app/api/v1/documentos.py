@@ -2,12 +2,14 @@
 
 Rutas (todas cuelgan de un postulante). Los archivos se guardan en SUPABASE STORAGE (un bucket privado);
 en nuestra base de datos solo queda la ruta del archivo y algunos datos suyos.
-    GET     /postulantes/{id}/documentos                          → listar sus documentos
+    GET     /postulantes/{id}/documentos                          → listar sus documentos      (Admin, RRHH, Supervisor)
     GET     /postulantes/{id}/documentos/{documento_id}/contenido → el archivo en sí, para verlo o descargarlo
     POST    /postulantes/{id}/documentos/archivo                  → SUBIR un archivo nuevo   (Admin, RRHH, Supervisor)
     PUT     /postulantes/{id}/documentos/{documento_id}/archivo   → REEMPLAZAR el archivo    (Admin, RRHH, Supervisor)
     DELETE  /postulantes/{id}/documentos/{documento_id}           → eliminar (y borrar del Storage)
 """
+from urllib.parse import quote
+
 from fastapi import APIRouter, Depends, File, Form, Response, UploadFile, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -65,7 +67,9 @@ async def _leer_y_validar(archivo: UploadFile, tipo: str) -> bytes:
 # ---------------------------------------------------------------------------
 @router.get("", response_model=list[DocumentoRespuesta])
 async def listar_documentos(
-    postulante_id: str, sesion: AsyncSession = Depends(obtener_sesion_lectura)
+    postulante_id: str,
+    sesion: AsyncSession = Depends(obtener_sesion_lectura),
+    _usuario: dict = Depends(requerir_rol(*_ROLES_QUE_EDITAN)),
 ) -> list[DocumentoRespuesta]:
     resultado = await sesion.execute(
         select(Documento).where(Documento.postulante_id == postulante_id).order_by(Documento.fecha_subida)
@@ -91,7 +95,13 @@ async def obtener_contenido_documento(
         raise RecursoNoEncontrado("Este documento no tiene un archivo disponible")
 
     contenido, tipo_de_archivo = await descargar_archivo(documento.ruta_archivo)
-    return Response(content=contenido, media_type=documento.tipo_contenido or tipo_de_archivo)
+    # "inline" = el navegador lo muestra en el visor; si se descarga, se guarda con su nombre original.
+    # El nombre va codificado (filename*=UTF-8''...) porque puede tener tildes o espacios.
+    return Response(
+        content=contenido,
+        media_type=documento.tipo_contenido or tipo_de_archivo,
+        headers={"Content-Disposition": f"inline; filename*=UTF-8''{quote(documento.nombre_archivo)}"},
+    )
 
 
 # ---------------------------------------------------------------------------

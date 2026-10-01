@@ -19,7 +19,7 @@ export default function NuevoAnuncioPage() {
       <div className="mx-auto max-w-2xl">
         <Link
           href="/anuncios"
-          className="mb-6 inline-flex items-center text-sm text-slate-500 hover:text-indigo-600"
+          className="mb-6 inline-flex items-center text-sm text-slate-500 hover:text-primary-600"
         >
           ← Volver a Anuncios
         </Link>

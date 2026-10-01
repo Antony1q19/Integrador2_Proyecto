@@ -21,7 +21,7 @@ export function ChatSkeleton() {
             className={`flex ${i % 2 === 0 ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`h-12 rounded-2xl bg-slate-100 ${
+              className={`h-12 rounded-xl bg-slate-100 ${
                 i % 2 === 0 ? "w-48" : "w-56"
               }`}
             />

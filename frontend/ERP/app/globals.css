@@ -1,15 +1,48 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   TOKENS DE DISEÑO (compartidos con frontend/ANUNCIOS/app/globals.css)
+   --------------------------------------------------------------------------
+   - Color principal: "primary" (índigo). En el código se usa SIEMPRE
+     bg-primary-600, text-primary-700, ring-primary-500... y NUNCA indigo-*,
+     violet-* ni colores sueltos tipo [#1D2B53]. Para cambiar la marca, se
+     cambian estos valores y listo.
+   - Botón principal: primary-600 (hover: primary-700).
+   - Radios: controles (botones, inputs, selects) → rounded-lg;
+             tarjetas, paneles y modales → rounded-xl.
+   - Fuente: Geist (cargada en app/layout.tsx).
+   Los colores de ESTADO (verde = éxito, rojo = peligro, ámbar = aviso,
+   azul/celeste en badges de etapa) siguen usando la paleta normal.
+   ========================================================================== */
+@theme {
+  --color-primary-50: oklch(96.2% 0.018 272.314);
+  --color-primary-100: oklch(93% 0.034 272.788);
+  --color-primary-200: oklch(87% 0.065 274.039);
+  --color-primary-300: oklch(78.5% 0.115 274.713);
+  --color-primary-400: oklch(67.3% 0.182 276.935);
+  --color-primary-500: oklch(58.5% 0.233 277.117);
+  --color-primary-600: oklch(51.1% 0.262 276.966);
+  --color-primary-700: oklch(45.7% 0.24 277.023);
+  --color-primary-800: oklch(39.8% 0.195 277.366);
+  --color-primary-900: oklch(35.9% 0.144 278.697);
+  --color-primary-950: oklch(25.7% 0.09 281.288);
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
-};
+  color-scheme: light;
+}
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-};
+}
 
 /* Scrollbar minimalista: quita las flechitas de scroll nativas que algunos
    navegadores/SO dibujan (ej. Edge/Chrome con estilo de scrollbar clásico

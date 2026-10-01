@@ -52,7 +52,7 @@ export function ChatPanel({
       {/* Header del chat */}
       <div className="flex items-center justify-between border-b border-slate-200 bg-white p-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 text-sm font-semibold text-indigo-700">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary-100 to-purple-100 text-sm font-semibold text-primary-700">
             {contacto.nombre.charAt(0)}
             {contacto.apellido.charAt(0)}
           </div>

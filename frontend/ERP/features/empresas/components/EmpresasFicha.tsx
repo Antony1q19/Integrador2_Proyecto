@@ -29,7 +29,7 @@ export default async function EmpresasFicha({
         {/* Navegación de vuelta */}
         <Link
           href="/empresas"
-          className="mb-6 inline-flex items-center text-sm text-slate-500 hover:text-indigo-600"
+          className="mb-6 inline-flex items-center text-sm text-slate-500 hover:text-primary-600"
         >
           ← Volver a Empresas
         </Link>

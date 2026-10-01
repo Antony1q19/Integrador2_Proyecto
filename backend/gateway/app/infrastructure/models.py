@@ -31,7 +31,8 @@ class Usuario(Base):
     # Contraseña convertida en hash (nunca la contraseña real). Ver core/security.py.
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    # Rol: Admin | RRHH | Supervisor (personal del ERP) | Postulante (app ANUNCIOS).
+    # Rol: Admin | RRHH | Supervisor. Solo trabajadores del ERP (los postulantes tienen su
+    # propia tabla de cuentas en servicio-postulantes).
     rol: Mapped[str] = mapped_column(String(50), nullable=False)
 
     # Estado de la cuenta: Activo | Suspendido | Eliminado.

@@ -1,7 +1,8 @@
 // features/anuncios/components/AnunciosExplorer.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Anuncio } from '../types';
 import JobCard from './JobCard';
 import JobDetailPanel from '@/features/anuncios/components/JobDetailPanel';
@@ -10,19 +11,26 @@ interface AnunciosExplorerProps {
   anuncios: Anuncio[];
 }
 
+// Desde este ancho (lg de Tailwind) se ve el panel de detalle a la derecha.
+const MEDIA_ESCRITORIO = '(min-width: 1024px)';
+
 export default function AnunciosExplorer({ anuncios }: AnunciosExplorerProps) {
-  const [selectedId, setSelectedId] = useState<string | null>(
-    anuncios.length > 0 ? anuncios[0].id : null
-  );
+  const router = useRouter();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const sigueExistiendo = anuncios.some((a) => a.id === selectedId);
-    if (!sigueExistiendo) {
-      setSelectedId(anuncios.length > 0 ? anuncios[0].id : null);
+  // Si el elegido ya no está en la lista (ej. por el filtro de búsqueda), se muestra el primero.
+  // Se calcula al vuelo en vez de corregir el estado en un useEffect.
+  const anuncioSeleccionado = anuncios.find((a) => a.id === selectedId) ?? anuncios[0] ?? null;
+
+  // En escritorio se muestra el detalle al costado; en celular el panel no cabe, así que se abre
+  // la página del anuncio (/anuncios/[id]).
+  const abrirAnuncio = (anuncio: Anuncio) => {
+    if (window.matchMedia(MEDIA_ESCRITORIO).matches) {
+      setSelectedId(anuncio.id);
+    } else {
+      router.push(`/anuncios/${anuncio.id}`);
     }
-  }, [anuncios, selectedId]);
-
-  const anuncioSeleccionado = anuncios.find((a) => a.id === selectedId) ?? null;
+  };
 
   if (anuncios.length === 0) {
     return (
@@ -42,13 +50,13 @@ export default function AnunciosExplorer({ anuncios }: AnunciosExplorerProps) {
           <JobCard
             key={anuncio.id}
             anuncio={anuncio}
-            isSelected={anuncio.id === selectedId}
-            onClick={() => setSelectedId(anuncio.id)}
+            isSelected={anuncio.id === anuncioSeleccionado?.id}
+            onClick={() => abrirAnuncio(anuncio)}
           />
         ))}
       </div>
 
-      {/* Columna derecha: panel de detalle (oculto en móvil si no hay selección) */}
+      {/* Columna derecha: panel de detalle (solo escritorio; en celular se abre la página del anuncio) */}
       <div className="hidden lg:block lg:sticky lg:top-4">
         {anuncioSeleccionado && <JobDetailPanel anuncio={anuncioSeleccionado} />}
       </div>

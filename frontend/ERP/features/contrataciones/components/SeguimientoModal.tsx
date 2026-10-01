@@ -53,7 +53,7 @@ export function SeguimientoModal({ seguimiento, onCerrar, onGuardado }: Seguimie
                 type="button"
                 onClick={() => setValoracion(v)}
                 className={`rounded-lg border px-2 py-2 text-xs font-semibold transition-colors ${
-                  valoracion === v ? "border-[#1D2B53] bg-[#1D2B53] text-white" : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                  valoracion === v ? "border-primary-600 bg-primary-600 text-white" : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
                 }`}
               >
                 {v}

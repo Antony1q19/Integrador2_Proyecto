@@ -36,7 +36,7 @@ export function Modal({ titulo, subtitulo, onCerrar, bloqueado = false, ancho = 
       <div
         role="dialog"
         aria-label={titulo}
-        className={`flex max-h-[92vh] w-full flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ${ANCHOS[ancho]}`}
+        className={`flex max-h-[92vh] w-full flex-col overflow-hidden rounded-xl bg-white shadow-2xl ${ANCHOS[ancho]}`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-3 border-b border-slate-100 bg-slate-50 px-6 py-4">
@@ -49,7 +49,7 @@ export function Modal({ titulo, subtitulo, onCerrar, bloqueado = false, ancho = 
             onClick={onCerrar}
             disabled={bloqueado}
             aria-label="Cerrar"
-            className="rounded-md p-1 text-slate-400 hover:bg-slate-200 hover:text-slate-600 disabled:opacity-40"
+            className="rounded-lg p-1 text-slate-400 hover:bg-slate-200 hover:text-slate-600 disabled:opacity-40"
           >
             <X size={18} />
           </button>
@@ -62,7 +62,7 @@ export function Modal({ titulo, subtitulo, onCerrar, bloqueado = false, ancho = 
 
 // Estilos comunes de los campos de los formularios dentro de los modales.
 export const ESTILO_CAMPO =
-  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-[#1D2B53] focus:outline-none focus:ring-2 focus:ring-[#1D2B53]/15 disabled:bg-slate-50 disabled:text-slate-400";
+  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/15 disabled:bg-slate-50 disabled:text-slate-400";
 
 export function Campo({ etiqueta, obligatorio, ayuda, children }: { etiqueta: string; obligatorio?: boolean; ayuda?: string; children: React.ReactNode }) {
   return (
@@ -91,7 +91,7 @@ export function BotonesModal({ guardando, textoGuardar, onCancelar }: { guardand
       <button
         type="submit"
         disabled={guardando}
-        className="flex-1 rounded-xl bg-[#1D2B53] py-2.5 text-sm font-semibold text-white shadow-md hover:bg-[#16224A] disabled:opacity-60"
+        className="flex-1 rounded-xl bg-primary-600 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-primary-700 disabled:opacity-60"
       >
         {guardando ? "Guardando…" : textoGuardar}
       </button>

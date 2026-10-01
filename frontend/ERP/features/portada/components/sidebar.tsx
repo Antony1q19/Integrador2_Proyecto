@@ -26,6 +26,10 @@ export default function Sidebar({
 }: SidebarProps) {
 
     const pathname = usePathname();
+
+    // ¿Estoy en esta sección? También cuenta una subpágina: en "/empresas/5" sigue
+    // marcada "Empresas" (antes solo se marcaba con la ruta exacta).
+    const estaEn = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
     const router = useRouter();
     const [submenusManuales, setSubmenusManuales] = useState<Record<string, boolean>>({});
 
@@ -65,9 +69,9 @@ export default function Sidebar({
           h-screen w-72
           overflow-hidden
           bg-gradient-to-b
-          from-[#111827]
-          via-[#172554]
-          to-[#312e81]
+          from-slate-900
+          via-primary-950
+          to-primary-900
           text-white
           shadow-2xl
           transition-transform
@@ -78,20 +82,20 @@ export default function Sidebar({
             >
 
                 {/* Decoración superior */}
-                <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-violet-600/20 blur-3xl" />
-                <div className="absolute -left-20 top-1/3 h-56 w-56 rounded-full bg-blue-600/10 blur-3xl" />
+                <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-primary-600/20 blur-3xl" />
+                <div className="absolute -left-20 top-1/3 h-56 w-56 rounded-full bg-primary-600/10 blur-3xl" />
 
                 {/* CONTENIDO */}
                 <div className="relative z-10 flex h-full flex-col">
 
                     {/* LOGO */}
                     <div className="flex h-20 items-center gap-3 border-b border-white/10 px-6">
-                        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-violet-600 shadow-lg shadow-violet-900/40">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 shadow-lg shadow-primary-900/40">
                             <Zap size={23} strokeWidth={2.5} />
                         </div>
                         <div>
                             <h1 className="text-xl font-bold tracking-tight">
-                                Talent<span className="text-violet-400">ERP</span>
+                                Talent<span className="text-primary-400">ERP</span>
                             </h1>
                             <p className="text-[11px] text-slate-400">Recursos Humanos</p>
                         </div>
@@ -107,9 +111,14 @@ export default function Sidebar({
                         <div className="space-y-2">
                             {filteredItems.map((item) => {
                                 const Icon = item.icon;
-                                const active = pathname === item.href;
+                                const active = estaEn(item.href);
                                 const tieneSubItems = !!item.subItems?.length;
-                                const subItemActivo = item.subItems?.some((sub) => pathname === sub.href) ?? false;
+                                // Del submenú se marca la coincidencia MÁS específica: en "/postulantes/pipeline"
+                                // coinciden "Listado" (/postulantes) y "Pipeline"; gana "Pipeline".
+                                const subActivoHref = item.subItems
+                                    ?.filter((sub) => estaEn(sub.href))
+                                    .sort((a, b) => b.href.length - a.href.length)[0]?.href;
+                                const subItemActivo = subActivoHref !== undefined;
                                 const expandido = submenusManuales[item.name] ?? (active || subItemActivo);
 
                                 return (
@@ -117,7 +126,7 @@ export default function Sidebar({
                                         <div
                                             className={`
                         group relative flex items-center gap-3 overflow-hidden rounded-xl text-sm font-medium transition-all duration-200
-                        ${active ? "bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-lg shadow-blue-950/30" : "text-slate-300 hover:bg-white/[0.08] hover:text-white"}
+                        ${active ? "bg-gradient-to-r from-primary-500 to-primary-700 text-white shadow-lg shadow-primary-950/30" : "text-slate-300 hover:bg-white/[0.08] hover:text-white"}
                       `}
                                         >
                                             {/* Brillo del elemento activo */}
@@ -125,6 +134,7 @@ export default function Sidebar({
 
                                             <Link
                                                 href={item.href}
+                                                aria-current={active ? "page" : undefined}
                                                 onClick={() => setOpen(false)}
                                                 className="relative z-10 flex flex-1 items-center gap-3 px-4 py-3"
                                             >
@@ -165,11 +175,12 @@ export default function Sidebar({
                                         {tieneSubItems && expandido && (
                                             <div className="ml-6 mt-1 space-y-1 border-l border-white/10 pl-4">
                                                 {item.subItems!.map((sub) => {
-                                                    const subActive = pathname === sub.href;
+                                                    const subActive = sub.href === subActivoHref;
                                                     return (
                                                         <Link
                                                             key={sub.href}
                                                             href={sub.href}
+                                                            aria-current={subActive ? "page" : undefined}
                                                             onClick={() => setOpen(false)}
                                                             className={`block rounded-lg px-3 py-2 text-sm transition ${
                                                                 subActive

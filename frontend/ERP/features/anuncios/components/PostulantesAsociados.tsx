@@ -38,7 +38,7 @@ export default function PostulantesAsociados({
         <button
           type="button"
           onClick={() => setModalAbierto(true)}
-          className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700 transition-colors"
+          className="rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-primary-700 transition-colors"
         >
           + Asociar Postulante
         </button>

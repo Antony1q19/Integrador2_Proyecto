@@ -20,22 +20,7 @@ import { EstadoBadge } from "./EstadoBadge";
 import { PostulantesEmptyState } from "./PostulantesEmptyState";
 import { PostulantesTableSkeleton } from "./PostulantesSkeleton";
 import { contarPostulaciones, postulanteTieneCuenta, prefetchPostulante } from "../services/postulantesService";
-
-// Dirección de la bolsa de trabajo donde el postulante crea su cuenta.
-const URL_ANUNCIOS = process.env.NEXT_PUBLIC_ANUNCIOS_URL ?? "http://localhost:3001";
-
-// "Solicitar" abre el correo del usuario con un mensaje listo para invitar al postulante
-// a crear su cuenta (el sistema todavía no envía correos por sí mismo).
-function enlaceSolicitarCuenta(postulante: Postulante): string {
-  const { nombres, email } = postulante.datosPersonales;
-  const asunto = "Crea tu cuenta para seguir tu postulación";
-  const cuerpo =
-    `Hola ${nombres},\n\n` +
-    `Para que puedas revisar el avance de tus postulaciones, te invitamos a crear tu cuenta ` +
-    `en nuestra bolsa de trabajo:\n${URL_ANUNCIOS}\n\n` +
-    `Usa este mismo correo (${email}) al registrarte.\n\nSaludos.`;
-  return `mailto:${email}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
-}
+import { SolicitarCuentaBoton } from "./SolicitarCuentaBoton";
 
 function ConsentimientoIcono({ aceptado }: { aceptado: boolean }) {
   return aceptado ? (
@@ -181,7 +166,7 @@ export const PostulantesTable = memo(function PostulantesTable({
                 <tr
                   key={postulante.id}
                   className={`transition-colors duration-150 ${
-                    isHovered ? "bg-indigo-50/50" : "hover:bg-slate-50"
+                    isHovered ? "bg-primary-50/50" : "hover:bg-slate-50"
                   }`}
                   onMouseEnter={() => {
                     setHoveredRow(postulante.id);
@@ -192,7 +177,7 @@ export const PostulantesTable = memo(function PostulantesTable({
                   {/* Postulante */}
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 text-indigo-700 font-semibold text-xs">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary-100 to-purple-100 text-primary-700 font-semibold text-xs">
                         {postulante.datosPersonales.nombres.charAt(0)}
                         {postulante.datosPersonales.apellidos.charAt(0)}
                       </div>
@@ -229,13 +214,7 @@ export const PostulantesTable = memo(function PostulantesTable({
                     {postulanteTieneCuenta(postulante) ? (
                       <Check className="mx-auto h-4 w-4 text-emerald-600" aria-label="Tiene cuenta" />
                     ) : (
-                      <a
-                        href={enlaceSolicitarCuenta(postulante)}
-                        title={`Enviar un correo a ${postulante.datosPersonales.email} para que cree su cuenta`}
-                        className="inline-flex items-center rounded-lg bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-100"
-                      >
-                        Solicitar
-                      </a>
+                      <SolicitarCuentaBoton postulanteId={postulante.id} email={postulante.datosPersonales.email} />
                     )}
                   </td>
 
@@ -254,7 +233,7 @@ export const PostulantesTable = memo(function PostulantesTable({
                     <div className="flex items-center justify-end gap-2">
                       <Link
                         href={`/postulantes/${postulante.id}`}
-                        className="inline-flex items-center gap-1 rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-600 transition-colors hover:bg-indigo-100"
+                        className="inline-flex items-center gap-1 rounded-lg bg-primary-50 px-3 py-1.5 text-xs font-medium text-primary-600 transition-colors hover:bg-primary-100"
                       >
                         <Eye className="h-3.5 w-3.5" />
                         Ver
@@ -285,7 +264,7 @@ export const PostulantesTable = memo(function PostulantesTable({
               id="pageSize"
               value={pageSize}
               onChange={(e) => onPageSizeChange(Number(e.target.value))}
-              className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-sm text-slate-700 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-sm text-slate-700 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
             >
               {[5, 10, 15, 25, 50].map((size) => (
                 <option key={size} value={size}>
@@ -328,7 +307,7 @@ export const PostulantesTable = memo(function PostulantesTable({
                     onClick={() => onPageChange(pageNum)}
                     className={`min-w-[36px] rounded-lg px-3 py-1.5 text-sm transition-colors ${
                       page === pageNum
-                        ? "bg-indigo-600 text-white font-medium"
+                        ? "bg-primary-600 text-white font-medium"
                         : "text-slate-600 hover:bg-slate-100"
                     }`}
                   >

@@ -21,7 +21,7 @@ export default function Navbar() {
           href="/"
           className="flex items-center gap-2 transition-opacity duration-150 hover:opacity-80"
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-800 text-white">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-700 text-white">
             <Briefcase size={16} />
           </span>
           <span className="text-sm font-semibold tracking-tight text-gray-900">

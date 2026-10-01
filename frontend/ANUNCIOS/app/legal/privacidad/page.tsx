@@ -74,7 +74,7 @@ export default function PrivacidadPage() {
 
         <Link
           href="/registro"
-          className="mt-8 inline-block text-sm font-medium text-purple-700 hover:text-purple-900"
+          className="mt-8 inline-block text-sm font-medium text-primary-600 hover:text-primary-800"
         >
           ← Volver a crear cuenta
         </Link>

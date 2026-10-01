@@ -3,14 +3,17 @@
 Rutas (prefijo /postulantes). El navegador las llama a través del Gateway,
 como /api/v1/postulantes...:
     GET    /postulantes         → listar todos      (Admin, RRHH, Supervisor)
-    GET    /postulantes/{id}    → ver uno           (cualquier usuario con sesión)
+    GET    /postulantes/{id}    → ver uno           (Admin, RRHH, Supervisor)
     POST   /postulantes         → crear             (ANUNCIOS al registrarse, o RRHH a mano; 409 si el documento o el correo ya existen)
     PATCH  /postulantes/{id}    → editar            (Admin, RRHH, Supervisor)
+    POST   /postulantes/{id}/solicitar-cuenta → enviar por correo (Mailjet) la invitación a crear su cuenta
+                                                (Admin, RRHH, Supervisor; 409 si ya tiene cuenta)
 
 Estas funciones son "delgadas" a propósito: reciben la petición, aplican la
 regla de negocio (domain/postulantes.py) y guardan/leen en la base de datos.
 """
 import asyncio
+import time
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, status
@@ -21,8 +24,14 @@ from app.api.deps import obtener_usuario_actual, requerir_rol
 from app.api.visibilidad import exigir_postulante_visible, postulantes_ocultos
 from app.core.database import obtener_sesion, obtener_sesion_lectura
 from app.domain.postulantes import validar_consentimiento_obligatorio
+from app.infrastructure.correo import correo_solicitud_cuenta, enviar_correo
 from app.infrastructure.models import Postulante, Usuario
-from app.schemas.postulante import PostulanteActualizar, PostulanteCrear, PostulanteRespuesta
+from app.schemas.postulante import (
+    PostulanteActualizar,
+    PostulanteCrear,
+    PostulanteRespuesta,
+    SolicitudCuentaRespuesta,
+)
 from shared_kernel.exceptions import ConflictoDeEstado, RecursoNoEncontrado
 
 router = APIRouter(prefix="/postulantes", tags=["postulantes"])
@@ -99,7 +108,9 @@ async def listar_postulantes(
 async def obtener_postulante(
     postulante_id: str,
     sesion: AsyncSession = Depends(obtener_sesion_lectura),
-    _usuario: dict = Depends(obtener_usuario_actual),
+    # Solo el personal del ERP: un Postulante (cuenta pública de ANUNCIOS) no tiene filtro de
+    # empresas, así que sin esta regla podría leer los datos personales de cualquier otro.
+    _usuario: dict = Depends(requerir_rol("Admin", "RRHH", "Supervisor")),
 ) -> PostulanteRespuesta:
     postulante, tiene_cuenta = await _obtener_con_cuenta(sesion, postulante_id)
     return _a_respuesta(postulante, tiene_cuenta)
@@ -190,3 +201,39 @@ async def actualizar_postulante(
 
     await sesion.commit()
     return _a_respuesta(postulante, tiene_cuenta)
+
+
+# ---------------------------------------------------------------------------
+# Solicitar cuenta: invitar por correo a un postulante a crear su cuenta
+# ---------------------------------------------------------------------------
+# Un mismo postulante no puede recibir otra invitación hasta que pase este tiempo: evita
+# mandarle varios correos por un doble clic (o que alguien llene su bandeja de entrada).
+_ESPERA_ENTRE_INVITACIONES_SEGUNDOS = 120
+_ultima_invitacion: dict[str, float] = {}  # postulante_id -> hora (monotonic) del último envío
+
+
+@router.post(
+    "/{postulante_id}/solicitar-cuenta",
+    response_model=SolicitudCuentaRespuesta,
+    dependencies=[Depends(exigir_postulante_visible)],
+)
+async def solicitar_cuenta(
+    postulante_id: str,
+    sesion: AsyncSession = Depends(obtener_sesion_lectura),
+    _usuario: dict = Depends(requerir_rol("Admin", "RRHH", "Supervisor")),
+) -> SolicitudCuentaRespuesta:
+    """Envía (con Mailjet) un correo al postulante invitándolo a crear su cuenta en ANUNCIOS."""
+    postulante, tiene_cuenta = await _obtener_con_cuenta(sesion, postulante_id)
+    if tiene_cuenta:
+        raise ConflictoDeEstado("Este postulante ya tiene una cuenta")
+
+    ahora = time.monotonic()
+    anterior = _ultima_invitacion.get(postulante_id)
+    if anterior is not None and ahora - anterior < _ESPERA_ENTRE_INVITACIONES_SEGUNDOS:
+        raise ConflictoDeEstado("Ya se le envió una invitación hace un momento. Espera unos minutos para reenviarla.")
+
+    asunto, html_cuerpo, texto = correo_solicitud_cuenta(postulante.nombres, postulante.email)
+    nombre_completo = f"{postulante.nombres} {postulante.apellidos}"
+    await enviar_correo(postulante.email, nombre_completo, asunto, html_cuerpo, texto)
+    _ultima_invitacion[postulante_id] = ahora
+    return SolicitudCuentaRespuesta(enviadoA=postulante.email)

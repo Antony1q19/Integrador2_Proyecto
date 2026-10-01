@@ -19,7 +19,7 @@ export default function NuevaEmpresaPage() {
       <div className="mx-auto max-w-2xl">
         <Link
           href="/empresas"
-          className="mb-6 inline-flex items-center text-sm text-slate-500 hover:text-indigo-600"
+          className="mb-6 inline-flex items-center text-sm text-slate-500 hover:text-primary-600"
         >
           ← Volver a Empresas
         </Link>

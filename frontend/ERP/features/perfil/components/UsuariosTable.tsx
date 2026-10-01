@@ -9,7 +9,7 @@ import { EstadoUsuario, Usuario } from "../types/usuario";
 import { Skeleton } from "@/components/shared/Skeleton";
 
 const ESTILOS_ROL: Record<Usuario["rol"], string> = {
-  Admin: "bg-violet-100 text-violet-700",
+  Admin: "bg-primary-100 text-primary-700",
   RRHH: "bg-blue-100 text-blue-700",
   Supervisor: "bg-amber-100 text-amber-700",
 };
@@ -132,7 +132,7 @@ export function UsuariosTable({
                       type="button"
                       onClick={() => onEditar(usuario)}
                       title="Editar datos"
-                      className="p-2 rounded-lg text-slate-400 hover:text-violet-600 hover:bg-violet-50 transition-colors"
+                      className="p-2 rounded-lg text-slate-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
                     >
                       <Pencil size={16} />
                     </button>

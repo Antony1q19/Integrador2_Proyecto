@@ -5,7 +5,7 @@ const ESTILOS_ESTADO: Record<EstadoProceso, { bg: string; text: string; label: s
   POSTULADO: { bg: "bg-slate-100", text: "text-slate-600", label: "Postulado" },
   EN_EVALUACION: { bg: "bg-amber-50", text: "text-amber-700", label: "En evaluación" },
   ENTREVISTA: { bg: "bg-blue-50", text: "text-blue-700", label: "Entrevista" },
-  PRESELECCIONADO: { bg: "bg-violet-50", text: "text-violet-700", label: "Preseleccionado" },
+  PRESELECCIONADO: { bg: "bg-primary-50", text: "text-primary-700", label: "Preseleccionado" },
   CONTRATADO: { bg: "bg-emerald-50", text: "text-emerald-700", label: "Contratado" },
   DESCARTADO: { bg: "bg-red-50", text: "text-red-700", label: "Descartado" },
 };

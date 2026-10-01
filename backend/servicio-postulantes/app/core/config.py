@@ -25,5 +25,18 @@ class Settings(BaseServiceSettings):
     # Bucket (carpeta grande) PRIVADO donde se guardan los archivos; se crea solo al encender el servicio.
     supabase_bucket: str = Field(default="postulantes-documentos", alias="SUPABASE_BUCKET")
 
+    # --- Correo (Mailjet: https://www.mailjet.com) ------------------------------------------
+    # Para "Solicitar cuenta" en /postulantes del ERP. Las claves salen de Mailjet > Account
+    # settings > API Key Management. La SECRET es secreta: solo en el .env, nunca en git.
+    # Si falta algo, ese botón responde 503 con un mensaje claro; el resto sigue funcionando.
+    mailjet_api_key: str = Field(default="", alias="MAILJET_API_KEY")
+    mailjet_secret_key: str = Field(default="", alias="MAILJET_SECRET_KEY")
+    # Remitente: tiene que estar VALIDADO en Mailjet (Account settings > Sender addresses & domains).
+    # Puede ser un Gmail: no hace falta tener dominio propio.
+    correo_remitente_email: str = Field(default="", alias="CORREO_REMITENTE_EMAIL")
+    correo_remitente_nombre: str = Field(default="TalentERP", alias="CORREO_REMITENTE_NOMBRE")
+    # Dirección pública de la app ANUNCIOS: el correo enlaza a su página de registro.
+    url_anuncios: str = Field(default="http://localhost:3001", alias="URL_ANUNCIOS")
+
 # Se crea UNA sola vez; el resto del código usa `settings`.
 settings = Settings()  # type: ignore[call-arg]

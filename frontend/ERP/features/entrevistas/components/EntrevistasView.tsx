@@ -85,7 +85,7 @@ export function EntrevistasView() {
         {puedeEditar && (
           <button
             onClick={() => setProgramando(true)}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#1D2B53] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#16224A]"
+            className="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700"
           >
             <Plus size={16} /> Programar entrevista
           </button>
@@ -98,7 +98,7 @@ export function EntrevistasView() {
             key={v.id}
             onClick={() => setVista(v.id)}
             className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
-              vista === v.id ? "bg-[#1D2B53] text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
+              vista === v.id ? "bg-primary-600 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
             }`}
           >
             {v.etiqueta}
@@ -151,7 +151,7 @@ export function EntrevistasView() {
                           <p className="text-[11px] text-slate-400">{e.duracionMin} min</p>
                         </div>
                         <div className="min-w-0 flex-1 space-y-1">
-                          <Link href={`/postulantes/${e.postulanteId}`} className="text-sm font-semibold text-slate-800 hover:text-[#1D2B53] hover:underline">
+                          <Link href={`/postulantes/${e.postulanteId}`} className="text-sm font-semibold text-slate-800 hover:text-primary-600 hover:underline">
                             {nombrePostulante(e.postulanteId)}
                           </Link>
                           <p className="text-xs text-slate-500">

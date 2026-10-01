@@ -5,8 +5,9 @@ nuevo, se registra aqui abajo.
 """
 from fastapi import APIRouter
 
-from app.api.v1 import anuncios, empresas
+from app.api.v1 import anuncios, empresas, publico
 
 router = APIRouter()
 router.include_router(empresas.router)  # /empresas...
 router.include_router(anuncios.router)  # /anuncios...
+router.include_router(publico.router)   # /publico/anuncios... (app ANUNCIOS, sin sesión)

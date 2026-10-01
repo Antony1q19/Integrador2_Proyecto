@@ -28,7 +28,7 @@ export default function RecuperarPasswordPage() {
         </p>
 
         {enviado ? (
-          <p className="rounded-md bg-emerald-50 px-3 py-2.5 text-sm text-emerald-700">
+          <p className="rounded-lg bg-emerald-50 px-3 py-2.5 text-sm text-emerald-700">
             Si el correo <span className="font-medium">{email}</span> está registrado, te
             enviaremos instrucciones en unos minutos.
           </p>
@@ -44,7 +44,7 @@ export default function RecuperarPasswordPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 placeholder="tu@email.com"
               />
             </div>
@@ -52,7 +52,7 @@ export default function RecuperarPasswordPage() {
             <button
               type="submit"
               disabled={enviando}
-              className="w-full bg-purple-800 hover:bg-purple-900 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium py-2.5 rounded-md transition-colors"
+              className="w-full bg-primary-700 hover:bg-primary-800 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium py-2.5 rounded-lg transition-colors"
             >
               {enviando ? 'Enviando...' : 'Enviar instrucciones'}
             </button>
@@ -61,7 +61,7 @@ export default function RecuperarPasswordPage() {
 
         <Link
           href="/login"
-          className="block text-center text-sm text-purple-700 hover:text-purple-900 mt-6"
+          className="block text-center text-sm text-primary-600 hover:text-primary-800 mt-6"
         >
           ← Volver a iniciar sesión
         </Link>

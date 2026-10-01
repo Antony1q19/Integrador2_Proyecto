@@ -20,6 +20,7 @@ from app.core.database import obtener_sesion, obtener_sesion_lectura
 from app.core.security import hash_password, verificar_password
 from app.domain.usuarios import (
     PASSWORD_POR_DEFECTO,
+    ROLES_INTERNOS_ERP,
     validar_estado,
     validar_rol_interno,
 )
@@ -41,9 +42,13 @@ router = APIRouter(prefix="/usuarios", tags=["usuarios"])
 # Funciones de ayuda (uso interno de este archivo)
 # ---------------------------------------------------------------------------
 async def _obtener_o_404(sesion: AsyncSession, usuario_id: str) -> Usuario:
-    """Busca un usuario por id; si no existe, responde 404."""
+    """Busca un TRABAJADOR por id; si no existe, responde 404.
+
+    Si en la tabla quedara alguna cuenta que no es de trabajador (ej. "Postulante", de cuando el
+    registro público escribía aquí), para esta pantalla "no existe": así un Admin no puede
+    editarla, suspenderla ni convertirla en RRHH/Supervisor/Admin por error."""
     usuario = await sesion.get(Usuario, usuario_id)
-    if usuario is None:
+    if usuario is None or usuario.rol not in ROLES_INTERNOS_ERP:
         raise RecursoNoEncontrado(f"Usuario {usuario_id} no encontrado")
     return usuario
 
@@ -65,9 +70,12 @@ async def listar_usuarios(
     sesion: AsyncSession = Depends(obtener_sesion_lectura),
     _usuario: dict = Depends(requerir_rol("Admin")),  # solo un Admin puede entrar
 ) -> list[UsuarioRespuesta]:
-    # Los "Eliminados" no se muestran en la lista. No se borran de la base de
-    # datos (para conservar su historial); simplemente se ocultan aquí.
-    resultado = await sesion.execute(select(Usuario).where(Usuario.estado != "Eliminado"))
+    # Solo trabajadores del ERP (si quedara alguna cuenta antigua de Postulante, se ignora).
+    # Los "Eliminados" tampoco se muestran. No se borran de la base de datos
+    # (para conservar su historial); simplemente se ocultan aquí.
+    resultado = await sesion.execute(
+        select(Usuario).where(Usuario.estado != "Eliminado", Usuario.rol.in_(ROLES_INTERNOS_ERP))
+    )
     return list(resultado.scalars().all())
 
 
@@ -80,10 +88,17 @@ async def crear_usuario(
     # PASO 1: el rol debe ser uno del ERP (Admin, RRHH o Supervisor).
     validar_rol_interno(datos.rol)
 
-    # PASO 2: el correo no debe estar ya usado.
+    # PASO 2: el correo no debe estar ya usado en esta tabla (ni siquiera por una cuenta
+    # antigua de Postulante: un mismo correo no puede ser a la vez postulante y trabajador).
     busqueda = await sesion.execute(select(Usuario).where(Usuario.email == datos.email))
-    if busqueda.scalar_one_or_none() is not None:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="El correo ya está registrado")
+    existente = busqueda.scalar_one_or_none()
+    if existente is not None:
+        detalle = (
+            "Ese correo pertenece a una cuenta de postulante; usa otro correo para el trabajador"
+            if existente.rol not in ROLES_INTERNOS_ERP
+            else "El correo ya está registrado"
+        )
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=detalle)
 
     # PASO 3: crear al trabajador con la contraseña por defecto (123456).
     nuevo = Usuario(
@@ -100,7 +115,7 @@ async def crear_usuario(
 
 
 # ---------------------------------------------------------------------------
-# Cambiar MI PROPIA contraseña (cualquier usuario con sesión)
+# Cambiar MI PROPIA contraseña (cualquier trabajador con sesión)
 # ---------------------------------------------------------------------------
 # Se declara antes que las rutas con "{usuario_id}" para que quede claro que
 # "me" es una palabra fija y no un id.
@@ -108,7 +123,7 @@ async def crear_usuario(
 async def cambiar_mi_password(
     datos: CambiarPasswordPropio,
     sesion: AsyncSession = Depends(obtener_sesion),
-    usuario_actual: dict = Depends(obtener_usuario_actual),  # cualquier rol
+    usuario_actual: dict = Depends(obtener_usuario_actual),  # cualquier rol del ERP
 ) -> None:
     # "sub" es el id del usuario, tomado de su token (no de lo que envíe).
     usuario = await _obtener_o_404(sesion, usuario_actual["sub"])

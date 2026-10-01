@@ -20,14 +20,15 @@ export async function GET(request: NextRequest, { params }: Contexto) {
   );
   // Es un archivo (no JSON): se devuelven los bytes tal cual, con su tipo (application/pdf, image/png...).
   const cuerpo = await respuesta.arrayBuffer();
-  return new NextResponse(cuerpo, {
-    status: respuesta.status,
-    headers: {
-      "Content-Type": respuesta.headers.get("content-type") ?? "application/octet-stream",
-      // El archivo es privado: que ningún caché lo guarde.
-      "Cache-Control": "private, no-store",
-    },
-  });
+  const cabeceras: Record<string, string> = {
+    "Content-Type": respuesta.headers.get("content-type") ?? "application/octet-stream",
+    // El archivo es privado: que ningún caché lo guarde.
+    "Cache-Control": "private, no-store",
+  };
+  // Nombre original del archivo (para que al descargarlo no se guarde como "archivo").
+  const disposicion = respuesta.headers.get("content-disposition");
+  if (disposicion) cabeceras["Content-Disposition"] = disposicion;
+  return new NextResponse(cuerpo, { status: respuesta.status, headers: cabeceras });
 }
 
 export async function PUT(request: NextRequest, { params }: Contexto) {

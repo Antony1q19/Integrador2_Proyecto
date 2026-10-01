@@ -32,9 +32,13 @@ services:
       - ./frontend/ANUNCIOS:/app
       - /app/node_modules
       - /app/.next
+    env_file:
+      - ./frontend/ANUNCIOS/.env
     environment:
       - WATCHPACK_POLLING=true
       - NODE_ENV=development
+    depends_on:
+      - gateway
 
   # --- Backend (ADR-002: microservicios detrás de un API Gateway) ---
   # Gateway + 3 microservicios de dominio (postulantes, empresas-vacantes y
@@ -71,8 +75,6 @@ services:
     env_file:
       - ./backend/servicio-postulantes/.env
 
-  # Por ahora solo tienen TABLAS y datos de prueba (sin rutas de negocio), por
-  # eso el Gateway todavía no les reenvía peticiones.
   servicio-empresas-vacantes:
     container_name: empresas-vacantes-service
     build:

@@ -31,7 +31,7 @@ export function PostulanteSuccessModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="relative w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-2xl animate-in fade-in zoom-in duration-300">
+      <div className="relative w-full max-w-md rounded-xl bg-white p-8 text-center shadow-2xl animate-in fade-in zoom-in duration-300">
         {/* Botón cerrar */}
         <button
           onClick={() => router.push("/postulantes")}
@@ -61,7 +61,7 @@ export function PostulanteSuccessModal({
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <button
             onClick={() => router.push(`/postulantes/${postulanteId}`)}
-            className="rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 transition-colors"
+            className="rounded-lg bg-primary-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-primary-700 transition-colors"
           >
             Ver ficha del postulante
           </button>

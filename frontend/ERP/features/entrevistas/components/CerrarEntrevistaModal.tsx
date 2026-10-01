@@ -51,7 +51,7 @@ export function CerrarEntrevistaModal({ entrevista, onCerrar, onGuardada }: Cerr
               key={op.texto}
               type="button"
               onClick={() => setSeRealizo(op.valor)}
-              className={`rounded-lg py-2 text-sm font-semibold transition-colors ${seRealizo === op.valor ? "bg-white text-[#1D2B53] shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+              className={`rounded-lg py-2 text-sm font-semibold transition-colors ${seRealizo === op.valor ? "bg-white text-primary-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
             >
               {op.texto}
             </button>

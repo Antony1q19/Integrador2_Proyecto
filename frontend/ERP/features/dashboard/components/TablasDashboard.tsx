@@ -22,7 +22,7 @@ function BarraCobertura({ porcentaje, detalle }: { porcentaje: number; detalle: 
       </div>
       <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
         <div
-          className={`h-1.5 rounded-full ${porcentaje >= 100 ? "bg-emerald-500" : "bg-violet-500"}`}
+          className={`h-1.5 rounded-full ${porcentaje >= 100 ? "bg-emerald-500" : "bg-primary-500"}`}
           style={{ width: `${Math.min(100, porcentaje)}%` }}
         />
       </div>
@@ -158,7 +158,7 @@ export function CompetenciasBarras({ competencias }: { competencias: DashboardDa
             <span className="font-semibold text-slate-800">{c.promedio !== null ? `${c.promedio} / 5` : "—"}</span>
           </div>
           <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
-            <div className="h-2 rounded-full bg-gradient-to-r from-violet-500 to-blue-500" style={{ width: `${((c.promedio ?? 0) / 5) * 100}%` }} />
+            <div className="h-2 rounded-full bg-gradient-to-r from-primary-400 to-primary-600" style={{ width: `${((c.promedio ?? 0) / 5) * 100}%` }} />
           </div>
         </li>
       ))}

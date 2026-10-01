@@ -32,7 +32,7 @@ export default function SesionMenu({ variant = 'light' }: SesionMenuProps) {
       <Link
         href="/login"
         className={`text-sm font-medium transition-colors duration-150 ${
-          esOscuro ? 'text-white hover:text-purple-200' : 'text-purple-800 hover:text-purple-900'
+          esOscuro ? 'text-white hover:text-primary-200' : 'text-primary-700 hover:text-primary-800'
         }`}
       >
         Iniciar sesión
@@ -45,15 +45,15 @@ export default function SesionMenu({ variant = 'light' }: SesionMenuProps) {
       <button
         onClick={() => setMenuAbierto((prev) => !prev)}
         className={`flex items-center gap-2 rounded-full text-sm font-medium transition-transform duration-150 ease-out active:scale-[0.97] ${
-          esOscuro ? 'text-white hover:text-purple-200' : 'text-gray-700 hover:text-purple-800'
+          esOscuro ? 'text-white hover:text-primary-200' : 'text-gray-700 hover:text-primary-700'
         }`}
       >
         <div
           className={`flex h-8 w-8 items-center justify-center rounded-full ${
-            esOscuro ? 'bg-white/15' : 'bg-purple-100'
+            esOscuro ? 'bg-white/15' : 'bg-primary-100'
           }`}
         >
-          <User size={16} className={esOscuro ? 'text-white' : 'text-purple-700'} />
+          <User size={16} className={esOscuro ? 'text-white' : 'text-primary-600'} />
         </div>
         {usuario?.nombre}
         <ChevronDown

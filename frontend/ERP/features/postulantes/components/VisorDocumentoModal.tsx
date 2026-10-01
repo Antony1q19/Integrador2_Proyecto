@@ -72,7 +72,7 @@ export function VisorDocumentoModal({ documento, onCerrar }: VisorDocumentoModal
       <div
         role="dialog"
         aria-label={`Documento ${documento.nombreArchivo}`}
-        className="flex h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
+        className="flex h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-3">
@@ -81,7 +81,7 @@ export function VisorDocumentoModal({ documento, onCerrar }: VisorDocumentoModal
             <button
               type="button"
               onClick={() => descargarArchivoDelDocumento(documento)}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-[#1D2B53] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#16224A]"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-primary-700"
             >
               <Download size={14} /> Descargar
             </button>
@@ -89,7 +89,7 @@ export function VisorDocumentoModal({ documento, onCerrar }: VisorDocumentoModal
               type="button"
               onClick={onCerrar}
               aria-label="Cerrar"
-              className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+              className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
             >
               <X size={20} />
             </button>

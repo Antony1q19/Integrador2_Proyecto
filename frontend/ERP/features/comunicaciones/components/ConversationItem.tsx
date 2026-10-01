@@ -32,12 +32,12 @@ export function ConversationItem({
     <button
       onClick={onSelect}
       className={`flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-slate-50 ${
-        isSelected ? "bg-indigo-50" : ""
+        isSelected ? "bg-primary-50" : ""
       }`}
     >
       {/* Avatar */}
       <div className="relative flex-shrink-0">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 text-indigo-700 font-semibold text-sm">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary-100 to-purple-100 text-primary-700 font-semibold text-sm">
           {contacto.nombre.charAt(0)}
           {contacto.apellido.charAt(0)}
         </div>
@@ -75,7 +75,7 @@ export function ConversationItem({
 
       {/* Badge de no leídos */}
       {contacto.noLeidos > 0 && (
-        <span className="flex-shrink-0 rounded-full bg-indigo-600 px-2 py-0.5 text-xs font-medium text-white">
+        <span className="flex-shrink-0 rounded-full bg-primary-600 px-2 py-0.5 text-xs font-medium text-white">
           {contacto.noLeidos}
         </span>
       )}

@@ -9,6 +9,7 @@ import { actualizarEntrevista } from "../services/entrevistasService";
 import { Entrevista } from "../types/entrevista.types";
 import { CerrarEntrevistaModal } from "./CerrarEntrevistaModal";
 import { EntrevistaModal } from "./EntrevistaModal";
+import ConfirmacionModal from "@/components/shared/ConfirmacionModal";
 
 interface EntrevistaAccionesProps {
   entrevista: Entrevista;
@@ -16,16 +17,16 @@ interface EntrevistaAccionesProps {
 }
 
 export function EntrevistaAcciones({ entrevista, onCambio }: EntrevistaAccionesProps) {
-  const [ventana, setVentana] = useState<"resultado" | "reprogramar" | null>(null);
+  const [ventana, setVentana] = useState<"resultado" | "reprogramar" | "cancelar" | null>(null);
   const [cancelando, setCancelando] = useState(false);
 
   if (entrevista.estado !== "Programada") return null;
 
   const cancelar = async () => {
-    if (!window.confirm("¿Cancelar esta entrevista?")) return;
     setCancelando(true);
     try {
       await actualizarEntrevista(entrevista, { estado: "Cancelada" });
+      setVentana(null);
       onCambio("Entrevista cancelada");
     } catch (e) {
       onCambio(e instanceof Error ? e.message : "No se pudo cancelar", "error");
@@ -34,7 +35,7 @@ export function EntrevistaAcciones({ entrevista, onCambio }: EntrevistaAccionesP
     }
   };
 
-  const estiloBoton = "rounded-md px-2 py-1 text-xs font-medium disabled:opacity-40";
+  const estiloBoton = "rounded-lg px-2 py-1 text-xs font-medium disabled:opacity-40";
   return (
     <>
       <div className="flex flex-wrap items-center gap-1">
@@ -44,7 +45,7 @@ export function EntrevistaAcciones({ entrevista, onCambio }: EntrevistaAccionesP
         <button onClick={() => setVentana("reprogramar")} className={`${estiloBoton} text-slate-500 hover:bg-slate-100`}>
           Reprogramar
         </button>
-        <button onClick={cancelar} disabled={cancelando} className={`${estiloBoton} text-slate-400 hover:bg-red-50 hover:text-red-600`}>
+        <button onClick={() => setVentana("cancelar")} disabled={cancelando} className={`${estiloBoton} text-slate-400 hover:bg-red-50 hover:text-red-600`}>
           {cancelando ? "Cancelando…" : "Cancelar"}
         </button>
       </div>
@@ -57,6 +58,18 @@ export function EntrevistaAcciones({ entrevista, onCambio }: EntrevistaAccionesP
             setVentana(null);
             onCambio("Resultado de la entrevista guardado");
           }}
+        />
+      )}
+      {ventana === "cancelar" && (
+        <ConfirmacionModal
+          titulo="¿Cancelar esta entrevista?"
+          mensaje="La entrevista quedará como cancelada. Si hace falta, puedes programar otra después."
+          labelConfirmar="Cancelar entrevista"
+          labelCancelar="Volver"
+          labelConfirmando="Cancelando…"
+          confirmando={cancelando}
+          onConfirmar={() => void cancelar()}
+          onCancelar={() => setVentana(null)}
         />
       )}
       {ventana === "reprogramar" && (

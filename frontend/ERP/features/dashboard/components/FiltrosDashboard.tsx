@@ -21,7 +21,7 @@ interface FiltrosDashboardProps {
 }
 
 const estiloCampo =
-  "rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-200";
+  "rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200";
 
 export function FiltrosDashboard({
   filtros,
@@ -36,7 +36,7 @@ export function FiltrosDashboard({
   const rangoInvalido = filtros.desde > filtros.hasta;
 
   return (
-    <div className="space-y-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm print:hidden">
+    <div className="space-y-3 rounded-xl border border-slate-100 bg-white p-4 shadow-sm print:hidden">
       <div className="flex flex-wrap items-end gap-4">
         {/* Empresa */}
         <div>
@@ -96,7 +96,7 @@ export function FiltrosDashboard({
             type="button"
             onClick={onImprimir}
             disabled={!puedeExportar || cargando}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-violet-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-violet-700 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-primary-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 disabled:opacity-50"
           >
             <Printer size={15} /> Imprimir / PDF
           </button>
@@ -115,7 +115,7 @@ export function FiltrosDashboard({
               type="button"
               onClick={() => onCambiar(rango)}
               className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                activo ? "bg-violet-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                activo ? "bg-primary-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
               {atajo.etiqueta}

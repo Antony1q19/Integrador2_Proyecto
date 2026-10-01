@@ -8,9 +8,10 @@
 export interface Empresa {
   id: string;
   nombre: string;
-  logoUrl: string;
-  ubicacion: string;
-  rubro: string; // ej. "Tecnología", "Retail", "Construcción"
+  // Opcionales: el backend todavía no los guarda (solo los traen los datos de prueba).
+  logoUrl?: string;
+  ubicacion?: string;
+  rubro?: string; // ej. "Tecnología", "Retail", "Construcción" (en el backend: "sector")
 }
 
 /**
@@ -33,8 +34,11 @@ export interface Anuncio {
   id: string;
   titulo: string;
   empresa: Empresa;
-  ubicacion: string;
-  modalidad: ModalidadTrabajo;
+  // Opcionales: el backend todavía no tiene ubicación ni modalidad; si no vienen, no se muestran.
+  ubicacion?: string;
+  modalidad?: ModalidadTrabajo;
+  numeroVacantes?: number;
+  fechaLimite?: string; // último día para postular, formato "2026-12-31"
   salarioMin?: number; // opcional: algunas empresas no publican el salario
   salarioMax?: number;
   descripcion: string;

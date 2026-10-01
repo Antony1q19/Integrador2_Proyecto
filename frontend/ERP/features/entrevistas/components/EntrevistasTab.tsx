@@ -24,7 +24,7 @@ const ICONO_MODALIDAD = { Virtual: Video, Presencial: MapPin, Telefónica: Phone
 export function LugarOEnlace({ texto }: { texto: string }) {
   if (/^https?:\/\//i.test(texto)) {
     return (
-      <a href={texto} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[#1D2B53] underline-offset-2 hover:underline">
+      <a href={texto} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary-600 underline-offset-2 hover:underline">
         Abrir enlace <ExternalLink size={12} />
       </a>
     );
@@ -71,7 +71,7 @@ export function EntrevistasTab({ postulanteId, onCambio }: EntrevistasTabProps) 
         {puedeEditar && (
           <button
             onClick={() => setProgramando(true)}
-            className="inline-flex items-center gap-1.5 rounded-md bg-[#1D2B53] px-3 py-1.5 text-sm font-medium text-white hover:bg-[#16224A]"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-primary-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-700"
           >
             <Plus size={15} /> Programar entrevista
           </button>
@@ -126,7 +126,7 @@ export function EntrevistasTab({ postulanteId, onCambio }: EntrevistasTabProps) 
                     <EstadoEntrevistaBadge estado={e.estado} />
                   </div>
                 </div>
-                {e.notas && <p className="mt-3 rounded-md bg-white/70 px-3 py-2 text-sm text-gray-600">{e.notas}</p>}
+                {e.notas && <p className="mt-3 rounded-lg bg-white/70 px-3 py-2 text-sm text-gray-600">{e.notas}</p>}
                 {puedeEditar && e.estado === "Programada" && (
                   <div className="mt-3 border-t border-blue-100 pt-3">
                     <EntrevistaAcciones entrevista={e} onCambio={alCambiar} />

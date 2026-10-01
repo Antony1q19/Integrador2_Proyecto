@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
+import { Menu } from "lucide-react";
 import Sidebar from "@/features/portada/components/sidebar";
 import { Role } from "@/features/portada/types/menu"; // Asegúrate de tener este import
 
@@ -83,24 +84,19 @@ export default function DashboardLayout({
           {/* IZQUIERDA */}
           <div className="flex items-center gap-4">
             <button
+              type="button"
               onClick={() => setSidebarOpen(true)}
-              className="
-                rounded-xl
-                p-2
-                text-slate-600
-                transition
-                hover:bg-slate-100
-                lg:hidden
-              "
+              aria-label="Abrir menú"
+              className="rounded-lg p-2 text-slate-600 transition hover:bg-slate-100 lg:hidden"
             >
-              ☰
+              <Menu size={22} />
             </button>
 
             <div>
               <h2 className="text-lg font-bold text-slate-800">
                 TalentERP
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500">
                 Sistema de Recursos Humanos
               </p>
             </div>
@@ -129,8 +125,8 @@ export default function DashboardLayout({
                 justify-center
                 rounded-full
                 bg-gradient-to-br
-                from-blue-500
-                to-violet-600
+                from-primary-500
+                to-primary-700
                 text-sm
                 font-bold
                 text-white

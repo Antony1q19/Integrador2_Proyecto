@@ -69,7 +69,7 @@ export function EstadoSelector({ estadoActual, disabled, onSeleccionar }: Estado
               }`}
             >
               {op.label}
-              {op.value === estadoActual && <span className="text-[#1D2B53]">✓</span>}
+              {op.value === estadoActual && <span className="text-primary-600">✓</span>}
             </button>
           ))}
         </div>

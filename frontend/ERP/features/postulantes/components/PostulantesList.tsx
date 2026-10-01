@@ -85,7 +85,7 @@ export const PostulantesList = memo(function PostulantesList() {
         <p className="mt-2 text-sm text-slate-500">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="mt-4 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
+          className="mt-4 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 transition-colors"
         >
           Reintentar
         </button>
@@ -105,7 +105,7 @@ export const PostulantesList = memo(function PostulantesList() {
         </div>
         <button
           onClick={() => router.push("/postulantes/nuevo")}
-          className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 transition-colors"
+          className="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 transition-colors"
         >
           <Plus className="h-4 w-4" />
           Nuevo Postulante

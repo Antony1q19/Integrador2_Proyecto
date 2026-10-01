@@ -11,6 +11,8 @@ El Gateway hace tres cosas:
   2. USUARIOS: crear/editar trabajadores del ERP (api/v1/usuarios.py).
   3. REENVÍO: revisa el token y pasa la petición al microservicio correcto
      (api/v1/proxy.py).
+  4. PÚBLICO: unas pocas rutas de solo lectura SIN token, para que cualquiera vea
+     los anuncios en la app ANUNCIOS (api/v1/publico.py).
 Además configura CORS: el permiso para que los frontends (puertos 3000 y 3001)
 puedan llamar a este servidor desde el navegador.
 
@@ -23,7 +25,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1 import auth, proxy, usuarios
+from app.api.v1 import auth, proxy, publico, usuarios
 from app.core.config import settings
 from app.core.database import engine
 from app.core.http_client import cerrar_cliente
@@ -85,6 +87,7 @@ registrar_manejadores_excepciones(app)
 # eso tiene que ir SIEMPRE al final; si no, se "comería" /auth y /usuarios.
 app.include_router(auth.router, prefix="/api/v1")       # /api/v1/auth/...
 app.include_router(usuarios.router, prefix="/api/v1")   # /api/v1/usuarios/...
+app.include_router(publico.router, prefix="/api/v1")    # /api/v1/publico/... (SIN sesión, app ANUNCIOS)
 app.include_router(proxy.router, prefix="/api/v1")      # /api/v1/postulantes/... (y lo demás)
 
 

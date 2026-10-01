@@ -80,7 +80,7 @@ export default function EmpresaAutocomplete({
         className={`w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
           error
             ? "border-red-400 focus:ring-red-200"
-            : "border-slate-300 focus:ring-indigo-200"
+            : "border-slate-300 focus:ring-primary-200"
         }`}
       />
 
@@ -99,7 +99,7 @@ export default function EmpresaAutocomplete({
                 onClick={() =>
                   handleSeleccionar(empresa.id, empresa.razonSocial)
                 }
-                className="w-full px-3 py-2 text-left text-sm hover:bg-indigo-50"
+                className="w-full px-3 py-2 text-left text-sm hover:bg-primary-50"
               >
                 <div className="font-medium text-slate-800">
                   {empresa.razonSocial}

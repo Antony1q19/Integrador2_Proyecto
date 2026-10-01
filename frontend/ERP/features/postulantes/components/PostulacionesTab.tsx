@@ -22,6 +22,7 @@ import { Timeline } from "./Timeline";
 import { useToast, ToastContainer } from "@/components/shared/Toast";
 import { ContratacionModal } from "@/features/contrataciones/components/ContratacionModal";
 import { Skeleton } from "@/components/shared/Skeleton";
+import ConfirmacionModal from "@/components/shared/ConfirmacionModal";
 import { useCargaConCache } from "@/lib/cacheCliente";
 
 const ESTILOS_ESTADO_ANUNCIO: Record<EstadoAnuncio, string> = {
@@ -69,6 +70,9 @@ export function PostulacionesTab({
   onContratado,
 }: PostulacionesTabProps) {
   const [contratando, setContratando] = useState<{ anuncioId: string; cargo: string } | null>(null);
+  // Descartar pide confirmación antes (ver ConfirmacionModal al final).
+  const [descartando, setDescartando] = useState<{ anuncioId: string; cargo: string } | null>(null);
+  const [guardandoDescarte, setGuardandoDescarte] = useState(false);
   const { toasts, mostrarToast } = useToast();
   const [comentarios, setComentarios] = useState<Record<string, string>>({});
   // Los anuncios se recuerdan entre pantallas (ver lib/cacheCliente.ts): casi siempre ya están cargados.
@@ -80,7 +84,7 @@ export function PostulacionesTab({
   const anuncios = anunciosCargados ?? [];
 
   const anunciosPostulados = anuncios.filter(
-    (a) => a.postulantesAsociadosIds.includes(postulanteId) || String(a.id) in procesosPostulacion
+    (a) => a.postulantesAsociadosIds?.includes(postulanteId) || String(a.id) in procesosPostulacion
   );
 
   const handleCambiarEstado = async (anuncioId: string, cargo: string, estado: EstadoProceso) => {
@@ -99,11 +103,15 @@ export function PostulacionesTab({
       setContratando({ anuncioId, cargo });
       return;
     }
-    const confirmado = window.confirm(
-      `¿Confirmas marcar la postulación a "${cargo}" como "${ESTILOS_ESTADO[estado].label}"?`
-    );
-    if (!confirmado) return;
-    await handleCambiarEstado(anuncioId, cargo, estado);
+    setDescartando({ anuncioId, cargo });
+  };
+
+  const confirmarDescarte = async () => {
+    if (!descartando) return;
+    setGuardandoDescarte(true);
+    await handleCambiarEstado(descartando.anuncioId, descartando.cargo, "DESCARTADO");
+    setGuardandoDescarte(false);
+    setDescartando(null);
   };
 
   const handleRevertir = async (anuncioId: string, cargo: string) => {
@@ -162,7 +170,7 @@ export function PostulacionesTab({
                 <div>
                   <Link
                     href={`/anuncios/${anuncio.id}`}
-                    className="text-sm font-medium text-gray-800 hover:text-[#1D2B53] hover:underline"
+                    className="text-sm font-medium text-gray-800 hover:text-primary-600 hover:underline"
                   >
                     {anuncio.cargo}
                   </Link>
@@ -185,7 +193,7 @@ export function PostulacionesTab({
                 <Timeline estadoActual={proceso.estadoActual} />
               </div>
 
-              <div className="mt-4 flex flex-col gap-3 rounded-md bg-slate-50/60 p-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="mt-4 flex flex-col gap-3 rounded-lg bg-slate-50/60 p-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex flex-wrap items-center gap-2">
                   <EstadoSelector
                     estadoActual={proceso.estadoActual}
@@ -196,7 +204,7 @@ export function PostulacionesTab({
                     value={comentarios[anuncioId] ?? ""}
                     onChange={(e) => setComentarios((prev) => ({ ...prev, [anuncioId]: e.target.value }))}
                     placeholder="Comentario (opcional, se aplica al próximo cambio)"
-                    className="min-w-[220px] flex-1 rounded-md border border-gray-200 px-3 py-1.5 text-sm focus:border-[#1D2B53] focus:outline-none focus:ring-1 focus:ring-[#1D2B53]"
+                    className="min-w-[220px] flex-1 rounded-lg border border-gray-200 px-3 py-1.5 text-sm focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
                   />
                 </div>
 
@@ -213,14 +221,14 @@ export function PostulacionesTab({
                     <button
                       onClick={() => handleDecisionFinal(anuncioId, anuncio.cargo, "CONTRATADO")}
                       disabled={guardando}
-                      className="rounded-md bg-emerald-600 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+                      className="rounded-lg bg-emerald-600 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
                     >
                       Contratado
                     </button>
                     <button
                       onClick={() => handleDecisionFinal(anuncioId, anuncio.cargo, "DESCARTADO")}
                       disabled={guardando}
-                      className="rounded-md bg-red-600 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                      className="rounded-lg bg-red-600 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50"
                     >
                       Descartado
                     </button>
@@ -246,6 +254,18 @@ export function PostulacionesTab({
             mostrarToast(`Contratación registrada: "${contratando.cargo}" pasó a "Contratado"`, "success");
             onContratado?.();
           }}
+        />
+      )}
+
+      {descartando && (
+        <ConfirmacionModal
+          titulo="¿Descartar esta postulación?"
+          mensaje={`La postulación a "${descartando.cargo}" pasará a "${ESTILOS_ESTADO.DESCARTADO.label}". Podrás revertirlo después.`}
+          labelConfirmar="Descartar"
+          labelConfirmando="Guardando…"
+          confirmando={guardandoDescarte}
+          onConfirmar={() => void confirmarDescarte()}
+          onCancelar={() => setDescartando(null)}
         />
       )}
 

@@ -31,7 +31,7 @@ export function DatosPersonalesSection({
             className={`mt-1 w-full rounded-lg border px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 ${
               errors.nombres
                 ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                : "border-slate-200 focus:border-indigo-500 focus:ring-indigo-200"
+                : "border-slate-200 focus:border-primary-500 focus:ring-primary-200"
             }`}
           />
           {errors.nombres && (
@@ -52,7 +52,7 @@ export function DatosPersonalesSection({
             className={`mt-1 w-full rounded-lg border px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 ${
               errors.apellidos
                 ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                : "border-slate-200 focus:border-indigo-500 focus:ring-indigo-200"
+                : "border-slate-200 focus:border-primary-500 focus:ring-primary-200"
             }`}
           />
           {errors.apellidos && (
@@ -68,7 +68,7 @@ export function DatosPersonalesSection({
           <select
             value={formData.documentoTipo}
             onChange={(e) => onChange("documentoTipo", e.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            className="mt-1 w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200"
           >
             {TIPOS_DOCUMENTO.map((tipo) => (
               <option key={tipo} value={tipo}>
@@ -91,7 +91,7 @@ export function DatosPersonalesSection({
             className={`mt-1 w-full rounded-lg border px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 ${
               errors.documentoNumero
                 ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                : "border-slate-200 focus:border-indigo-500 focus:ring-indigo-200"
+                : "border-slate-200 focus:border-primary-500 focus:ring-primary-200"
             }`}
           />
           {errors.documentoNumero && (
@@ -111,7 +111,7 @@ export function DatosPersonalesSection({
             className={`mt-1 w-full max-w-xs rounded-lg border px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 ${
               errors.fechaNacimiento
                 ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                : "border-slate-200 focus:border-indigo-500 focus:ring-indigo-200"
+                : "border-slate-200 focus:border-primary-500 focus:ring-primary-200"
             }`}
           />
           {errors.fechaNacimiento && (

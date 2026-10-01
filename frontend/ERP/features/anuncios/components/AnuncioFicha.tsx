@@ -15,7 +15,7 @@ export default function AnuncioFicha({ anuncio, postulantes }: AnuncioFichaProps
             <div className="mx-auto max-w-4xl">
                 <Link
                     href="/anuncios"
-                    className="mb-6 inline-flex items-center text-sm text-slate-500 hover:text-indigo-600"
+                    className="mb-6 inline-flex items-center text-sm text-slate-500 hover:text-primary-600"
                 >
                     ← Volver a Anuncios
                 </Link>
@@ -37,7 +37,7 @@ export default function AnuncioFicha({ anuncio, postulantes }: AnuncioFichaProps
                         </div>
                         <Link
                             href={`/empresas/${anuncio.empresaId}`}
-                            className="text-sm text-indigo-600 hover:underline"
+                            className="text-sm text-primary-600 hover:underline"
                         >
                             {anuncio.empresaRazonSocial}
                         </Link>

@@ -6,8 +6,8 @@ que si una regla cambia, se cambie aquí y en ningún otro sitio.
 """
 from shared_kernel.exceptions import SolicitudInvalida
 
-# Los únicos roles que puede tener un trabajador del ERP.
-# ("Postulante" también existe, pero se crea aparte desde /auth/registro.)
+# Los únicos roles que puede tener un trabajador del ERP (y los únicos que pueden entrar al ERP).
+# Los postulantes NO viven en esta tabla: tendrán su propio login en servicio-postulantes.
 ROLES_INTERNOS_ERP = {"Admin", "RRHH", "Supervisor"}
 
 # Los tres estados posibles de una cuenta.

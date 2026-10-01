@@ -22,7 +22,7 @@ export function PerfilHeader({ perfil, guardando, onCambiarFoto }: PerfilHeaderP
   return (
     <div className="flex flex-col items-center gap-4 rounded-xl border border-gray-200 bg-white p-6 sm:flex-row sm:items-center">
       <div className="group relative shrink-0">
-        <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-purple-800 text-xl font-semibold text-white">
+        <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-primary-700 text-xl font-semibold text-white">
           {perfil.fotoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={perfil.fotoUrl} alt="Foto de perfil" className="h-full w-full object-cover" />
@@ -35,7 +35,7 @@ export function PerfilHeader({ perfil, guardando, onCambiarFoto }: PerfilHeaderP
           disabled={guardando}
           onClick={() => inputRef.current?.click()}
           title="Cambiar foto"
-          className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-purple-800 text-white transition-transform duration-150 ease-out hover:bg-purple-900 active:scale-90 disabled:opacity-50"
+          className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-primary-700 text-white transition-transform duration-150 ease-out hover:bg-primary-800 active:scale-90 disabled:opacity-50"
         >
           <Camera size={13} />
         </button>

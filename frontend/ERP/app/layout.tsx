@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Mi aplicación",
-  description: "Mi aplicación hecha con Next.js",
+  // Cada página puede poner su propio título ("Empresas") y queda "Empresas | TalentERP".
+  title: { default: "TalentERP", template: "%s | TalentERP" },
+  description: "TalentERP: gestión de reclutamiento y recursos humanos.",
 };
 
 export default function RootLayout({
@@ -27,7 +28,7 @@ export default function RootLayout({
       lang="es"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>
   );
 }

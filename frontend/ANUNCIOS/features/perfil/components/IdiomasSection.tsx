@@ -40,7 +40,7 @@ export function IdiomasSection({ idiomas, guardando, onAgregar, onEliminar }: Id
       accion={
         <button
           onClick={() => setMostrarForm((v) => !v)}
-          className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-purple-700 transition-colors duration-150 hover:bg-purple-50 active:scale-[0.97]"
+          className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-primary-600 transition-colors duration-150 hover:bg-primary-50 active:scale-[0.97]"
         >
           {mostrarForm ? <X size={13} /> : <Plus size={13} />} {mostrarForm ? 'Cancelar' : 'Agregar'}
         </button>
@@ -58,7 +58,7 @@ export function IdiomasSection({ idiomas, guardando, onAgregar, onEliminar }: Id
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
               placeholder="Ej. Inglés"
-              className="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-900 transition-colors duration-150 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30"
+              className="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-900 transition-colors duration-150 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
             />
           </div>
           <div className="flex-1">
@@ -66,7 +66,7 @@ export function IdiomasSection({ idiomas, guardando, onAgregar, onEliminar }: Id
             <select
               value={nivel}
               onChange={(e) => setNivel(e.target.value as NivelIdioma)}
-              className="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-900 transition-colors duration-150 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30"
+              className="w-full rounded-lg border border-gray-300 px-3 py-1.5 text-sm text-gray-900 transition-colors duration-150 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
             >
               {Object.entries(ETIQUETAS_NIVEL).map(([valor, etiqueta]) => (
                 <option key={valor} value={valor}>
@@ -78,7 +78,7 @@ export function IdiomasSection({ idiomas, guardando, onAgregar, onEliminar }: Id
           <button
             type="submit"
             disabled={guardando}
-            className="rounded-md bg-purple-800 px-4 py-1.5 text-sm font-medium text-white transition-[background-color,transform] duration-150 ease-out hover:bg-purple-900 active:scale-[0.97] disabled:opacity-50"
+            className="rounded-lg bg-primary-700 px-4 py-1.5 text-sm font-medium text-white transition-[background-color,transform] duration-150 ease-out hover:bg-primary-800 active:scale-[0.97] disabled:opacity-50"
           >
             {guardando ? 'Guardando…' : 'Guardar'}
           </button>
@@ -92,13 +92,13 @@ export function IdiomasSection({ idiomas, guardando, onAgregar, onEliminar }: Id
           {idiomas.map((i) => (
             <span
               key={i.id}
-              className="inline-flex items-center gap-2 rounded-full bg-purple-50 py-1.5 pl-3 pr-2 text-sm text-purple-800"
+              className="inline-flex items-center gap-2 rounded-full bg-primary-50 py-1.5 pl-3 pr-2 text-sm text-primary-700"
             >
               <Languages size={13} />
-              {i.nombre} · <span className="text-purple-600">{ETIQUETAS_NIVEL[i.nivel]}</span>
+              {i.nombre} · <span className="text-primary-600">{ETIQUETAS_NIVEL[i.nivel]}</span>
               <button
                 onClick={() => onEliminar(i.id)}
-                className="ml-1 rounded-full p-0.5 text-purple-400 transition-colors duration-150 hover:bg-purple-100 hover:text-purple-700 active:scale-90"
+                className="ml-1 rounded-full p-0.5 text-primary-400 transition-colors duration-150 hover:bg-primary-100 hover:text-primary-600 active:scale-90"
               >
                 <X size={13} />
               </button>

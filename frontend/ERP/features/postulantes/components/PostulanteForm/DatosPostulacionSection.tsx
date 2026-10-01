@@ -41,7 +41,7 @@ export function DatosPostulacionSection({
             className={`mt-1 w-full rounded-lg border px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 ${
               errors.empresaCliente
                 ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                : "border-slate-200 focus:border-indigo-500 focus:ring-indigo-200"
+                : "border-slate-200 focus:border-primary-500 focus:ring-primary-200"
             }`}
           >
             <option value="">{cargandoOpciones ? "Cargando…" : "Selecciona una empresa"}</option>
@@ -68,7 +68,7 @@ export function DatosPostulacionSection({
             className={`mt-1 w-full rounded-lg border px-4 py-2.5 text-sm transition-colors focus:outline-none focus:ring-2 ${
               errors.cargoPostulado
                 ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-                : "border-slate-200 focus:border-indigo-500 focus:ring-indigo-200"
+                : "border-slate-200 focus:border-primary-500 focus:ring-primary-200"
             }`}
           >
             <option value="">{cargandoOpciones ? "Cargando…" : "Selecciona un cargo"}</option>
@@ -91,7 +91,7 @@ export function DatosPostulacionSection({
           <select
             value={formData.fuenteReclutamiento || ""}
             onChange={(e) => onChange("fuenteReclutamiento", e.target.value)}
-            className="mt-1 w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            className="mt-1 w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200"
           >
             <option value="">Selecciona una fuente</option>
             {FUENTES_RECLUTAMIENTO.map((fuente) => (

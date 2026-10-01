@@ -9,6 +9,7 @@ import { CambiarPasswordCard } from "./CambiarPasswordCard";
 import { UsuariosTable } from "./UsuariosTable";
 import { UsuarioFormModal } from "./UsuarioFormModal";
 import { ConfirmarEliminacionModal } from "./ConfirmarEliminacionModal";
+import ConfirmacionModal from "@/components/shared/ConfirmacionModal";
 import {
   listarUsuarios,
   restablecerPassword,
@@ -26,6 +27,9 @@ export function PerfilView() {
   });
   const [usuarioAEliminar, setUsuarioAEliminar] = useState<Usuario | null>(null);
   const [eliminando, setEliminando] = useState(false);
+  // Restablecer la contraseña pide confirmación antes (ver ConfirmacionModal al final).
+  const [usuarioARestablecer, setUsuarioARestablecer] = useState<Usuario | null>(null);
+  const [restableciendo, setRestableciendo] = useState(false);
   const { toasts, mostrarToast } = useToast();
 
   // Lectura síncrona de cookies (sin useEffect+setState) para no disparar
@@ -69,13 +73,19 @@ export function PerfilView() {
     cargarUsuarios();
   };
 
-  const handleRestablecerPassword = async (usuario: Usuario) => {
-    if (!window.confirm(`¿Restablecer la contraseña de ${usuario.nombre} a "123456"?`)) return;
+  const handleRestablecerPassword = (usuario: Usuario) => setUsuarioARestablecer(usuario);
+
+  const confirmarRestablecerPassword = async () => {
+    if (!usuarioARestablecer) return;
+    setRestableciendo(true);
     try {
-      const actualizado = await restablecerPassword(usuario.id);
-      mostrarToast(`Nueva contraseña temporal de ${usuario.nombre}: ${actualizado.passwordTemporal}`, "success");
+      const actualizado = await restablecerPassword(usuarioARestablecer.id);
+      mostrarToast(`Nueva contraseña temporal de ${usuarioARestablecer.nombre}: ${actualizado.passwordTemporal}`, "success");
+      setUsuarioARestablecer(null);
     } catch (err) {
       mostrarToast(err instanceof Error ? err.message : "No se pudo restablecer", "error");
+    } finally {
+      setRestableciendo(false);
     }
   };
 
@@ -120,14 +130,14 @@ export function PerfilView() {
       <div className="flex gap-4 border-b border-slate-200">
         <button
           onClick={() => setActiveTab("mi-perfil")}
-          className={`pb-3 px-2 text-sm font-semibold transition-colors flex items-center gap-2 border-b-2 ${activeTab === "mi-perfil" ? "border-violet-600 text-violet-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}
+          className={`pb-3 px-2 text-sm font-semibold transition-colors flex items-center gap-2 border-b-2 ${activeTab === "mi-perfil" ? "border-primary-600 text-primary-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}
         >
           <User size={18} /> Mi Perfil
         </button>
         {esAdmin && (
           <button
             onClick={() => setActiveTab("usuarios")}
-            className={`pb-3 px-2 text-sm font-semibold transition-colors flex items-center gap-2 border-b-2 ${activeTab === "usuarios" ? "border-violet-600 text-violet-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}
+            className={`pb-3 px-2 text-sm font-semibold transition-colors flex items-center gap-2 border-b-2 ${activeTab === "usuarios" ? "border-primary-600 text-primary-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}
           >
             <Users size={18} /> Gestión de Trabajadores
           </button>
@@ -136,9 +146,9 @@ export function PerfilView() {
 
       {activeTab === "mi-perfil" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
             <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-              <User className="text-violet-500" size={20} /> Datos Personales
+              <User className="text-primary-500" size={20} /> Datos Personales
             </h2>
             <div className="space-y-4">
               <div>
@@ -155,7 +165,7 @@ export function PerfilView() {
               </div>
               <div>
                 <label className="block text-xs font-medium text-slate-500 mb-1">Rol de Sistema</label>
-                <div className="p-3 bg-violet-50 text-violet-700 rounded-lg text-sm font-semibold border border-violet-100 flex items-center gap-2 w-fit">
+                <div className="p-3 bg-primary-50 text-primary-700 rounded-lg text-sm font-semibold border border-primary-100 flex items-center gap-2 w-fit">
                   <ShieldCheck size={16} /> {misDatos.role}
                 </div>
               </div>
@@ -167,7 +177,7 @@ export function PerfilView() {
       )}
 
       {esAdmin && activeTab === "usuarios" && (
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
           <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
             <div>
               <h2 className="text-lg font-bold text-slate-800">Trabajadores Registrados</h2>
@@ -206,6 +216,19 @@ export function PerfilView() {
           eliminando={eliminando}
           onConfirmar={handleConfirmarEliminacion}
           onCancelar={() => setUsuarioAEliminar(null)}
+        />
+      )}
+
+      {usuarioARestablecer && (
+        <ConfirmacionModal
+          titulo="¿Restablecer la contraseña?"
+          mensaje={`La contraseña de ${usuarioARestablecer.nombre} volverá a ser "123456". Compártela con el trabajador: puede cambiarla desde "Mi perfil".`}
+          labelConfirmar="Restablecer"
+          labelConfirmando="Restableciendo…"
+          variante="primario"
+          confirmando={restableciendo}
+          onConfirmar={() => void confirmarRestablecerPassword()}
+          onCancelar={() => setUsuarioARestablecer(null)}
         />
       )}
 

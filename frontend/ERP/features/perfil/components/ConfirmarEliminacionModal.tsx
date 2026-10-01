@@ -24,7 +24,7 @@ export function ConfirmarEliminacionModal({
 }: ConfirmarEliminacionModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden">
         <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-red-50">
           <h3 className="text-lg font-bold text-red-700 flex items-center gap-2">
             <AlertTriangle size={20} /> Eliminar cuenta
@@ -32,7 +32,7 @@ export function ConfirmarEliminacionModal({
           <button
             type="button"
             onClick={onCancelar}
-            className="text-slate-400 hover:text-red-500 hover:bg-red-100 p-1 rounded-md transition-colors"
+            className="text-slate-400 hover:text-red-500 hover:bg-red-100 p-1 rounded-lg transition-colors"
           >
             <X size={20} />
           </button>

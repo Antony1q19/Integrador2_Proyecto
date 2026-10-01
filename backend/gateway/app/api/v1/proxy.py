@@ -15,6 +15,7 @@ dos datos. Por eso NUNCA debe poder llamársele directo, sin pasar por aquí.
 """
 from urllib.parse import quote
 
+import httpx
 from fastapi import APIRouter, Depends, Request, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -105,9 +106,37 @@ async def reenviar(
         headers=cabeceras,
     )
 
-    # PASO 5: devolver al navegador lo que respondió el microservicio.
+    # PASO 5: devolver al navegador lo que respondió el microservicio, CON sus cabeceras
+    # (ej. Content-Disposition, que dice el nombre del archivo al descargar un CV).
     return Response(
         content=respuesta.content,
         status_code=respuesta.status_code,
-        media_type=respuesta.headers.get("content-type"),
+        headers=_cabeceras_de_respuesta(respuesta.headers),
     )
+
+
+# Cabeceras que NO se copian de la respuesta del microservicio:
+#   - las "de conexión" (hop-by-hop): describen la conexión Gateway↔microservicio, no la del navegador;
+#   - content-length y content-encoding: httpx ya descomprimió el cuerpo, así que el tamaño y la
+#     compresión originales ya no son ciertos (Starlette vuelve a calcular el tamaño solo).
+_CABECERAS_EXCLUIDAS = {
+    "connection",
+    "keep-alive",
+    "proxy-authenticate",
+    "proxy-authorization",
+    "te",
+    "trailer",
+    "transfer-encoding",
+    "upgrade",
+    "content-length",
+    "content-encoding",
+}
+
+
+def _cabeceras_de_respuesta(cabeceras: httpx.Headers) -> dict[str, str]:
+    """Las cabeceras del microservicio que sí deben llegar al navegador."""
+    return {
+        nombre: valor
+        for nombre, valor in cabeceras.items()
+        if nombre.lower() not in _CABECERAS_EXCLUIDAS
+    }

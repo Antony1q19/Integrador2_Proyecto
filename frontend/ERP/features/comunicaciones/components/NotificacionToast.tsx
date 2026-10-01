@@ -23,8 +23,8 @@ export function NotificacionToast({
       className="pointer-events-auto flex w-80 cursor-pointer items-start gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-lg transition-all hover:shadow-xl animate-in slide-in-from-right duration-300"
     >
       {/* Icono */}
-      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100">
-        <MessageCircle className="h-5 w-5 text-indigo-600" />
+      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary-100">
+        <MessageCircle className="h-5 w-5 text-primary-600" />
       </div>
 
       {/* Contenido */}

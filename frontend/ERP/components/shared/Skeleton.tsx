@@ -6,7 +6,7 @@
 
 // Un bloque gris que "respira". Se le da el tamaño con clases de Tailwind (ej. "h-4 w-32").
 export function Skeleton({ className = "" }: { className?: string }) {
-  return <div aria-hidden className={`animate-pulse rounded-md bg-slate-200/80 ${className}`} />;
+  return <div aria-hidden className={`animate-pulse rounded-lg bg-slate-200/80 ${className}`} />;
 }
 
 // Varias líneas de texto (la última más corta, como un párrafo real).
@@ -54,7 +54,7 @@ export function SkeletonTabla({
 // Una tarjeta de indicador (KPI) del Dashboard.
 export function SkeletonKpi() {
   return (
-    <div aria-hidden className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+    <div aria-hidden className="rounded-xl border border-slate-100 bg-white p-5 shadow-sm">
       <div className="mb-3 flex items-start justify-between gap-3">
         <div className="space-y-2">
           <Skeleton className="h-3.5 w-24" />

@@ -41,7 +41,7 @@ const hoyDelServidor = () => "";
 
 function Tarjeta({ titulo, subtitulo, children, className = "" }: { titulo: string; subtitulo?: string; children: React.ReactNode; className?: string }) {
   return (
-    <section className={`rounded-2xl border border-slate-100 bg-white p-6 shadow-sm print:break-inside-avoid ${className}`}>
+    <section className={`rounded-xl border border-slate-100 bg-white p-6 shadow-sm print:break-inside-avoid ${className}`}>
       <div className="mb-4">
         <h2 className="text-lg font-bold text-slate-800">{titulo}</h2>
         {subtitulo && <p className="text-xs text-slate-400">{subtitulo}</p>}
@@ -108,7 +108,7 @@ export function IndicadoresDashboard({
           valor={r.diasPromedioContratacion !== null ? String(r.diasPromedioContratacion) : "—"}
           detalle={r.diasPromedioContratacion !== null ? "Promedio desde que postula hasta que lo contratan" : "Aún no hay contrataciones en el periodo"}
           icono={Timer}
-          color="from-violet-500 to-purple-500"
+          color="from-primary-500 to-purple-500"
           ayuda="Promedio de días entre la fecha de postulación y la fecha en que se marcó Contratado (postulaciones contratadas del periodo)."
         />
         <KpiCard
@@ -116,7 +116,7 @@ export function IndicadoresDashboard({
           valor={`${r.vacantesCubiertas} de ${r.vacantesActivas}`}
           detalle={`${r.coberturaVacantes}% de las vacantes de los anuncios activos`}
           icono={TrendingUp}
-          color="from-indigo-500 to-blue-500"
+          color="from-primary-500 to-blue-500"
           progreso={r.coberturaVacantes}
           ayuda="Contratados (de todo el tiempo) respecto a las vacantes que pidieron las empresas en sus anuncios activos."
         />

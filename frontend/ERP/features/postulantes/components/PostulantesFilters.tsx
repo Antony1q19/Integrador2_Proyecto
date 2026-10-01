@@ -57,7 +57,7 @@ export function PostulantesFilters({
           <Filter className="h-4 w-4" />
           {showFilters ? "Ocultar filtros" : "Mostrar filtros"}
           {hasActiveFilters && (
-            <span className="ml-1 rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-700">
+            <span className="ml-1 rounded-full bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-700">
               {Object.values(filtros).filter(v => v && v !== "").length}
             </span>
           )}
@@ -85,7 +85,7 @@ export function PostulantesFilters({
             <select
               value={filtros.estado || ""}
               onChange={(e) => onFilterChange("estado", e.target.value)}
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
             >
               <option value="">Todos los estados</option>
               {estadosOptions.map((estado) => (
@@ -104,7 +104,7 @@ export function PostulantesFilters({
             <select
               value={filtros.cargo || ""}
               onChange={(e) => onFilterChange("cargo", e.target.value)}
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
             >
               <option value="">Todos los cargos</option>
               {cargosOptions.map((cargo) => (
@@ -123,7 +123,7 @@ export function PostulantesFilters({
             <select
               value={filtros.empresa || ""}
               onChange={(e) => onFilterChange("empresa", e.target.value)}
-              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
             >
               <option value="">Todas las empresas</option>
               {empresasOptions.map((empresa) => (

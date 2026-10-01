@@ -27,15 +27,20 @@ function Campo({
   onChange: (v: string) => void;
   type?: string;
 }) {
+  // id para unir la etiqueta con su campo (accesibilidad: al hacer clic en la etiqueta se enfoca el campo).
+  const id = `campo-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
   return (
     <div>
-      <label className="mb-1 block text-xs font-medium text-gray-500">{label}</label>
+      <label htmlFor={editando ? id : undefined} className="mb-1 block text-xs font-medium text-gray-500">
+        {label}
+      </label>
       {editando ? (
         <input
+          id={id}
           type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full rounded-md border border-gray-200 px-3 py-1.5 text-sm text-gray-800 focus:border-[#1D2B53] focus:outline-none focus:ring-1 focus:ring-[#1D2B53]"
+          className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-800 focus:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600"
         />
       ) : (
         <p className="text-sm text-gray-800">{value || "—"}</p>
@@ -54,13 +59,33 @@ export function DatosPersonalesTab({
 }: DatosPersonalesTabProps) {
   const [editando, setEditando] = useState(false);
   const [form, setForm] = useState<DatosPersonales>(datos);
+  const [error, setError] = useState<string | null>(null);
+  const [guardado, setGuardado] = useState(false);
+
+  // Fuera de edición se muestra SIEMPRE lo que está guardado (`datos`, que viene del servidor), no lo
+  // último que se escribió: así lo que se ve es lo que de verdad quedó en la base de datos.
+  const valores = editando ? form : datos;
 
   const set = <K extends keyof DatosPersonales>(campo: K, valor: DatosPersonales[K]) =>
     setForm((f) => ({ ...f, [campo]: valor }));
 
+  const empezarEdicion = () => {
+    setForm(datos); // se parte de lo guardado más reciente
+    setError(null);
+    setGuardado(false);
+    setEditando(true);
+  };
+
   const handleGuardar = async () => {
-    await onGuardar(form);
-    setEditando(false);
+    setError(null);
+    try {
+      await onGuardar(form);
+      setEditando(false);
+      setGuardado(true);
+    } catch (e) {
+      // Antes el error se perdía: el formulario quedaba abierto sin ningún aviso.
+      setError(e instanceof Error ? e.message : "No se pudieron guardar los cambios");
+    }
   };
 
   return (
@@ -69,38 +94,53 @@ export function DatosPersonalesTab({
         {editando ? (
           <div className="flex gap-2">
             <button
-              onClick={() => { setForm(datos); setEditando(false); }}
-              className="rounded-md px-3 py-1.5 text-sm font-medium text-gray-500 hover:bg-gray-50"
+              onClick={() => { setForm(datos); setError(null); setEditando(false); }}
+              className="rounded-lg px-3 py-1.5 text-sm font-medium text-gray-500 hover:bg-gray-50"
             >
               Cancelar
             </button>
             <button
               onClick={handleGuardar}
               disabled={guardando}
-              className="rounded-md bg-[#1D2B53] px-3 py-1.5 text-sm font-medium text-white hover:bg-[#16224A] disabled:opacity-50"
+              className="rounded-lg bg-primary-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-700 disabled:opacity-50"
             >
               {guardando ? "Guardando…" : "Guardar cambios"}
             </button>
           </div>
         ) : (
           <button
-            onClick={() => setEditando(true)}
-            className="rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50"
+            onClick={empezarEdicion}
+            className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50"
           >
             Editar datos
           </button>
         )}
       </div>
 
+      {error && (
+        <p role="alert" className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          {error}
+        </p>
+      )}
+      {guardado && !editando && (
+        <p role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+          Datos actualizados.
+        </p>
+      )}
+      {editando && (
+        <p className="text-xs text-gray-500">El N.º de documento y el correo no se pueden cambiar.</p>
+      )}
+
       <div className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
-        <Campo label="Nombres" value={form.nombres} editando={editando} onChange={(v) => set("nombres", v)} />
-        <Campo label="Apellidos" value={form.apellidos} editando={editando} onChange={(v) => set("apellidos", v)} />
-        <Campo label="N.º de documento" value={form.documentoNumero} editando={editando} onChange={(v) => set("documentoNumero", v)} />
-        <Campo label="Correo electrónico" value={form.email} editando={editando} onChange={(v) => set("email", v)} type="email" />
-        <Campo label="Teléfono" value={form.telefono} editando={editando} onChange={(v) => set("telefono", v)} />
-        <Campo label="Fecha de nacimiento" value={form.fechaNacimiento} editando={editando} onChange={(v) => set("fechaNacimiento", v)} type="date" />
-        <Campo label="Dirección" value={form.direccion ?? ""} editando={editando} onChange={(v) => set("direccion", v)} />
-        <Campo label="Fuente de reclutamiento" value={form.fuenteReclutamiento ?? ""} editando={editando} onChange={(v) => set("fuenteReclutamiento", v)} />
+        <Campo label="Nombres" value={valores.nombres} editando={editando} onChange={(v) => set("nombres", v)} />
+        <Campo label="Apellidos" value={valores.apellidos} editando={editando} onChange={(v) => set("apellidos", v)} />
+        {/* El documento y el correo identifican al postulante: el backend no permite cambiarlos. */}
+        <Campo label="N.º de documento" value={valores.documentoNumero} editando={false} onChange={() => {}} />
+        <Campo label="Correo electrónico" value={valores.email} editando={false} onChange={() => {}} />
+        <Campo label="Teléfono" value={valores.telefono} editando={editando} onChange={(v) => set("telefono", v)} type="tel" />
+        <Campo label="Fecha de nacimiento" value={valores.fechaNacimiento} editando={editando} onChange={(v) => set("fechaNacimiento", v)} type="date" />
+        <Campo label="Dirección" value={valores.direccion ?? ""} editando={editando} onChange={(v) => set("direccion", v)} />
+        <Campo label="Fuente de reclutamiento" value={valores.fuenteReclutamiento ?? ""} editando={editando} onChange={(v) => set("fuenteReclutamiento", v)} />
       </div>
 
       <PerfilProfesionalResumen

@@ -98,7 +98,7 @@ export function PostulanteFicha({ id }: { id: string }) {
     <div className="mx-auto max-w-5xl space-y-6 p-6">
       <Link
         href="/postulantes"
-        className="inline-flex items-center text-sm text-gray-500 hover:text-[#1D2B53]"
+        className="inline-flex items-center text-sm text-gray-500 hover:text-primary-600"
       >
         ← Volver
       </Link>
@@ -107,7 +107,7 @@ export function PostulanteFicha({ id }: { id: string }) {
       <div className="rounded-xl border border-gray-100 bg-white p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#1D2B53] text-sm font-semibold text-white">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-600 text-sm font-semibold text-white">
               {iniciales(d.nombres, d.apellidos)}
             </div>
             <div>
@@ -119,7 +119,7 @@ export function PostulanteFicha({ id }: { id: string }) {
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <EstadoBadge estado={postulante.estadoActual} />
-            <button className="rounded-md border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50">
+            <button className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50">
               Enviar WhatsApp
             </button>
           </div>
@@ -135,12 +135,12 @@ export function PostulanteFicha({ id }: { id: string }) {
               onClick={() => setTabActivo(tab.id)}
               className={[
                 "relative whitespace-nowrap px-4 py-3 text-sm font-medium transition-colors",
-                tabActivo === tab.id ? "text-[#1D2B53]" : "text-gray-400 hover:text-gray-600",
+                tabActivo === tab.id ? "text-primary-600" : "text-gray-400 hover:text-gray-600",
               ].join(" ")}
             >
               {tab.label}
               {tabActivo === tab.id && (
-                <span className="absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-[#1D2B53]" />
+                <span className="absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-primary-600" />
               )}
             </button>
           ))}
