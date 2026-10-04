@@ -7,16 +7,25 @@ import hashlib
 import secrets
 from datetime import date, datetime, timedelta, timezone
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, status
+from urllib.parse import quote
+
+from fastapi import APIRouter, BackgroundTasks, Depends, File, Header, HTTPException, Response, UploadFile, status
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
 from app.api.deps import verificar_peticion_del_gateway
+from app.core.config import settings
 from app.core.database import obtener_sesion, obtener_sesion_lectura
-from app.domain.postulantes import VERSION_TERMINOS, validar_consentimiento_obligatorio
+from app.domain.postulantes import (
+    TAMANO_MAXIMO_BYTES,
+    VERSION_TERMINOS,
+    validar_archivo,
+    validar_consentimiento_obligatorio,
+)
 from app.infrastructure.correo import enviar_correo_recuperacion
-from app.infrastructure.models import Postulante, TokenRecuperacion, Usuario
+from app.infrastructure.models import Documento, Postulante, TokenRecuperacion, Usuario
+from app.infrastructure.storage import descargar_archivo, eliminar_archivo, subir_archivo
 from app.schemas.auth import (
     AceptarTerminosEntrada,
     AuthPostulanteRespuesta,
@@ -331,6 +340,7 @@ async def obtener_perfil_me(
         formacionAcademica=p.formacion_academica,
         idiomas=p.idiomas,
         experiencia=p.experiencia,
+        cv=await _cv_respuesta(sesion, p.id),
         requiereAceptarTerminos=requiere_terminos,
         versionTerminos=p.version_terminos_aceptados,
         passwordCambiadaEn=usuario.password_cambiada_en,
@@ -395,6 +405,7 @@ async def actualizar_perfil_me(
         formacionAcademica=p.formacion_academica,
         idiomas=p.idiomas,
         experiencia=p.experiencia,
+        cv=await _cv_respuesta(sesion, p.id),
         requiereAceptarTerminos=requiere_terminos,
         versionTerminos=p.version_terminos_aceptados,
         passwordCambiadaEn=usuario.password_cambiada_en,
@@ -424,3 +435,122 @@ async def aceptar_terminos_vigentes(
 
     await sesion.commit()
     return MensajeRespuesta(mensaje="Términos y condiciones aceptados correctamente")
+
+
+# ---------------------------------------------------------------------------
+# CV del propio postulante (app ANUNCIOS)
+# ---------------------------------------------------------------------------
+# El postulante solo ve y gestiona su documento de tipo "CV". Los demás tipos
+# (DNI, CERTIFICADO, OTRO) son internos del ERP y nunca se exponen aquí.
+# Es el MISMO registro de la tabla `documentos` que ve RRHH en el ERP: si RRHH
+# le subió un CV, el postulante lo ve en su perfil, y viceversa.
+_TIPO_CV = "CV"
+
+
+async def _postulante_activo(sesion: AsyncSession, usuario_id: str) -> Postulante:
+    """Devuelve el postulante de la cuenta (404 si no existe o no está activa)."""
+    usuario = await sesion.get(Usuario, usuario_id)
+    if usuario is None or usuario.estado != "Activo" or usuario.postulante_id is None:
+        raise RecursoNoEncontrado("Usuario no encontrado o inactivo")
+    postulante = await sesion.get(Postulante, usuario.postulante_id)
+    if postulante is None:
+        raise RecursoNoEncontrado("Postulante no encontrado")
+    return postulante
+
+
+async def _cv_actual(sesion: AsyncSession, postulante_id: str) -> Documento | None:
+    """El CV más reciente del postulante que tenga un archivo real en el Storage."""
+    consulta = (
+        select(Documento)
+        .where(
+            Documento.postulante_id == postulante_id,
+            Documento.tipo == _TIPO_CV,
+            Documento.ruta_archivo.is_not(None),
+        )
+        .order_by(Documento.fecha_subida.desc())
+        .limit(1)
+    )
+    return (await sesion.execute(consulta)).scalar_one_or_none()
+
+
+def _cv_a_dict(documento: Documento) -> dict:
+    """Formato que espera ANUNCIOS (CurriculumAdjunto, sin la url: la arma el frontend)."""
+    return {
+        "nombreArchivo": documento.nombre_archivo,
+        "tamanioKb": round((documento.tamano_bytes or 0) / 1024),
+        "fechaCarga": documento.fecha_subida.isoformat(),
+    }
+
+
+async def _cv_respuesta(sesion: AsyncSession, postulante_id: str) -> dict | None:
+    documento = await _cv_actual(sesion, postulante_id)
+    return _cv_a_dict(documento) if documento else None
+
+
+@router.post("/me/cv", status_code=status.HTTP_201_CREATED)
+async def subir_cv_me(
+    archivo: UploadFile = File(...),
+    x_usuario_id: str = Header(...),
+    sesion: AsyncSession = Depends(obtener_sesion),
+) -> dict:
+    """Sube el CV del postulante. Si ya tenía uno, lo reemplaza (un solo CV vigente)."""
+    postulante = await _postulante_activo(sesion, x_usuario_id)
+
+    # Se lee como máximo 1 byte más del límite: alcanza para saber que se pasó.
+    contenido = await archivo.read(TAMANO_MAXIMO_BYTES + 1)
+    validar_archivo(_TIPO_CV, archivo.content_type, len(contenido))
+
+    # Se sube el archivo NUEVO primero; recién si salió bien se borra el viejo.
+    subido = await subir_archivo(contenido, archivo.content_type, postulante.id)
+
+    documento = await _cv_actual(sesion, postulante.id)
+    ruta_anterior = documento.ruta_archivo if documento else None
+    if documento is None:
+        documento = Documento(postulante_id=postulante.id, tipo=_TIPO_CV)
+        sesion.add(documento)
+
+    documento.nombre_archivo = archivo.filename or "cv"
+    documento.referencia_almacenamiento = f"{settings.supabase_bucket}/{subido.ruta}"
+    documento.ruta_archivo = subido.ruta
+    documento.tipo_contenido = subido.tipo_contenido
+    documento.tamano_bytes = subido.bytes
+    documento.fecha_subida = datetime.now(timezone.utc)
+    await sesion.commit()
+
+    await eliminar_archivo(ruta_anterior)
+    return _cv_a_dict(documento)
+
+
+@router.get("/me/cv/contenido")
+async def obtener_cv_me(
+    x_usuario_id: str = Header(...),
+    sesion: AsyncSession = Depends(obtener_sesion_lectura),
+) -> Response:
+    """Devuelve el archivo del CV para verlo en el navegador."""
+    postulante = await _postulante_activo(sesion, x_usuario_id)
+    documento = await _cv_actual(sesion, postulante.id)
+    if documento is None:
+        raise RecursoNoEncontrado("Aún no has subido tu CV")
+
+    contenido, tipo_de_archivo = await descargar_archivo(documento.ruta_archivo)
+    return Response(
+        content=contenido,
+        media_type=documento.tipo_contenido or tipo_de_archivo,
+        headers={"Content-Disposition": f"inline; filename*=UTF-8''{quote(documento.nombre_archivo)}"},
+    )
+
+
+@router.delete("/me/cv", status_code=status.HTTP_204_NO_CONTENT)
+async def eliminar_cv_me(
+    x_usuario_id: str = Header(...),
+    sesion: AsyncSession = Depends(obtener_sesion),
+) -> None:
+    """Elimina el CV vigente del postulante (y su archivo del Storage)."""
+    postulante = await _postulante_activo(sesion, x_usuario_id)
+    documento = await _cv_actual(sesion, postulante.id)
+    if documento is None:
+        return
+    ruta = documento.ruta_archivo
+    await sesion.delete(documento)
+    await sesion.commit()
+    await eliminar_archivo(ruta)

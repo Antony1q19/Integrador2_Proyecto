@@ -57,6 +57,7 @@ services:
       - "8000:8000"
     volumes:
       - ./backend/gateway/app:/app/app
+      - ./backend/libs/shared/shared_kernel:/app/libs/shared_kernel
     env_file:
       - ./backend/gateway/.env
     depends_on:
@@ -72,6 +73,7 @@ services:
       - "8001:8001"
     volumes:
       - ./backend/servicio-postulantes/app:/app/app
+      - ./backend/libs/shared/shared_kernel:/app/libs/shared_kernel
     env_file:
       - ./backend/servicio-postulantes/.env
 
@@ -84,6 +86,7 @@ services:
       - "8002:8002"
     volumes:
       - ./backend/servicio-empresas-vacantes/app:/app/app
+      - ./backend/libs/shared/shared_kernel:/app/libs/shared_kernel
     env_file:
       - ./backend/servicio-empresas-vacantes/.env
 
@@ -96,5 +99,6 @@ services:
       - "8003:8003"
     volumes:
       - ./backend/servicio-procesos-seleccion/app:/app/app
+      - ./backend/libs/shared/shared_kernel:/app/libs/shared_kernel
     env_file:
       - ./backend/servicio-procesos-seleccion/.env

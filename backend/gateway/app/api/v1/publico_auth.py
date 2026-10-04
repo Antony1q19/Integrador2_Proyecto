@@ -333,3 +333,77 @@ async def actualizar_perfil(
         status_code=200,
         media_type="application/json",
     )
+
+
+# ---------------------------------------------------------------------------
+# CV del postulante
+# ---------------------------------------------------------------------------
+# Solo el documento de tipo CV; los demás documentos son internos del ERP.
+# El archivo se reenvía tal cual (multipart) sin procesarlo aquí.
+_TAMANO_MAXIMO_CV_BYTES = 6 * 1024 * 1024  # 5 MB del archivo + margen del multipart
+
+
+def _reenviar_respuesta_cv(respuesta, mensaje_error: str) -> Response:
+    """Convierte errores del servicio en HTTPException o devuelve la respuesta tal cual."""
+    if respuesta.status_code >= 400:
+        detalle = mensaje_error
+        try:
+            detalle = respuesta.json().get("detail", detalle)
+        except Exception:  # noqa: BLE001
+            pass
+        raise HTTPException(status_code=respuesta.status_code, detail=detalle)
+    cabeceras = {}
+    if "content-disposition" in respuesta.headers:
+        cabeceras["Content-Disposition"] = respuesta.headers["content-disposition"]
+    return Response(
+        content=respuesta.content,
+        status_code=respuesta.status_code,
+        media_type=respuesta.headers.get("content-type"),
+        headers=cabeceras,
+    )
+
+
+@router.post("/cv", status_code=status.HTTP_201_CREATED)
+async def subir_cv(
+    request: Request,
+    postulante: dict = Depends(obtener_postulante_actual),
+) -> Response:
+    """Sube (o reemplaza) el CV del postulante autenticado."""
+    if int(request.headers.get("content-length") or 0) > _TAMANO_MAXIMO_CV_BYTES:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail="El archivo supera el máximo de 5 MB",
+        )
+    respuesta = await obtener_cliente().post(
+        f"{settings.url_servicio_postulantes}/auth/me/cv",
+        content=await request.body(),
+        headers=cabeceras_firmadas(
+            {
+                "Content-Type": request.headers.get("content-type", ""),
+                "X-Usuario-Id": str(postulante.get("sub", "")),
+            }
+        ),
+    )
+    return _reenviar_respuesta_cv(respuesta, "No se pudo subir el CV")
+
+
+@router.get("/cv/contenido")
+async def obtener_cv(postulante: dict = Depends(obtener_postulante_actual)) -> Response:
+    """Devuelve el archivo del CV del postulante autenticado."""
+    respuesta = await obtener_cliente().get(
+        f"{settings.url_servicio_postulantes}/auth/me/cv/contenido",
+        headers=cabeceras_firmadas({"X-Usuario-Id": str(postulante.get("sub", ""))}),
+    )
+    return _reenviar_respuesta_cv(respuesta, "No se pudo obtener el CV")
+
+
+@router.delete("/cv", status_code=status.HTTP_204_NO_CONTENT)
+async def eliminar_cv(postulante: dict = Depends(obtener_postulante_actual)) -> Response:
+    """Elimina el CV del postulante autenticado."""
+    respuesta = await obtener_cliente().delete(
+        f"{settings.url_servicio_postulantes}/auth/me/cv",
+        headers=cabeceras_firmadas({"X-Usuario-Id": str(postulante.get("sub", ""))}),
+    )
+    if respuesta.status_code >= 400:
+        _reenviar_respuesta_cv(respuesta, "No se pudo eliminar el CV")
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

@@ -88,9 +88,14 @@ class PostulanteRespuesta(BaseModel):
     fechaNacimiento: date | None
     direccion: str | None
     fuenteReclutamiento: str | None
-    formacionAcademica: list[FormacionAcademicaItem]
-    idiomas: list[IdiomaItem]
-    experiencia: list[ExperienciaItem]
+    # Se devuelven tal cual están guardadas: el ERP las crea con un formato
+    # (ej. idioma {"idioma", "nivel"}) y el postulante las edita desde ANUNCIOS
+    # con otro (ej. {"id", "nombre", "nivel"}). El frontend del ERP ya acepta
+    # ambos (ver mapearIdiomas en postulantesService.ts); validarlas aquí con
+    # un solo formato hacía fallar (500) todo el listado.
+    formacionAcademica: list[dict]
+    idiomas: list[dict]
+    experiencia: list[dict]
     fechaRegistro: date
     consentimientoTratamientoDatos: bool
     consentimientoComunicacionesComerciales: bool

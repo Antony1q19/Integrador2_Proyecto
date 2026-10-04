@@ -57,7 +57,7 @@ export async function fetchPerfil(): Promise<PerfilPostulante> {
     formacionAcademica: data.formacionAcademica || [],
     idiomas: data.idiomas || [],
     experiencia: data.experiencia || [],
-    cv: data.cv,
+    cv: mapCv(data.cv),
     consentimientos: {
       tratamientoDatos: true, // Ya aceptó para tener cuenta
       comunicacionesComerciales: false,
@@ -70,6 +70,19 @@ export async function updateFoto(archivo: File): Promise<string> {
   // TODO: Subir foto a storage real
   const url = URL.createObjectURL(archivo);
   return url;
+}
+
+// El backend devuelve los datos del CV sin url: el archivo se ve a través de
+// /api/auth/cv/contenido (el bucket es privado). `?v=` evita que el navegador
+// muestre la versión anterior en caché después de reemplazarlo.
+function mapCv(cv: Record<string, any> | null | undefined): CurriculumAdjunto | undefined {
+  if (!cv) return undefined;
+  return {
+    nombreArchivo: cv.nombreArchivo,
+    tamanioKb: cv.tamanioKb,
+    fechaCarga: cv.fechaCarga,
+    url: `/api/auth/cv/contenido?v=${encodeURIComponent(cv.fechaCarga)}`,
+  };
 }
 
 // Convierte la respuesta plana del backend (MePostulanteRespuesta)
@@ -92,7 +105,7 @@ function mapRespuesta(data: Record<string, any>): PerfilPostulante {
     formacionAcademica: data.formacionAcademica || [],
     idiomas: data.idiomas || [],
     experiencia: data.experiencia || [],
-    cv: data.cv,
+    cv: mapCv(data.cv),
     consentimientos: {
       tratamientoDatos: true,
       comunicacionesComerciales: false,
@@ -128,19 +141,24 @@ export async function updateResumenProfesional(resumen: string): Promise<PerfilP
   return patchPerfil({ resumenProfesional: resumen });
 }
 
-// TODO: Subir CV a storage real (necesita endpoint en el backend)
+// Sube (o reemplaza) el CV. Es el mismo documento "CV" que ve RRHH en el ERP.
 export async function subirCv(archivo: File): Promise<CurriculumAdjunto> {
-  const nuevoCv: CurriculumAdjunto = {
-    nombreArchivo: archivo.name,
-    tamanioKb: Math.round(archivo.size / 1024),
-    fechaCarga: new Date().toISOString(),
-    url: URL.createObjectURL(archivo),
-  };
-  return nuevoCv;
+  const formData = new FormData();
+  formData.append('archivo', archivo);
+  const res = await fetch('/api/auth/cv', { method: 'POST', body: formData });
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    throw new Error(err?.error || 'No se pudo subir el CV');
+  }
+  return mapCv(await res.json()) as CurriculumAdjunto;
 }
 
 export async function eliminarCv(): Promise<void> {
-  // TODO: Eliminar CV del storage
+  const res = await fetch('/api/auth/cv', { method: 'DELETE' });
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    throw new Error(err?.error || 'No se pudo eliminar el CV');
+  }
 }
 
 export async function addFormacion(

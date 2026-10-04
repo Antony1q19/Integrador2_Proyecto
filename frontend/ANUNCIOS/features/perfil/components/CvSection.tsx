@@ -6,7 +6,8 @@ import { FileText, UploadCloud, Trash2 } from 'lucide-react';
 import { CurriculumAdjunto } from '../types';
 import { SectionCard } from './SectionCard';
 
-const FORMATOS_ACEPTADOS = '.pdf,.doc,.docx';
+// Mismos formatos que acepta el backend (servicio-postulantes: PDF, JPG o PNG).
+const FORMATOS_ACEPTADOS = '.pdf,.jpg,.jpeg,.png';
 const TAMANIO_MAXIMO_MB = 5;
 
 interface CvSectionProps {
@@ -61,6 +62,15 @@ export function CvSection({ cv, onSubir, onEliminar }: CvSectionProps) {
     }
   };
 
+  const eliminar = async () => {
+    setError(null);
+    try {
+      await onEliminar();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudo eliminar el archivo.');
+    }
+  };
+
   return (
     <SectionCard titulo="Curriculum vitae">
       {cv && !subiendo ? (
@@ -94,7 +104,7 @@ export function CvSection({ cv, onSubir, onEliminar }: CvSectionProps) {
               Reemplazar
             </button>
             <button
-              onClick={onEliminar}
+              onClick={eliminar}
               className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-400 transition-colors duration-150 hover:bg-red-50 hover:text-red-600 active:scale-[0.97]"
             >
               <Trash2 size={13} />
@@ -127,7 +137,7 @@ export function CvSection({ cv, onSubir, onEliminar }: CvSectionProps) {
             {subiendo ? 'Subiendo CV…' : 'Arrastra tu CV o haz clic para seleccionarlo'}
           </p>
           <p className="mt-1 text-xs text-gray-400">
-            {FORMATOS_ACEPTADOS.replaceAll('.', '').toUpperCase()} · máx. {TAMANIO_MAXIMO_MB}MB
+            PDF, JPG o PNG · máx. {TAMANIO_MAXIMO_MB}MB
           </p>
         </div>
       )}
