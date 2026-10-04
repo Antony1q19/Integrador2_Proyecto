@@ -47,6 +47,7 @@ class Postulante(Base):
     direccion: Mapped[str] = mapped_column(String(255), nullable=True)
     # Cómo llegó a nosotros (LinkedIn, Referido, Bolsa de trabajo...).
     fuente_reclutamiento: Mapped[str] = mapped_column(String(100), nullable=True)
+    resumen_profesional: Mapped[str] = mapped_column(String(1000), nullable=True)
 
     # --- Listas guardadas como JSON -----------------------------------------
     # Formación, idiomas y experiencia son listas de tamaño variable. Se guardan
@@ -63,6 +64,9 @@ class Postulante(Base):
     consentimiento_comunicaciones_comerciales: Mapped[bool] = mapped_column(Boolean, default=False)
     # Vacía si nunca aceptó (por ejemplo, un postulante registrado a mano por RRHH).
     fecha_aceptacion_consentimiento: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
+    # Trazabilidad de términos y condiciones (versión vigente aceptada e IP de origen)
+    version_terminos_aceptados: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    ip_aceptacion: Mapped[str | None] = mapped_column(String(45), nullable=True)
 
     fecha_registro: Mapped[date] = mapped_column(Date, default=date.today)
 
@@ -103,10 +107,7 @@ class Documento(Base):
 
 
 class Usuario(Base):
-    """Cuenta de acceso de un postulante (la que usará en la app ANUNCIOS).
-
-    Solo es la TABLA: todavía no hay rutas de login ni de registro que la usen.
-    """
+    """Cuenta de acceso de un postulante (la que usa en la app ANUNCIOS)."""
 
     __tablename__ = "usuarios"
 
@@ -126,8 +127,31 @@ class Usuario(Base):
     # Activo | Suspendido | Eliminado (igual que en los usuarios del ERP).
     estado: Mapped[str] = mapped_column(String(20), nullable=False, default="Activo")
 
+    # Invalidez de sesiones tras restablecer contraseña (compara con 'iat' del JWT).
+    password_cambiada_en: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
     fecha_creacion: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
 
     postulante: Mapped[Postulante] = relationship(back_populates="usuario")
+
+
+class TokenRecuperacion(Base):
+    """Token de un solo uso para recuperar contraseña.
+
+    Guarda SOLO el hash SHA-256 del token (nunca el token en texto plano).
+    Vigencia de 30 minutos.
+    """
+
+    __tablename__ = "tokens_recuperacion"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_nuevo_id)
+    usuario_id: Mapped[str] = mapped_column(ForeignKey("usuarios.id"), nullable=False, index=True)
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True, nullable=False)
+    expira_en: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    usado_en: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    creado_en: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+    ip: Mapped[str | None] = mapped_column(String(45), nullable=True)

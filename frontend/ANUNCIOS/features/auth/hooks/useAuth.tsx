@@ -1,50 +1,72 @@
 // features/auth/hooks/useAuth.tsx
 'use client';
 
-import { createContext, useContext, useState, ReactNode } from 'react';
-import { Usuario } from '../types';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { DatosRegistroPostulante, Usuario } from '../types';
 import {
   iniciarSesion as iniciarSesionService,
+  registrarCuenta as registrarCuentaService,
   cerrarSesion as cerrarSesionService,
+  obtenerSesionActual as obtenerSesionActualService,
+  aceptarTerminosVigentes as aceptarTerminosService,
 } from '@/features/auth/services/authService';
-import { establecerPerfilActivo } from '@/features/perfil/services/perfilService';
 
 interface AuthContextValue {
   usuario: Usuario | null;
   estaAutenticado: boolean;
   cargando: boolean;
-  iniciarSesion: (email: string, password: string) => Promise<void>;
-  // Establece la sesión directamente con un usuario ya conocido (ej. justo
-  // después de crear la cuenta), sin pasar por el login mock.
-  registrarSesion: (usuario: Usuario) => void;
+  iniciarSesion: (email: string, password: string) => Promise<Usuario>;
+  registrar: (datos: DatosRegistroPostulante) => Promise<Usuario>;
   cerrarSesion: () => Promise<void>;
+  aceptarTerminos: (version?: string) => Promise<void>;
+  recargarSesion: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
-  const [cargando, setCargando] = useState(false);
+  const [cargando, setCargando] = useState(true);
 
-  async function iniciarSesion(email: string, password: string) {
+  const recargarSesion = useCallback(async () => {
+    try {
+      const sesion = await obtenerSesionActualService();
+      setUsuario(sesion);
+    } catch {
+      setUsuario(null);
+    } finally {
+      setCargando(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    recargarSesion();
+  }, [recargarSesion]);
+
+  async function iniciarSesion(email: string, password: string): Promise<Usuario> {
     setCargando(true);
     try {
       const usuarioObtenido = await iniciarSesionService(email, password);
-      // Sincroniza qué perfil mock (features/perfil) corresponde a esta
-      // sesión: son dos mocks independientes, así que hay que enlazarlos
-      // explícitamente por id.
-      establecerPerfilActivo(usuarioObtenido.id);
       setUsuario(usuarioObtenido);
+      return usuarioObtenido;
     } finally {
       setCargando(false);
     }
   }
 
-  function registrarSesion(nuevoUsuario: Usuario) {
-    setUsuario(nuevoUsuario);
+  async function registrar(datos: DatosRegistroPostulante): Promise<Usuario> {
+    setCargando(true);
+    try {
+      const usuarioObtenido = await registrarCuentaService(datos);
+      setUsuario(usuarioObtenido);
+      return usuarioObtenido;
+    } finally {
+      setCargando(false);
+    }
   }
 
-  async function cerrarSesion() {
+  async function cerrarSesion(): Promise<void> {
     setCargando(true);
     try {
       await cerrarSesionService();
@@ -54,6 +76,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  async function aceptarTerminos(version = '2026-01'): Promise<void> {
+    await aceptarTerminosService(version);
+    setUsuario((prev) => (prev ? { ...prev, requiereAceptarTerminos: false, versionTerminos: version } : null));
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -61,8 +88,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         estaAutenticado: usuario !== null,
         cargando,
         iniciarSesion,
-        registrarSesion,
+        registrar,
         cerrarSesion,
+        aceptarTerminos,
+        recargarSesion,
       }}
     >
       {children}

@@ -19,250 +19,172 @@ import {
   ExperienciaLaboral,
   ConsentimientosPerfil,
 } from '../types';
-import { mockPerfiles, ID_PERFIL_POR_DEFECTO } from '../data/mockPerfil';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL; // ej: http://localhost:8080/api
-const LATENCIA_MOCK_MS = 400;
-
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-// Id del perfil "logueado" en esta sesión del navegador. `useAuth` lo cambia
-// al iniciar sesión o registrarse (ver `establecerPerfilActivo`), así cada
-// una de las 3 cuentas mock ve su propia información en /perfil.
-let perfilActivoId: string = ID_PERFIL_POR_DEFECTO;
-
-function obtenerActivo(): PerfilPostulante {
-  const perfil = mockPerfiles[perfilActivoId];
-  if (!perfil) throw new Error('No hay un perfil activo para esta sesión.');
-  return perfil;
-}
-
-function guardarActivo(actualizado: PerfilPostulante): void {
-  mockPerfiles[perfilActivoId] = actualizado;
-}
-
-export function establecerPerfilActivo(id: string): void {
-  perfilActivoId = id;
-}
-
 export interface DatosRegistro {
   datosPersonales: DatosPersonalesPerfil;
-  // La fecha de aceptación la fija el servidor (aquí, el propio mock), no el
-  // formulario: evita que quede en manos del cliente declarar cuándo aceptó.
   consentimientos: Omit<ConsentimientosPerfil, 'fechaAceptacion'>;
 }
 
-// Simula la creación de cuenta: agrega un nuevo perfil a la "base de datos"
-// mock con los datos y consentimientos recién declarados, y lo deja como
-// perfil activo. El tratamiento de datos es obligatorio (validado antes de
-// llegar aquí, en el formulario); las comunicaciones comerciales quedan tal
-// como el titular las marcó, sin forzar "true".
 export async function registrarCuenta(datos: DatosRegistro): Promise<PerfilPostulante> {
-  await delay(LATENCIA_MOCK_MS);
-  const nuevoId = crypto.randomUUID();
-  const nuevoPerfil: PerfilPostulante = {
-    id: nuevoId,
-    datosPersonales: datos.datosPersonales,
-    resumenProfesional: '',
-    formacionAcademica: [],
-    idiomas: [],
-    experiencia: [],
-    consentimientos: {
-      ...datos.consentimientos,
-      fechaAceptacion: new Date().toISOString(),
-    },
-  };
-  mockPerfiles[nuevoId] = nuevoPerfil;
-  perfilActivoId = nuevoId;
-  return structuredClone(nuevoPerfil);
-
-  // ---- MODO API (descomentar al integrar backend) ----
-  // const res = await fetch(`${API_URL}/auth/registro`, {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify(datos),
-  // });
-  // if (!res.ok) throw new Error('Error al crear la cuenta');
-  // return res.json();
+  const res = await fetch('/api/auth/registro', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(datos),
+  });
+  if (!res.ok) throw new Error('Error al crear la cuenta');
+  return res.json();
 }
 
 export async function fetchPerfil(): Promise<PerfilPostulante> {
-  // ---- MODO MOCK (activo ahora) ----
-  await delay(LATENCIA_MOCK_MS);
-  return structuredClone(obtenerActivo());
-
-  // ---- MODO API (descomentar al integrar backend) ----
-  // const res = await fetch(`${API_URL}/perfil`);
-  // if (!res.ok) throw new Error('Error al obtener el perfil');
-  // return res.json();
+  const res = await fetch('/api/auth/me');
+  if (!res.ok) throw new Error('Error al obtener el perfil');
+  const body = await res.json();
+  const data = body.usuario;
+  
+  // Mapeamos MePostulanteRespuesta a PerfilPostulante
+  return {
+    id: data.postulanteId,
+    datosPersonales: {
+      nombres: data.nombres || '',
+      apellidos: data.apellidos || '',
+      documentoTipo: data.documentoTipo as any,
+      documentoNumero: data.documentoNumero,
+      email: data.email,
+      telefono: data.telefono || '',
+      fechaNacimiento: data.fechaNacimiento || '',
+      direccion: data.direccion || '',
+    },
+    resumenProfesional: data.resumenProfesional || '',
+    formacionAcademica: data.formacionAcademica || [],
+    idiomas: data.idiomas || [],
+    experiencia: data.experiencia || [],
+    cv: data.cv,
+    consentimientos: {
+      tratamientoDatos: true, // Ya aceptó para tener cuenta
+      comunicacionesComerciales: false,
+      fechaAceptacion: new Date().toISOString()
+    }
+  };
 }
 
 export async function updateFoto(archivo: File): Promise<string> {
-  await delay(LATENCIA_MOCK_MS);
-  const actual = obtenerActivo();
+  // TODO: Subir foto a storage real
   const url = URL.createObjectURL(archivo);
-  if (actual.fotoUrl) URL.revokeObjectURL(actual.fotoUrl);
-  guardarActivo({ ...actual, fotoUrl: url });
   return url;
+}
 
-  // ---- MODO API ----
-  // const formData = new FormData();
-  // formData.append('foto', archivo);
-  // const res = await fetch(`${API_URL}/perfil/foto`, { method: 'POST', body: formData });
-  // if (!res.ok) throw new Error('Error al subir la foto');
-  // const data = await res.json();
-  // return data.url;
+// Convierte la respuesta plana del backend (MePostulanteRespuesta)
+// al formato anidado que espera el frontend (PerfilPostulante).
+// Se reutiliza en todas las funciones de actualización.
+function mapRespuesta(data: Record<string, any>): PerfilPostulante {
+  return {
+    id: data.postulanteId,
+    datosPersonales: {
+      nombres: data.nombres || '',
+      apellidos: data.apellidos || '',
+      documentoTipo: data.documentoTipo as any,
+      documentoNumero: data.documentoNumero,
+      email: data.email,
+      telefono: data.telefono || '',
+      fechaNacimiento: data.fechaNacimiento || '',
+      direccion: data.direccion || '',
+    },
+    resumenProfesional: data.resumenProfesional || '',
+    formacionAcademica: data.formacionAcademica || [],
+    idiomas: data.idiomas || [],
+    experiencia: data.experiencia || [],
+    cv: data.cv,
+    consentimientos: {
+      tratamientoDatos: true,
+      comunicacionesComerciales: false,
+      fechaAceptacion: new Date().toISOString(),
+    },
+  };
+}
+
+// Envía un PATCH al endpoint y devuelve el perfil mapeado.
+// Lanza un error descriptivo con el mensaje que viene del servidor si lo hay.
+async function patchPerfil(cambios: Record<string, unknown>): Promise<PerfilPostulante> {
+  const res = await fetch('/api/auth/perfil', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(cambios),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    throw new Error(err?.detail || 'Error al guardar los cambios');
+  }
+  return mapRespuesta(await res.json());
 }
 
 export async function updateDatosPersonales(
   datos: DatosPersonalesPerfil
 ): Promise<PerfilPostulante> {
-  await delay(LATENCIA_MOCK_MS);
-  const actualizado = { ...obtenerActivo(), datosPersonales: datos };
-  guardarActivo(actualizado);
-  return structuredClone(actualizado);
-
-  // ---- MODO API ----
-  // const res = await fetch(`${API_URL}/perfil`, {
-  //   method: 'PATCH',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify(datos),
-  // });
-  // if (!res.ok) throw new Error('Error al actualizar datos personales');
-  // return res.json();
+  // Omitimos email: el backend no lo acepta en este endpoint (extra="forbid")
+  const { email: _email, ...sinEmail } = datos;
+  return patchPerfil(sinEmail);
 }
 
 export async function updateResumenProfesional(resumen: string): Promise<PerfilPostulante> {
-  await delay(LATENCIA_MOCK_MS);
-  const actualizado = { ...obtenerActivo(), resumenProfesional: resumen };
-  guardarActivo(actualizado);
-  return structuredClone(actualizado);
-
-  // ---- MODO API ----
-  // const res = await fetch(`${API_URL}/perfil/resumen`, {
-  //   method: 'PATCH',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify({ resumen }),
-  // });
-  // if (!res.ok) throw new Error('Error al actualizar el resumen profesional');
-  // return res.json();
+  return patchPerfil({ resumenProfesional: resumen });
 }
 
+// TODO: Subir CV a storage real (necesita endpoint en el backend)
 export async function subirCv(archivo: File): Promise<CurriculumAdjunto> {
-  await delay(LATENCIA_MOCK_MS);
-  const actual = obtenerActivo();
-  if (actual.cv?.url) URL.revokeObjectURL(actual.cv.url);
   const nuevoCv: CurriculumAdjunto = {
     nombreArchivo: archivo.name,
     tamanioKb: Math.round(archivo.size / 1024),
     fechaCarga: new Date().toISOString(),
     url: URL.createObjectURL(archivo),
   };
-  guardarActivo({ ...actual, cv: nuevoCv });
   return nuevoCv;
-
-  // ---- MODO API ----
-  // const formData = new FormData();
-  // formData.append('cv', archivo);
-  // const res = await fetch(`${API_URL}/perfil/cv`, { method: 'POST', body: formData });
-  // if (!res.ok) throw new Error('Error al subir el CV');
-  // return res.json();
 }
 
 export async function eliminarCv(): Promise<void> {
-  await delay(LATENCIA_MOCK_MS);
-  const actual = obtenerActivo();
-  if (actual.cv?.url) URL.revokeObjectURL(actual.cv.url);
-  guardarActivo({ ...actual, cv: undefined });
-
-  // ---- MODO API ----
-  // await fetch(`${API_URL}/perfil/cv`, { method: 'DELETE' });
+  // TODO: Eliminar CV del storage
 }
 
 export async function addFormacion(
-  formacion: Omit<FormacionAcademica, 'id'>
+  formacion: Omit<FormacionAcademica, 'id'>,
+  todasLasFormaciones: FormacionAcademica[]
 ): Promise<FormacionAcademica> {
-  await delay(LATENCIA_MOCK_MS);
   const nueva: FormacionAcademica = { ...formacion, id: crypto.randomUUID() };
-  const actual = obtenerActivo();
-  guardarActivo({ ...actual, formacionAcademica: [...actual.formacionAcademica, nueva] });
+  const nuevaLista = [...todasLasFormaciones, nueva];
+  await patchPerfil({ formacionAcademica: nuevaLista });
   return nueva;
-
-  // ---- MODO API ----
-  // const res = await fetch(`${API_URL}/perfil/formacion`, {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify(formacion),
-  // });
-  // if (!res.ok) throw new Error('Error al registrar la formación académica');
-  // return res.json();
 }
 
-export async function eliminarFormacion(formacionId: string): Promise<void> {
-  await delay(LATENCIA_MOCK_MS);
-  const actual = obtenerActivo();
-  guardarActivo({
-    ...actual,
-    formacionAcademica: actual.formacionAcademica.filter((f) => f.id !== formacionId),
-  });
-
-  // ---- MODO API ----
-  // await fetch(`${API_URL}/perfil/formacion/${formacionId}`, { method: 'DELETE' });
+export async function eliminarFormacion(formacionId: string, todasLasFormaciones: FormacionAcademica[]): Promise<void> {
+  const nuevaLista = todasLasFormaciones.filter(f => f.id !== formacionId);
+  await patchPerfil({ formacionAcademica: nuevaLista });
 }
 
-export async function addIdioma(idioma: Omit<IdiomaPerfil, 'id'>): Promise<IdiomaPerfil> {
-  await delay(LATENCIA_MOCK_MS);
+export async function addIdioma(
+  idioma: Omit<IdiomaPerfil, 'id'>,
+  todosLosIdiomas: IdiomaPerfil[]
+): Promise<IdiomaPerfil> {
   const nuevo: IdiomaPerfil = { ...idioma, id: crypto.randomUUID() };
-  const actual = obtenerActivo();
-  guardarActivo({ ...actual, idiomas: [...actual.idiomas, nuevo] });
+  const nuevaLista = [...todosLosIdiomas, nuevo];
+  await patchPerfil({ idiomas: nuevaLista });
   return nuevo;
-
-  // ---- MODO API ----
-  // const res = await fetch(`${API_URL}/perfil/idiomas`, {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify(idioma),
-  // });
-  // if (!res.ok) throw new Error('Error al registrar el idioma');
-  // return res.json();
 }
 
-export async function eliminarIdioma(idiomaId: string): Promise<void> {
-  await delay(LATENCIA_MOCK_MS);
-  const actual = obtenerActivo();
-  guardarActivo({ ...actual, idiomas: actual.idiomas.filter((i) => i.id !== idiomaId) });
-
-  // ---- MODO API ----
-  // await fetch(`${API_URL}/perfil/idiomas/${idiomaId}`, { method: 'DELETE' });
+export async function eliminarIdioma(idiomaId: string, todosLosIdiomas: IdiomaPerfil[]): Promise<void> {
+  const nuevaLista = todosLosIdiomas.filter(i => i.id !== idiomaId);
+  await patchPerfil({ idiomas: nuevaLista });
 }
 
 export async function addExperiencia(
-  experiencia: Omit<ExperienciaLaboral, 'id'>
+  experiencia: Omit<ExperienciaLaboral, 'id'>,
+  todasLasExperiencias: ExperienciaLaboral[]
 ): Promise<ExperienciaLaboral> {
-  await delay(LATENCIA_MOCK_MS);
   const nueva: ExperienciaLaboral = { ...experiencia, id: crypto.randomUUID() };
-  const actual = obtenerActivo();
-  guardarActivo({ ...actual, experiencia: [...actual.experiencia, nueva] });
+  const nuevaLista = [...todasLasExperiencias, nueva];
+  await patchPerfil({ experiencia: nuevaLista });
   return nueva;
-
-  // ---- MODO API ----
-  // const res = await fetch(`${API_URL}/perfil/experiencia`, {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify(experiencia),
-  // });
-  // if (!res.ok) throw new Error('Error al registrar la experiencia');
-  // return res.json();
 }
 
-export async function eliminarExperiencia(experienciaId: string): Promise<void> {
-  await delay(LATENCIA_MOCK_MS);
-  const actual = obtenerActivo();
-  guardarActivo({
-    ...actual,
-    experiencia: actual.experiencia.filter((e) => e.id !== experienciaId),
-  });
-
-  // ---- MODO API ----
-  // await fetch(`${API_URL}/perfil/experiencia/${experienciaId}`, { method: 'DELETE' });
+export async function eliminarExperiencia(experienciaId: string, todasLasExperiencias: ExperienciaLaboral[]): Promise<void> {
+  const nuevaLista = todasLasExperiencias.filter(e => e.id !== experienciaId);
+  await patchPerfil({ experiencia: nuevaLista });
 }
+

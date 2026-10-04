@@ -1,47 +1,109 @@
 // features/auth/services/authService.ts
 //
-// IMPORTANTE — unificado con el ERP: estas 3 cuentas corresponden 1 a 1 con
-// los postulantes id "1", "2" y "3" en
-// `ERP/features/postulantes/data/mockPostulantes.ts` y con los perfiles en
-// `features/perfil/data/mockPerfil.ts`. Mismo id, mismo nombre. Contraseña
-// mock única para las 3 (igual que en el login del ERP): "123456".
+// Capa de servicio de autenticación para ANUNCIOS.
+// Llama exclusivamente a las rutas seguras de Next.js (/api/auth/*),
+// que a su vez se comunican con el API Gateway y gestionan las cookies httpOnly.
 
-import { Usuario } from '../types';
-
-function simularRetardoDeRed<T>(data: T, ms = 400): Promise<T> {
-  return new Promise((resolve) => setTimeout(() => resolve(data), ms));
-}
-
-const CONTRASENA_MOCK = '123456';
-
-const MOCK_USERS: Record<string, Usuario> = {
-  'camila.rodriguez@example.com': {
-    id: '1',
-    nombre: 'Camila Rodríguez Vega',
-    email: 'camila.rodriguez@example.com',
-  },
-  'diego.salazar@example.com': {
-    id: '2',
-    nombre: 'Diego Salazar Peña',
-    email: 'diego.salazar@example.com',
-  },
-  'valeria.chumpitaz@example.com': {
-    id: '3',
-    nombre: 'Valeria Chumpitaz Ríos',
-    email: 'valeria.chumpitaz@example.com',
-  },
-};
+import { DatosRegistroPostulante, Usuario } from '../types';
 
 export async function iniciarSesion(email: string, password: string): Promise<Usuario> {
-  // TODO: reemplazar por fetch real al backend de postulantes cuando exista
-  const usuario = MOCK_USERS[email.trim().toLowerCase()];
-  if (!usuario || password !== CONTRASENA_MOCK) {
-    await simularRetardoDeRed(undefined);
-    throw new Error('Credenciales inválidas');
+  const respuesta = await fetch('/api/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+
+  if (!respuesta.ok) {
+    const errorJson = await respuesta.json().catch(() => null);
+    throw new Error(errorJson?.error ?? 'No pudimos iniciar sesión. Verifica tus credenciales.');
   }
-  return simularRetardoDeRed(usuario);
+
+  const { usuario } = await respuesta.json();
+  return usuario;
+}
+
+export async function registrarCuenta(datos: DatosRegistroPostulante): Promise<Usuario> {
+  const respuesta = await fetch('/api/auth/registro', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(datos),
+  });
+
+  if (!respuesta.ok) {
+    const errorJson = await respuesta.json().catch(() => null);
+    throw new Error(errorJson?.error ?? 'No pudimos crear tu cuenta.');
+  }
+
+  const { usuario } = await respuesta.json();
+  return usuario;
 }
 
 export async function cerrarSesion(): Promise<void> {
-  return simularRetardoDeRed(undefined);
+  await fetch('/api/auth/logout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+export async function obtenerSesionActual(): Promise<Usuario | null> {
+  try {
+    const respuesta = await fetch('/api/auth/me', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!respuesta.ok) {
+      return null;
+    }
+
+    const { usuario } = await respuesta.json();
+    return usuario;
+  } catch {
+    return null;
+  }
+}
+
+export async function solicitarRecuperacion(email: string): Promise<string> {
+  const respuesta = await fetch('/api/auth/recuperar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!respuesta.ok) {
+    const errorJson = await respuesta.json().catch(() => null);
+    throw new Error(errorJson?.error ?? 'No se pudo procesar la solicitud en este momento.');
+  }
+
+  const data = await respuesta.json();
+  return data.mensaje;
+}
+
+export async function restablecerPassword(token: string, nuevaPassword: string): Promise<string> {
+  const respuesta = await fetch('/api/auth/restablecer', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token, nuevaPassword }),
+  });
+
+  if (!respuesta.ok) {
+    const errorJson = await respuesta.json().catch(() => null);
+    throw new Error(errorJson?.error ?? 'El enlace no es válido o ya venció.');
+  }
+
+  const data = await respuesta.json();
+  return data.mensaje;
+}
+
+export async function aceptarTerminosVigentes(version = '2026-01'): Promise<void> {
+  const respuesta = await fetch('/api/auth/aceptar-terminos', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ version }),
+  });
+
+  if (!respuesta.ok) {
+    const errorJson = await respuesta.json().catch(() => null);
+    throw new Error(errorJson?.error ?? 'No se pudo registrar la aceptación de términos.');
+  }
 }

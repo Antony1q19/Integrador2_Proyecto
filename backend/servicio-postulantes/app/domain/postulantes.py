@@ -5,6 +5,9 @@ rutas HTTP para que, si una regla cambia, se cambie solo aquí.
 """
 from shared_kernel.exceptions import SolicitudInvalida
 
+# --- Versión vigente de términos y política de privacidad (Ley N.º 29733) ---
+VERSION_TERMINOS = "2026-01"
+
 # --- Archivos que se pueden subir (mismas reglas que muestra la pantalla) ---
 TIPOS_DOCUMENTO = {"CV", "DNI", "CERTIFICADO", "OTRO"}
 TIPOS_DE_ARCHIVO_PERMITIDOS = {"application/pdf", "image/jpeg", "image/png"}

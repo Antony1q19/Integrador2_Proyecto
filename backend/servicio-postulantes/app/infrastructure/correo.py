@@ -129,3 +129,75 @@ def correo_solicitud_cuenta(nombres: str, email: str) -> tuple[str, str, str]:
         f"Usa este mismo correo ({email}) al registrarte.\n\nSaludos."
     )
     return asunto, html_cuerpo, texto
+
+
+def correo_recuperar_password(nombres: str, enlace: str) -> tuple[str, str, str]:
+    """Arma el correo para restablecer la contraseña de un postulante.
+
+    Devuelve (asunto, html, texto). Vigencia de 30 minutos.
+    """
+    asunto = "Restablece tu contraseña - Bolsa de Trabajo"
+
+    nombre_html = html.escape(nombres)
+    enlace_html = html.escape(enlace, quote=True)
+
+    html_cuerpo = f"""\
+<div style="font-family: Arial, Helvetica, sans-serif; max-width: 560px; margin: 0 auto; color: #1e293b;">
+  <h2 style="color: #4338ca; margin-bottom: 8px;">Hola {nombre_html},</h2>
+  <p style="line-height: 1.6;">
+    Recibimos una solicitud para restablecer la contraseña de tu cuenta en nuestra bolsa de trabajo.
+  </p>
+  <p style="text-align: center; margin: 28px 0;">
+    <a href="{enlace_html}"
+       style="background: #4f46e5; color: #ffffff; padding: 12px 24px; border-radius: 8px;
+              text-decoration: none; font-weight: bold; display: inline-block;">
+      Restablecer contraseña
+    </a>
+  </p>
+  <p style="line-height: 1.6; font-size: 13px; color: #475569;">
+    Este enlace estará vigente durante <strong>30 minutos</strong> y solo puede usarse una vez.
+  </p>
+  <p style="line-height: 1.6; font-size: 13px; color: #64748b;">
+    Si no realizaste esta solicitud, puedes ignorar este correo; tu contraseña permanecerá segura.
+  </p>
+  <p style="font-size: 12px; color: #94a3b8; margin-top: 32px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+    Si el botón no funciona, copia y pega este enlace en tu navegador:<br>
+    <a href="{enlace_html}" style="color: #4f46e5; word-break: break-all;">{html.escape(enlace)}</a>
+  </p>
+</div>"""
+
+    texto = (
+        f"Hola {nombres},\n\n"
+        "Recibimos una solicitud para restablecer la contraseña de tu cuenta en la bolsa de trabajo.\n\n"
+        f"Puedes restablecerla ingresando al siguiente enlace (vigente por 30 minutos):\n{enlace}\n\n"
+        "Si tú no solicitaste este cambio, puedes ignorar este mensaje.\n\nSaludos."
+    )
+    return asunto, html_cuerpo, texto
+
+
+async def enviar_correo_recuperacion(destinatario: str, nombres: str, raw_token: str) -> None:
+    """Envía el correo de recuperación en segundo plano sin bloquear ni propagar excepciones.
+
+    Si Mailjet falla o no está configurado y ENTORNO es desarrollo, imprime el enlace en los logs.
+    """
+    enlace = f"{settings.url_anuncios.rstrip('/')}/restablecer-password?token={raw_token}"
+    asunto, html_cuerpo, texto = correo_recuperar_password(nombres, enlace)
+
+    correo_configurado = bool(settings.mailjet_api_key and settings.mailjet_secret_key and settings.correo_remitente_email)
+
+    if correo_configurado:
+        try:
+            await enviar_correo(destinatario, nombres, asunto, html_cuerpo, texto)
+            logger.info("Correo de recuperación enviado con éxito a la dirección solicitada.")
+            return
+        except Exception as exc:  # noqa: BLE001
+            # Se registra el error SIN revelar el token
+            logger.warning("No se pudo entregar el correo de recuperación vía Mailjet: %s", exc)
+
+    # Si no está configurado o falló, y estamos en desarrollo, se muestra en el log para pruebas
+    if settings.entorno == "desarrollo":
+        logger.info(
+            "[DESARROLLO] Enlace de recuperación generado para %s: %s",
+            destinatario,
+            enlace,
+        )

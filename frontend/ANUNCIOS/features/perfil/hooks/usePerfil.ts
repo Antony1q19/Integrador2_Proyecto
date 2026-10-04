@@ -2,12 +2,14 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import {
   PerfilPostulante,
   DatosPersonalesPerfil,
   FormacionAcademica,
   IdiomaPerfil,
   ExperienciaLaboral,
+  TipoDocumento,
 } from '../types';
 import {
   fetchPerfil,
@@ -43,15 +45,24 @@ interface UsePerfilResult {
 }
 
 export function usePerfil(): UsePerfilResult {
+  const { usuario, cargando: authCargando } = useAuth();
   const [perfil, setPerfil] = useState<PerfilPostulante | null>(null);
   const [loading, setLoading] = useState(true);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const cargar = useCallback(async () => {
+    if (!usuario) {
+      if (!authCargando) {
+        setPerfil(null);
+        setLoading(false);
+      }
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
+      // Data comes from real API endpoint now
       const data = await fetchPerfil();
       setPerfil(data);
     } catch (e) {
@@ -59,9 +70,10 @@ export function usePerfil(): UsePerfilResult {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [usuario, authCargando]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     cargar();
   }, [cargar]);
 
@@ -106,9 +118,10 @@ export function usePerfil(): UsePerfilResult {
   };
 
   const agregarFormacion = async (formacion: Omit<FormacionAcademica, 'id'>) => {
+    if (!perfil) return;
     setGuardando(true);
     try {
-      const nueva = await addFormacion(formacion);
+      const nueva = await addFormacion(formacion, perfil.formacionAcademica);
       setPerfil((prev) =>
         prev ? { ...prev, formacionAcademica: [...prev.formacionAcademica, nueva] } : prev
       );
@@ -118,7 +131,8 @@ export function usePerfil(): UsePerfilResult {
   };
 
   const handleEliminarFormacion = async (id: string) => {
-    await eliminarFormacion(id);
+    if (!perfil) return;
+    await eliminarFormacion(id, perfil.formacionAcademica);
     setPerfil((prev) =>
       prev
         ? { ...prev, formacionAcademica: prev.formacionAcademica.filter((f) => f.id !== id) }
@@ -127,9 +141,10 @@ export function usePerfil(): UsePerfilResult {
   };
 
   const agregarIdioma = async (idioma: Omit<IdiomaPerfil, 'id'>) => {
+    if (!perfil) return;
     setGuardando(true);
     try {
-      const nuevo = await addIdioma(idioma);
+      const nuevo = await addIdioma(idioma, perfil.idiomas);
       setPerfil((prev) => (prev ? { ...prev, idiomas: [...prev.idiomas, nuevo] } : prev));
     } finally {
       setGuardando(false);
@@ -137,14 +152,16 @@ export function usePerfil(): UsePerfilResult {
   };
 
   const handleEliminarIdioma = async (id: string) => {
-    await eliminarIdioma(id);
+    if (!perfil) return;
+    await eliminarIdioma(id, perfil.idiomas);
     setPerfil((prev) => (prev ? { ...prev, idiomas: prev.idiomas.filter((i) => i.id !== id) } : prev));
   };
 
   const agregarExperiencia = async (experiencia: Omit<ExperienciaLaboral, 'id'>) => {
+    if (!perfil) return;
     setGuardando(true);
     try {
-      const nueva = await addExperiencia(experiencia);
+      const nueva = await addExperiencia(experiencia, perfil.experiencia);
       setPerfil((prev) => (prev ? { ...prev, experiencia: [...prev.experiencia, nueva] } : prev));
     } finally {
       setGuardando(false);
@@ -152,7 +169,8 @@ export function usePerfil(): UsePerfilResult {
   };
 
   const handleEliminarExperiencia = async (id: string) => {
-    await eliminarExperiencia(id);
+    if (!perfil) return;
+    await eliminarExperiencia(id, perfil.experiencia);
     setPerfil((prev) =>
       prev ? { ...prev, experiencia: prev.experiencia.filter((e) => e.id !== id) } : prev
     );

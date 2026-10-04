@@ -17,6 +17,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from sqlalchemy import text
 from app.api.v1.router import router as router_v1
 from app.core.config import settings
 from app.core.database import engine
@@ -30,6 +31,24 @@ from shared_kernel.logging import configurar_logging
 configurar_logging("servicio-postulantes", settings.log_level)
 
 
+async def _asegurar_columnas_nuevas() -> None:
+    """Añade columnas a tablas existentes si la base de datos ya existía en Supabase."""
+    esquema = settings.db_schema
+    prefijo = f'"{esquema}".' if esquema else ""
+    consultas = [
+        f"ALTER TABLE {prefijo}usuarios ADD COLUMN IF NOT EXISTS password_cambiada_en TIMESTAMP WITH TIME ZONE;",
+        f"ALTER TABLE {prefijo}postulantes ADD COLUMN IF NOT EXISTS version_terminos_aceptados VARCHAR(20);",
+        f"ALTER TABLE {prefijo}postulantes ADD COLUMN IF NOT EXISTS ip_aceptacion VARCHAR(45);",
+        f"ALTER TABLE {prefijo}postulantes ADD COLUMN IF NOT EXISTS resumen_profesional VARCHAR(1000);",
+    ]
+    async with engine.begin() as conn:
+        for sql in consultas:
+            try:
+                await conn.execute(text(sql))
+            except Exception:  # noqa: BLE001
+                pass
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # AL ENCENDER: en modo "desarrollo" crea las tablas que falten (leyendo las
@@ -37,6 +56,7 @@ async def lifespan(app: FastAPI):
     # (infrastructure/seed.py).
     if settings.entorno == "desarrollo":
         await crear_tablas(engine)
+        await _asegurar_columnas_nuevas()
         await sembrar_datos_de_prueba()
     # Abre las conexiones a la base ahora (en segundo plano) y no cuando llegue la primera petición.
     tarea_calentamiento = asyncio.create_task(calentar_conexiones(engine))

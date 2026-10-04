@@ -26,7 +26,13 @@ def _emitir_token(usuario: Usuario) -> TokenRespuesta:
     # Estos 4 datos viajan DENTRO del token (firmados). Los microservicios
     # leen de aquí el rol y el id de quien hace la petición.
     token = crear_token_acceso(
-        {"sub": usuario.id, "email": usuario.email, "rol": usuario.rol, "nombre": usuario.nombre},
+        {
+            "sub": usuario.id,
+            "email": usuario.email,
+            "rol": usuario.rol,
+            "nombre": usuario.nombre,
+            "aud": "erp",
+        },
         settings.jwt_secret,
         settings.jwt_minutos_expiracion,
         settings.jwt_algoritmo,

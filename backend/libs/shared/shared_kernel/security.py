@@ -40,19 +40,30 @@ def crear_token_acceso(
 ) -> str:
     """Crea y firma un token con `datos` dentro. Solo lo usa el Gateway."""
     payload = datos.copy()
-    payload["exp"] = datetime.now(timezone.utc) + timedelta(minutes=minutos_expiracion)
+    ahora = datetime.now(timezone.utc)
+    if "iat" not in payload:
+        payload["iat"] = int(ahora.timestamp())
+    payload["exp"] = ahora + timedelta(minutes=minutos_expiracion)
     return jwt.encode(payload, secreto, algorithm=algoritmo)
 
 
 def decodificar_token(
-    token: str, secreto: str, algoritmo: str = ALGORITMO_POR_DEFECTO
+    token: str,
+    secreto: str,
+    algoritmo: str = ALGORITMO_POR_DEFECTO,
+    aud: str | None = None,
 ) -> dict[str, Any]:
     """Lee un token y devuelve sus datos.
 
+    Si se pasa `aud`, exige que el token tenga esa audiencia exacta.
     Si el token es falso, fue modificado o ya venció, lanza `JWTError`; quien
     llama a esta función la convierte en un error HTTP 401.
     """
-    return jwt.decode(token, secreto, algorithms=[algoritmo])
+    opciones = {"verify_aud": aud is not None}
+    kwargs: dict[str, Any] = {"options": opciones}
+    if aud is not None:
+        kwargs["audience"] = aud
+    return jwt.decode(token, secreto, algorithms=[algoritmo], **kwargs)
 
 
 # ---------------------------------------------------------------------------
