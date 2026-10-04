@@ -91,7 +91,7 @@ import AnunciosFiltros from "@/features/anuncios/components/AnunciosFiltros";
 import AnunciosView from "@/features/anuncios/components/AnunciosView";
 
 export default function AnunciosPage() {
-  const { anuncios, cargando, error, eliminar } = useAnuncios();
+  const { anuncios, cargando, error, eliminar, cambiarEstado } = useAnuncios();
   const { empresas } = useEmpresas();
   const {
     filtros,
@@ -142,7 +142,11 @@ export default function AnunciosPage() {
               cargosDisponibles={cargosDisponibles}
               empresas={empresas}
             />
-            <AnunciosView anuncios={anunciosFiltrados} onEliminar={eliminar} />
+            <AnunciosView
+              anuncios={anunciosFiltrados}
+              onEliminar={eliminar}
+              onCambiarEstado={cambiarEstado}
+            />
           </>
         )}
       </div>

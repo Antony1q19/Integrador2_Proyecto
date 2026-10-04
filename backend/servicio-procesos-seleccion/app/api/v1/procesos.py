@@ -4,7 +4,7 @@ Rutas (prefijo /procesos). El navegador las llama a través del Gateway, como
 /api/v1/procesos...:
     GET    /procesos?postulanteId=...                                   → ver en qué anuncios postuló y su etapa
     GET    /procesos/postulantes-ocultos                                → ids de postulantes que el usuario no debe ver (lo usa servicio-postulantes)
-    POST   /procesos                                                    → registrar que se presentó a un anuncio (Admin, RRHH)
+    POST   /procesos                                                    → registrar que se presentó a un anuncio (Admin, RRHH, Supervisor)
     PATCH  /procesos/postulante/{id}/anuncio/{id}/estado                → moverlo de etapa (Admin, RRHH, Supervisor)
 
 Un postulante puede tener VARIAS postulaciones, cada una en una etapa distinta
@@ -80,7 +80,7 @@ async def listar_postulantes_ocultos(
 async def crear_proceso(
     datos: ProcesoCrear,
     sesion: AsyncSession = Depends(obtener_sesion),
-    usuario: dict = Depends(requerir_rol("Admin", "RRHH")),
+    usuario: dict = Depends(requerir_rol("Admin", "RRHH", "Supervisor")),
 ) -> ProcesoPostulacion:
     # PASO 0: el anuncio debe ser de una empresa que el usuario puede ver.
     visibles = await anuncios_visibles(usuario)

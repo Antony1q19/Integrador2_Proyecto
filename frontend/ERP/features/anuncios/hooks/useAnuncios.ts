@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
-import { Anuncio } from "@/features/anuncios/types/anuncio";
-import { listarAnuncios, eliminarAnuncio } from "@/features/anuncios/services/anunciosService";
+import { Anuncio, EstadoAnuncio } from "@/features/anuncios/types/anuncio";
+import {
+  listarAnuncios,
+  eliminarAnuncio,
+  cambiarEstadoAnuncio,
+} from "@/features/anuncios/services/anunciosService";
 
 export function useAnuncios() {
   const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
@@ -36,5 +40,10 @@ export function useAnuncios() {
     setAnuncios((prev) => prev.filter((anuncio) => anuncio.id !== id));
   }
 
-  return { anuncios, cargando, error, eliminar };
+  async function cambiarEstado(id: number, estado: EstadoAnuncio): Promise<void> {
+    const actualizado = await cambiarEstadoAnuncio(id, estado);
+    setAnuncios((prev) => prev.map((anuncio) => (anuncio.id === id ? actualizado : anuncio)));
+  }
+
+  return { anuncios, cargando, error, eliminar, cambiarEstado };
 }

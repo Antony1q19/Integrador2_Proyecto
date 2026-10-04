@@ -177,6 +177,7 @@ export function PostulanteFicha({ id }: { id: string }) {
             <PostulacionesTab
               nombrePostulante={`${d.nombres} ${d.apellidos}`}
               onContratado={refrescar}
+              onPostulado={refrescar}
               postulanteId={postulante.id}
               procesosPostulacion={postulante.procesosPostulacion}
               guardando={guardando}

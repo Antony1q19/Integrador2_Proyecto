@@ -709,3 +709,18 @@ export async function crearPostulante(
   // if (!res.ok) throw new Error("Error al crear el postulante");
   // return res.json();
 }
+// Postula (agrega) a un postulante a un anuncio: crea su postulación en la
+// etapa "Postulado" (servicio-procesos-seleccion). Admin, RRHH y Supervisor,
+// solo en anuncios de sus empresas asignadas; 409 si ya estaba postulado.
+export async function postularAAnuncio(postulanteId: string, anuncioId: number): Promise<void> {
+  const res = await fetch("/api/procesos", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ postulanteId, anuncioId }),
+  });
+  if (res.status === 401) throw new Error(sesionVencida());
+  if (!res.ok) throw new Error(await mensajeDeError(res, "No se pudo agregar al anuncio"));
+  marcarVencido(`postulante:${postulanteId}`);
+  marcarVencido("postulantes:");
+  marcarVencido("dashboard:");
+}

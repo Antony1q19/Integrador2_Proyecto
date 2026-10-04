@@ -15,7 +15,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { Anuncio, EstadoAnuncio } from "@/features/anuncios/types/anuncio";
 import { EstadoProceso, HistorialEstado, ProcesoPostulacion } from "../types/postulante.types";
-import { fetchAnuncios } from "../services/postulantesService";
+import { fetchAnuncios, postularAAnuncio } from "../services/postulantesService";
+import { AgregarAAnuncioModal } from "./AgregarAAnuncioModal";
 import { EstadoBadge, ESTILOS_ESTADO } from "./EstadoBadge";
 import { EstadoSelector } from "./EstadoSelector";
 import { Timeline } from "./Timeline";
@@ -41,6 +42,8 @@ interface PostulacionesTabProps {
   nombrePostulante?: string;
   // Se llama después de registrar una contratación (cambia la etapa de la postulación en el servidor).
   onContratado?: () => void;
+  // Se llama después de agregarlo a un anuncio nuevo, para recargar sus postulaciones.
+  onPostulado?: () => void | Promise<void>;
 }
 
 function HistorialPostulacion({ historial }: { historial: HistorialEstado[] }) {
@@ -68,7 +71,9 @@ export function PostulacionesTab({
   onActualizarEstado,
   nombrePostulante,
   onContratado,
+  onPostulado,
 }: PostulacionesTabProps) {
+  const [agregando, setAgregando] = useState(false);
   const [contratando, setContratando] = useState<{ anuncioId: string; cargo: string } | null>(null);
   // Descartar pide confirmación antes (ver ConfirmacionModal al final).
   const [descartando, setDescartando] = useState<{ anuncioId: string; cargo: string } | null>(null);
@@ -85,6 +90,41 @@ export function PostulacionesTab({
 
   const anunciosPostulados = anuncios.filter(
     (a) => a.postulantesAsociadosIds?.includes(postulanteId) || String(a.id) in procesosPostulacion
+  );
+
+  // Anuncios a los que se le puede agregar: no cerrados y a los que aún no postuló.
+  // `anuncios` ya viene filtrado por el backend: RRHH y Supervisor solo reciben los
+  // de las empresas que tienen asignadas (Admin ve todos).
+  const anunciosDisponibles = anuncios.filter(
+    (a) => a.estado !== "Cerrado" && !anunciosPostulados.some((p) => p.id === a.id)
+  );
+
+  const handleAgregarAAnuncio = async (anuncio: Anuncio) => {
+    await postularAAnuncio(postulanteId, anuncio.id);
+    setAgregando(false);
+    mostrarToast(`Agregado al anuncio "${anuncio.cargo}" en la etapa "Postulado"`, "success");
+    await onPostulado?.();
+  };
+
+  const botonAgregar = (
+    <div className="flex justify-end">
+      <button
+        type="button"
+        onClick={() => setAgregando(true)}
+        className="rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-primary-700"
+      >
+        + Agregar a un anuncio
+      </button>
+    </div>
+  );
+
+  const modalAgregar = agregando && (
+    <AgregarAAnuncioModal
+      anuncios={anunciosDisponibles}
+      nombrePostulante={nombrePostulante}
+      onConfirmar={handleAgregarAAnuncio}
+      onCancelar={() => setAgregando(false)}
+    />
   );
 
   const handleCambiarEstado = async (anuncioId: string, cargo: string, estado: EstadoProceso) => {
@@ -150,14 +190,20 @@ export function PostulacionesTab({
 
   if (anunciosPostulados.length === 0) {
     return (
-      <p className="py-6 text-center text-sm text-gray-400">
-        Este postulante aún no está asociado a ningún anuncio.
-      </p>
+      <div className="space-y-2">
+        {botonAgregar}
+        <p className="py-6 text-center text-sm text-gray-400">
+          Este postulante aún no está asociado a ningún anuncio.
+        </p>
+        {modalAgregar}
+        <ToastContainer toasts={toasts} />
+      </div>
     );
   }
 
   return (
     <div className="space-y-4">
+      {botonAgregar}
       <ul className="space-y-4">
         {anunciosPostulados.map((anuncio) => {
           const anuncioId = String(anuncio.id);
@@ -269,6 +315,7 @@ export function PostulacionesTab({
         />
       )}
 
+      {modalAgregar}
       <ToastContainer toasts={toasts} />
     </div>
   );

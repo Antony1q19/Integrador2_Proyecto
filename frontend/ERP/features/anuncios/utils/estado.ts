@@ -1,5 +1,11 @@
 import { EstadoAnuncio } from "@/features/anuncios/types/anuncio";
 
+// Estado al que pasa un anuncio con el botón Abrir/Cerrar. Un anuncio
+// "En proceso" se cierra; uno "Cerrado" se vuelve a abrir.
+export function estadoSiguiente(estado: EstadoAnuncio): EstadoAnuncio {
+  return estado === "Cerrado" ? "Abierto" : "Cerrado";
+}
+
 export function colorEstado(estado: EstadoAnuncio): string {
   switch (estado) {
     case "Abierto":

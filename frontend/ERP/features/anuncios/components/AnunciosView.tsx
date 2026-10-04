@@ -2,20 +2,41 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Anuncio } from "@/features/anuncios/types/anuncio";
-import { colorEstado } from "@/features/anuncios/utils/estado";
+import { Anuncio, EstadoAnuncio } from "@/features/anuncios/types/anuncio";
+import { colorEstado, estadoSiguiente } from "@/features/anuncios/utils/estado";
 import ConfirmacionModal from "@/components/shared/ConfirmacionModal";
 
 interface AnunciosViewProps {
     anuncios: Anuncio[];
     onEliminar: (id: number) => Promise<void>;
+    onCambiarEstado: (id: number, estado: EstadoAnuncio) => Promise<void>;
 }
 
-export default function AnunciosView({ anuncios, onEliminar }: AnunciosViewProps) {
+export default function AnunciosView({ anuncios, onEliminar, onCambiarEstado }: AnunciosViewProps) {
     
     const [anuncioAEliminar, setAnuncioAEliminar] = useState<Anuncio | null>(null);
     const [eliminando, setEliminando] = useState(false);
     const [errorPorFila, setErrorPorFila] = useState<Record<number, string>>({});
+    const [cambiandoEstadoId, setCambiandoEstadoId] = useState<number | null>(null);
+
+    // Clic en el estado: Abierto/En proceso -> Cerrado, Cerrado -> Abierto.
+    const alternarEstado = async (anuncio: Anuncio) => {
+        setCambiandoEstadoId(anuncio.id);
+        setErrorPorFila((prev) => {
+            const { [anuncio.id]: _omitido, ...resto } = prev;
+            return resto;
+        });
+        try {
+            await onCambiarEstado(anuncio.id, estadoSiguiente(anuncio.estado));
+        } catch (err) {
+            setErrorPorFila((prev) => ({
+                ...prev,
+                [anuncio.id]: err instanceof Error ? err.message : "No se pudo cambiar el estado",
+            }));
+        } finally {
+            setCambiandoEstadoId(null);
+        }
+    };
 
     const confirmarEliminacion = async () => {
         if (!anuncioAEliminar) return;
@@ -91,13 +112,21 @@ export default function AnunciosView({ anuncios, onEliminar }: AnunciosViewProps
                                 {anuncio.fechaLimite}
                             </td>
                             <td className="px-6 py-4 text-center">
-                                <span
-                                    className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${colorEstado(
+                                <button
+                                    type="button"
+                                    onClick={() => alternarEstado(anuncio)}
+                                    disabled={cambiandoEstadoId === anuncio.id}
+                                    title={
+                                        estadoSiguiente(anuncio.estado) === "Cerrado"
+                                            ? "Clic para cerrar el anuncio"
+                                            : "Clic para abrir el anuncio"
+                                    }
+                                    className={`inline-flex cursor-pointer rounded-full px-2.5 py-0.5 text-xs font-medium ring-offset-1 transition hover:ring-2 hover:ring-slate-300 disabled:cursor-wait disabled:opacity-60 ${colorEstado(
                                         anuncio.estado
                                     )}`}
                                 >
-                                    {anuncio.estado}
-                                </span>
+                                    {cambiandoEstadoId === anuncio.id ? "…" : anuncio.estado}
+                                </button>
                             </td>
                             <td className="px-6 py-4 text-center">
                                 <button
@@ -135,7 +164,7 @@ export default function AnunciosView({ anuncios, onEliminar }: AnunciosViewProps
             {anuncioAEliminar && (
                 <ConfirmacionModal
                 titulo="Eliminar anuncio"
-                mensaje={`¿Eliminar el anuncio "${anuncioAEliminar.cargo}"? Esta acción no se puede deshacer.`}
+                mensaje={`¿Eliminar el anuncio "${anuncioAEliminar.cargo}"? Dejará de aparecer en el ERP y en el portal de anuncios.`}
                 confirmando={eliminando}
                 labelConfirmando="Eliminando…"
                 onConfirmar={confirmarEliminacion}

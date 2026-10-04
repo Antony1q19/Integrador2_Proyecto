@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Anuncio } from "@/features/anuncios/types/anuncio";
-import { obtenerAnuncio } from "@/features/anuncios/services/anunciosService";
+import { Anuncio, EstadoAnuncio } from "@/features/anuncios/types/anuncio";
+import { obtenerAnuncio, cambiarEstadoAnuncio } from "@/features/anuncios/services/anunciosService";
 
 export function useAnuncio(id: number) {
   const [anuncio, setAnuncio] = useState<Anuncio | null>(null);
@@ -37,5 +37,10 @@ export function useAnuncio(id: number) {
     };
   }, [id]);
 
-  return { anuncio, cargando, error, noEncontrado };
+  async function cambiarEstado(estado: EstadoAnuncio): Promise<void> {
+    const actualizado = await cambiarEstadoAnuncio(id, estado);
+    setAnuncio(actualizado);
+  }
+
+  return { anuncio, cargando, error, noEncontrado, cambiarEstado };
 }

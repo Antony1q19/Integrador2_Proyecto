@@ -1,15 +1,32 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
-import { Anuncio } from "@/features/anuncios/types/anuncio";
-import { Postulante } from "@/features/postulantes/types/postulante.types";
-import { colorEstado } from "@/features/anuncios/utils/estado";
-import PostulantesAsociados from "@/features/anuncios/components/PostulantesAsociados";
+import { Anuncio, EstadoAnuncio } from "@/features/anuncios/types/anuncio";
+import { colorEstado, estadoSiguiente } from "@/features/anuncios/utils/estado";
 
 interface AnuncioFichaProps {
     anuncio: Anuncio;
-    postulantes: Postulante[];
+    onCambiarEstado: (estado: EstadoAnuncio) => Promise<void>;
 }
 
-export default function AnuncioFicha({ anuncio, postulantes }: AnuncioFichaProps) {
+export default function AnuncioFicha({ anuncio, onCambiarEstado }: AnuncioFichaProps) {
+    const [cambiando, setCambiando] = useState(false);
+    const [errorEstado, setErrorEstado] = useState<string | null>(null);
+    const siguiente = estadoSiguiente(anuncio.estado);
+
+    const alternarEstado = async () => {
+        setCambiando(true);
+        setErrorEstado(null);
+        try {
+            await onCambiarEstado(siguiente);
+        } catch (err) {
+            setErrorEstado(err instanceof Error ? err.message : "No se pudo cambiar el estado");
+        } finally {
+            setCambiando(false);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-slate-50 p-8">
             <div className="mx-auto max-w-4xl">
@@ -42,13 +59,33 @@ export default function AnuncioFicha({ anuncio, postulantes }: AnuncioFichaProps
                             {anuncio.empresaRazonSocial}
                         </Link>
                     </div>
-                    <Link
-                            href={`/anuncios/${anuncio.id}/editar`}
-                            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
-                        >
-                            Editar
-                    </Link>
-
+                    <div className="flex flex-col items-end gap-1">
+                        <div className="flex items-center gap-2">
+                            <button
+                                type="button"
+                                onClick={alternarEstado}
+                                disabled={cambiando}
+                                className={`rounded-lg px-4 py-2 text-sm font-medium shadow-sm transition-colors disabled:opacity-60 ${
+                                    siguiente === "Cerrado"
+                                        ? "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+                                        : "bg-emerald-600 text-white hover:bg-emerald-700"
+                                }`}
+                            >
+                                {cambiando
+                                    ? "Guardando…"
+                                    : siguiente === "Cerrado"
+                                      ? "Cerrar anuncio"
+                                      : "Abrir anuncio"}
+                            </button>
+                            <Link
+                                href={`/anuncios/${anuncio.id}/editar`}
+                                className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
+                            >
+                                Editar
+                            </Link>
+                        </div>
+                        {errorEstado && <p className="text-xs text-red-500">{errorEstado}</p>}
+                    </div>
                 </div>
 
                 {/* Datos generales */}
@@ -97,17 +134,6 @@ export default function AnuncioFicha({ anuncio, postulantes }: AnuncioFichaProps
                     </p>
                 </div>
 
-                {/* Postulantes asociados 
-                    NOTA: esta relación vive en servicio-procesos-seleccion (otro
-                    microservicio, aún no conectado desde este frontend). Por ahora,
-                    PostulantesAsociados arranca vacío y su estado es solo local
-                    (se pierde al recargar) — no hay persistencia real todavía. */}
-                <div className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-                    <PostulantesAsociados
-                        postulantesAsociadosIds={[]}
-                        postulantes={postulantes}
-                    />
-                </div>
             </div>
         </div>
     );
