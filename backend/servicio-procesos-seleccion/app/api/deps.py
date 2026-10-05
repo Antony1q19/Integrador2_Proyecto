@@ -36,25 +36,25 @@ async def verificar_peticion_del_gateway(
 
 
 async def obtener_usuario_actual(
-    _: None = Depends(verificar_peticion_del_gateway),  # primero se exige la firma
+    _: None = Depends(verificar_peticion_del_gateway),
     x_usuario_id: str = Header(...),
     x_usuario_rol: str = Header(...),
     x_usuario_nombre: str = Header(default=""),
     x_usuario_empresas: str | None = Header(default=None),
+    x_usuario_postulante_id: str | None = Header(default=None),
 ) -> dict:
-    """Devuelve quién hace la petición: {"id": ..., "rol": ..., "nombre": ..., "empresas": ...}.
+    """Devuelve quién hace la petición.
 
-    "empresas" son los ids de las empresas que puede ver (RRHH/Supervisor) o None si no
-    tiene filtro (ver shared_kernel/visibilidad.py).
-
-    El Gateway manda el nombre "codificado" (ej. "Mar%C3%ADa" en vez de "María")
-    porque las cabeceras HTTP no admiten bien las tildes; aquí se decodifica.
+    Incluye "postulante_id" cuando el usuario es un postulante de la app ANUNCIOS
+    (el Gateway lo lee del claim "postulanteId" del JWT); para trabajadores del ERP
+    queda en None.
     """
     return {
         "id": x_usuario_id,
         "rol": x_usuario_rol,
         "nombre": unquote(x_usuario_nombre),
         "empresas": parsear_empresas(x_usuario_rol, x_usuario_empresas),
+        "postulante_id": x_usuario_postulante_id or None,
     }
 
 

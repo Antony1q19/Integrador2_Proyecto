@@ -13,13 +13,13 @@ Un postulante puede tener VARIAS postulaciones, cada una en una etapa distinta
 RRHH y Supervisor solo ven (y tocan) las postulaciones a anuncios de las empresas que un
 Admin les asignó; lo demás responde como si no existiera (404).
 """
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
 from app.api.comunes import buscar_proceso
-from app.api.deps import requerir_rol
+from app.api.deps import obtener_usuario_actual, requerir_rol
 from app.api.visibilidad import anuncios_visibles, postulantes_ocultos
 from app.core.database import obtener_sesion, obtener_sesion_lectura
 from app.domain.procesos import validar_estado_proceso
@@ -44,13 +44,23 @@ _USUARIO_POR_DEFECTO = "Usuario RRHH"
 # ---------------------------------------------------------------------------
 @router.get("", response_model=list[ProcesoRespuesta])
 async def listar_procesos(
-    postulanteId: str | None = None,  # opcional: si se envía, solo las de ese postulante
+    postulanteId: str | None = None,
     sesion: AsyncSession = Depends(obtener_sesion_lectura),
-    usuario: dict = Depends(requerir_rol("Admin", "RRHH", "Supervisor")),
+    usuario: dict = Depends(obtener_usuario_actual),
 ) -> list[ProcesoPostulacion]:
-    visibles = await anuncios_visibles(usuario)
-    # `joinedload` trae cada postulación JUNTO con su historial en una sola consulta (un viaje a la base
-    # de datos en vez de dos). Con la base asíncrona no se puede pedir el historial "después".
+    # --- Postulante (app ANUNCIOS): solo ve sus propios procesos ---
+    if usuario["rol"] == "Postulante":
+        if not usuario.get("postulante_id"):
+            raise HTTPException(status_code=403, detail="Token de postulante inválido")
+        if postulanteId and postulanteId != usuario["postulante_id"]:
+            raise HTTPException(status_code=403, detail="Solo puedes ver tus propias postulaciones")
+        postulanteId = usuario["postulante_id"]
+        visibles = None  # No aplica el filtro de empresas
+    elif usuario["rol"] in ("Admin", "RRHH", "Supervisor"):
+        visibles = await anuncios_visibles(usuario)
+    else:
+        raise HTTPException(status_code=403, detail="Rol no autorizado")
+
     consulta = (
         select(ProcesoPostulacion)
         .options(joinedload(ProcesoPostulacion.historial))
@@ -58,10 +68,10 @@ async def listar_procesos(
     )
     if postulanteId:
         consulta = consulta.where(ProcesoPostulacion.postulante_id == postulanteId)
-    if visibles is not None:  # RRHH / Supervisor: solo anuncios de sus empresas
+    if visibles is not None:
         consulta = consulta.where(ProcesoPostulacion.anuncio_id.in_(list(visibles)))
     resultado = await sesion.execute(consulta)
-    return list(resultado.unique().scalars().all())  # unique(): quita las filas repetidas del join
+    return list(resultado.unique().scalars().all())
 
 
 @router.get("/postulantes-ocultos", response_model=list[str])
@@ -80,12 +90,20 @@ async def listar_postulantes_ocultos(
 async def crear_proceso(
     datos: ProcesoCrear,
     sesion: AsyncSession = Depends(obtener_sesion),
-    usuario: dict = Depends(requerir_rol("Admin", "RRHH", "Supervisor")),
+    usuario: dict = Depends(obtener_usuario_actual),
 ) -> ProcesoPostulacion:
-    # PASO 0: el anuncio debe ser de una empresa que el usuario puede ver.
-    visibles = await anuncios_visibles(usuario)
-    if visibles is not None and datos.anuncioId not in visibles:
-        raise RecursoNoEncontrado("Anuncio no encontrado")
+    # --- Validación por rol ---
+    if usuario["rol"] == "Postulante":
+        # Un postulante solo puede postularse a sí mismo
+        if not usuario.get("postulante_id") or datos.postulanteId != usuario["postulante_id"]:
+            raise HTTPException(status_code=403, detail="Solo puedes postularte tú mismo")
+    elif usuario["rol"] in ("Admin", "RRHH", "Supervisor"):
+        # Debe ser un anuncio de sus empresas
+        visibles = await anuncios_visibles(usuario)
+        if visibles is not None and datos.anuncioId not in visibles:
+            raise RecursoNoEncontrado("Anuncio no encontrado")
+    else:
+        raise HTTPException(status_code=403, detail="Rol no autorizado")
 
     # PASO 1: no se puede postular dos veces al mismo anuncio.
     if await buscar_proceso(sesion, datos.postulanteId, datos.anuncioId) is not None:
@@ -102,8 +120,6 @@ async def crear_proceso(
     )
     sesion.add(proceso)
     await sesion.commit()
-
-    # PASO 3: devolverla (ya trae su id, su fecha y su historial: no hace falta volver a leerla).
     return proceso
 
 

@@ -73,14 +73,17 @@ async def reenviar(
     # "codificado" con quote() (ej. "María" → "Mar%C3%ADa"): las cabeceras HTTP
     # no admiten bien las tildes; el microservicio lo decodifica.
     cabeceras = cabeceras_firmadas(
-        {
-            "X-Usuario-Id": str(usuario.get("sub", "")),
-            "X-Usuario-Rol": str(usuario.get("rol", "")),
-            "X-Usuario-Nombre": quote(str(usuario.get("nombre", ""))),
-            "Content-Type": request.headers.get("content-type", "application/json"),
-        }
-    )
-
+    {
+        "X-Usuario-Id": str(usuario.get("sub", "")),
+        "X-Usuario-Rol": str(usuario.get("rol", "")),
+        "X-Usuario-Nombre": quote(str(usuario.get("nombre", ""))),
+        # El token del postulante (app ANUNCIOS) incluye "postulanteId" en sus claims.
+        # Se propaga como cabecera interna para que los microservicios puedan
+        # validar que un postulante solo vea/crea SUS PROPIOS procesos.
+        "X-Usuario-Postulante-Id": str(usuario.get("postulanteId", "")),
+        "Content-Type": request.headers.get("content-type", "application/json"),
+    }
+)
     # PASO 4b: RRHH y Supervisor solo ven las empresas que un Admin les asignó. La lista sale de la
     # base de datos (no del token), así un cambio del Admin vale al instante y una cuenta suspendida o
     # eliminada deja de ver empresas de inmediato. Para no viajar a la base en cada petición, se recuerda

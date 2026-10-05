@@ -25,7 +25,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1 import auth, proxy, publico, publico_auth, usuarios
+from app.api.v1 import auth, proxy, publico, publico_auth, publico_procesos, usuarios
+
 from app.core.config import settings
 from app.core.database import engine
 from app.core.http_client import cerrar_cliente
@@ -85,11 +86,12 @@ registrar_manejadores_excepciones(app)
 # Rutas. IMPORTANTE: el orden importa. FastAPI prueba las rutas en el orden
 # en que se registran, y "proxy" acepta CUALQUIER dirección bajo /api/v1, por
 # eso tiene que ir SIEMPRE al final; si no, se "comería" /auth y /usuarios.
-app.include_router(auth.router, prefix="/api/v1")          # /api/v1/auth/...
-app.include_router(publico_auth.router, prefix="/api/v1")  # /api/v1/publico/auth/... (cuentas de postulantes)
-app.include_router(usuarios.router, prefix="/api/v1")      # /api/v1/usuarios/...
-app.include_router(publico.router, prefix="/api/v1")       # /api/v1/publico/... (SIN sesión, app ANUNCIOS)
-app.include_router(proxy.router, prefix="/api/v1")         # /api/v1/postulantes/... (y lo demás)
+app.include_router(auth.router, prefix="/api/v1")             # /api/v1/auth/...
+app.include_router(publico_auth.router, prefix="/api/v1")     # /api/v1/publico/auth/... (cuentas de postulantes)
+app.include_router(publico_procesos.router, prefix="/api/v1") # /api/v1/publico/procesos (postulaciones de postulantes)
+app.include_router(usuarios.router, prefix="/api/v1")         # /api/v1/usuarios/...
+app.include_router(publico.router, prefix="/api/v1")          # /api/v1/publico/... (SIN sesión, app ANUNCIOS)
+app.include_router(proxy.router, prefix="/api/v1")            # /api/v1/postulantes/... (y lo demás) — SIEMPRE AL FINAL
 
 
 @app.get("/health", tags=["health"])

@@ -1,6 +1,4 @@
 // features/anuncios/components/JobDetailPanel.tsx
-// 'use client' porque tiene botones con onClick y también se usa desde una página de servidor
-// (app/anuncios/[id]/page.tsx).
 'use client';
 
 import { useState } from 'react';
@@ -10,6 +8,7 @@ import { useAuth } from '@/features/auth/hooks/useAuth';
 import { Anuncio } from '../types';
 import { formatearSalario } from '../utils/formatearSalario';
 import { formatearFechaRelativa } from '../utils/formatearFecha';
+import { postularseAAnuncio } from '@/features/postulaciones/services/postulacionesService';
 
 interface JobDetailPanelProps {
   anuncio: Anuncio;
@@ -21,21 +20,35 @@ export default function JobDetailPanel({ anuncio }: JobDetailPanelProps) {
     fechaPublicacion, numeroVacantes, fechaLimite,
   } = anuncio;
   const router = useRouter();
-  const { estaAutenticado } = useAuth();
+  const { estaAutenticado, usuario } = useAuth();
   const [aviso, setAviso] = useState<string | null>(null);
   const [enlaceCopiado, setEnlaceCopiado] = useState(false);
+  const [postulando, setPostulando] = useState(false);
 
   // Sin sesión → al login, y de vuelta a ESTE anuncio al entrar.
-  // Con sesión → la postulación en línea todavía no existe en el backend: se avisa en pantalla.
-  const postular = () => {
-    if (!estaAutenticado) {
+  // Con sesión → crea la postulación en el backend y redirige al historial.
+  const postular = async () => {
+    if (!estaAutenticado || !usuario?.postulanteId) {
       router.push(`/login?motivo=postular&siguiente=${encodeURIComponent(`/anuncios/${anuncio.id}`)}`);
       return;
     }
-    setAviso('La postulación en línea estará disponible muy pronto.');
+
+    setPostulando(true);
+    setAviso(null);
+    try {
+      await postularseAAnuncio({
+        anuncioId: Number(anuncio.id),
+        postulanteId: usuario.postulanteId,
+      });
+      setAviso('¡Te postulaste correctamente! Redirigiendo a tu historial...');
+      setTimeout(() => router.push('/his_postulaciones'), 1500);
+    } catch (err) {
+      setAviso(err instanceof Error ? err.message : 'No se pudo completar la postulación');
+    } finally {
+      setPostulando(false);
+    }
   };
 
-  // En celular abre el menú "Compartir" del sistema; en computadora copia el enlace.
   const compartir = async () => {
     const url = `${window.location.origin}/anuncios/${anuncio.id}`;
     if (navigator.share) {
@@ -65,10 +78,11 @@ export default function JobDetailPanel({ anuncio }: JobDetailPanelProps) {
         <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
-            className="bg-primary-600 hover:bg-primary-700 text-white font-medium px-5 py-2.5 rounded-lg transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+            disabled={postulando}
+            className="bg-primary-600 hover:bg-primary-700 text-white font-medium px-5 py-2.5 rounded-lg transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
             onClick={postular}
           >
-            Postularme a esta oferta
+            {postulando ? 'Postulando...' : 'Postularme a esta oferta'}
           </button>
           <button
             type="button"
@@ -149,7 +163,6 @@ export default function JobDetailPanel({ anuncio }: JobDetailPanelProps) {
               <div>
                 <p className="text-xs text-gray-500 mb-1">Postula hasta</p>
                 <p className="text-sm text-gray-700">
-                  {/* "T00:00:00" para que la fecha no se corra un día por la zona horaria */}
                   {new Date(`${fechaLimite}T00:00:00`).toLocaleDateString('es-PE', {
                     day: 'numeric',
                     month: 'long',
