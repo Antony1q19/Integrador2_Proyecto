@@ -9,6 +9,7 @@
 // GATEWAY_INTERNAL_URL (nombre del contenedor en la red de Docker), no
 // NEXT_PUBLIC_API_URL (esa es para el navegador, que no está en esa red).
 import { NextRequest, NextResponse } from "next/server";
+import { cabecerasIpCliente } from "@/lib/ipCliente";
 
 const GATEWAY_URL = process.env.GATEWAY_INTERNAL_URL;
 const ROLES_VALIDOS_ERP = ["Admin", "RRHH", "Supervisor"];
@@ -30,7 +31,8 @@ export async function POST(request: NextRequest) {
 
   const respuestaGateway = await fetch(`${GATEWAY_URL}/auth/login`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    // La IP real del usuario: el Gateway la usa para bloquear tras 5 intentos fallidos (ver lib/ipCliente.ts).
+    headers: { "Content-Type": "application/json", ...cabecerasIpCliente(request) },
     body: JSON.stringify({ email, password }),
   });
 
@@ -45,7 +47,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { access_token, rol, nombre, email: emailUsuario, empresasVisibles } = await respuestaGateway.json();
+  const { access_token, rol, nombre, email: emailUsuario, empresasVisibles, debeCambiarPassword } =
+    await respuestaGateway.json();
   if (!ROLES_VALIDOS_ERP.includes(rol)) {
     return NextResponse.json({ error: "Esta cuenta no tiene acceso al ERP" }, { status: 403 });
   }
@@ -54,7 +57,7 @@ export async function POST(request: NextRequest) {
   // cookies de UI userRole/userName/... que usan middleware.ts y la
   // pantalla de empresas) -el access_token nunca sale de este endpoint
   // hacia el body de la respuesta-.
-  const respuesta = NextResponse.json({ rol, nombre, email: emailUsuario, empresasVisibles });
+  const respuesta = NextResponse.json({ rol, nombre, email: emailUsuario, empresasVisibles, debeCambiarPassword });
   respuesta.cookies.set("authToken", access_token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -62,5 +65,12 @@ export async function POST(request: NextRequest) {
     path: "/",
     maxAge: DURACION_COOKIE_SEGUNDOS,
   });
+  // Entró con una contraseña temporal: el Gateway solo le deja cambiarla. Esta cookie (de pantalla,
+  // no es un secreto) hace que middleware.ts lo lleve a /perfil hasta que la cambie.
+  if (debeCambiarPassword) {
+    respuesta.cookies.set("cambioPassword", "1", { path: "/", sameSite: "lax", maxAge: DURACION_COOKIE_SEGUNDOS });
+  } else {
+    respuesta.cookies.delete("cambioPassword");
+  }
   return respuesta;
 }

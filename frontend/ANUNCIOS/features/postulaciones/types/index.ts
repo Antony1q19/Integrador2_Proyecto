@@ -17,12 +17,12 @@ export interface PostulacionApi {
   anuncioId: number;
   estadoActual: EstadoActualBackend;
   fechaPostulacion: string;
+  // Solo etapa y fecha: los comentarios internos y el nombre de quien hizo cada cambio
+  // son datos del ERP y el backend no se los entrega al postulante.
   historialEstados: Array<{
     id: string;
     estado: string;
     fecha: string;
-    usuarioResponsable: string;
-    comentario: string | null;
   }>;
 }
 

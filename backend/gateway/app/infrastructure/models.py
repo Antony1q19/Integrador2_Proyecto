@@ -9,7 +9,7 @@ reciben el id y el rol de quien hace la petición, nunca su contraseña.
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import JSON, DateTime, String
+from sqlalchemy import JSON, Boolean, DateTime, String, false
 from sqlalchemy.orm import Mapped, mapped_column
 
 from shared_kernel.database import Base
@@ -49,3 +49,14 @@ class Usuario(Base):
     fecha_creacion: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
+
+    # True mientras la persona siga con la contraseña TEMPORAL que le generó un Admin (al crearla o
+    # al restablecerla). Mientras sea True, su sesión solo sirve para cambiar su propia contraseña.
+    # (Columna agregada después: la crea app/infrastructure/migraciones.py al encender.)
+    debe_cambiar_password: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default=false()
+    )
+
+    # Cuándo cambió su contraseña por última vez (o se la restableció un Admin). Los tokens emitidos
+    # ANTES de esa fecha dejan de valer (ver api/deps.py). (La crea app/infrastructure/migraciones.py.)
+    password_cambiada_en: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

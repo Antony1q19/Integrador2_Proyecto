@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Anuncio, EstadoAnuncio } from "@/features/anuncios/types/anuncio";
 import { colorEstado, estadoSiguiente } from "@/features/anuncios/utils/estado";
+import { usePermisos } from "@/lib/usePermisos";
 
 interface AnuncioFichaProps {
     anuncio: Anuncio;
@@ -11,6 +12,8 @@ interface AnuncioFichaProps {
 }
 
 export default function AnuncioFicha({ anuncio, onCambiarEstado }: AnuncioFichaProps) {
+    // Cerrar/abrir y editar: Admin y Supervisor (RRHH solo ve el anuncio).
+    const { puedeGestionarAnuncios } = usePermisos();
     const [cambiando, setCambiando] = useState(false);
     const [errorEstado, setErrorEstado] = useState<string | null>(null);
     const siguiente = estadoSiguiente(anuncio.estado);
@@ -60,6 +63,7 @@ export default function AnuncioFicha({ anuncio, onCambiarEstado }: AnuncioFichaP
                         </Link>
                     </div>
                     <div className="flex flex-col items-end gap-1">
+                        {puedeGestionarAnuncios && (
                         <div className="flex items-center gap-2">
                             <button
                                 type="button"
@@ -84,6 +88,7 @@ export default function AnuncioFicha({ anuncio, onCambiarEstado }: AnuncioFichaP
                                 Editar
                             </Link>
                         </div>
+                        )}
                         {errorEstado && <p className="text-xs text-red-500">{errorEstado}</p>}
                     </div>
                 </div>

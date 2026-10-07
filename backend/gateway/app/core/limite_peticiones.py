@@ -6,24 +6,49 @@ si se pasa, recibe 429 ("demasiadas peticiones") hasta que pase el minuto.
 
 Se guarda en memoria (un diccionario), así que vale para UN proceso del Gateway: suficiente
 para este proyecto. Con varias copias del Gateway habría que llevarlo a Redis o similar.
+
+¿De quién es la IP?
+Los navegadores NO llaman al Gateway directo: llaman al servidor de Next.js (ERP o ANUNCIOS) y
+ese servidor llama al Gateway. Para el Gateway, entonces, "la IP que llama" es SIEMPRE la del
+servidor de Next.js, la misma para todos los usuarios. Si se contara esa, 5 contraseñas mal
+escritas por una sola persona bloquearían el login de TODOS.
+Por eso Next.js manda la IP real del usuario en la cabecera `X-Cliente-IP`, junto con una clave
+compartida (`X-Proxy-Secret` = FRONTEND_PROXY_SECRET). El Gateway solo cree esa IP si la clave
+coincide; si no (alguien llamando directo al puerto 8000 con una IP inventada), usa la IP real
+de la conexión. `X-Forwarded-For` ya NO se usa: cualquiera puede escribir lo que quiera ahí.
 """
+import hmac
 import time
 from collections import deque
 
 from fastapi import HTTPException, Request, status
 
+from app.core.config import settings
+
 _VENTANA_SEGUNDOS = 60
 
-# ip -> horas (en segundos) de sus últimas peticiones dentro de la ventana
-_peticiones_por_ip: dict[str, deque[float]] = {}
+
+def obtener_ip_cliente(request: Request) -> str:
+    """La IP del usuario final (ver la explicación de arriba)."""
+    secreto = settings.frontend_proxy_secret
+    ip_declarada = (request.headers.get("x-cliente-ip") or "").strip()
+    clave_recibida = request.headers.get("x-proxy-secret") or ""
+    if secreto and ip_declarada and hmac.compare_digest(clave_recibida.encode(), secreto.encode()):
+        return ip_declarada[:45]  # 45 = largo máximo de una IPv6 escrita
+    return request.client.host if request.client else "desconocida"
 
 
 def limitar_por_ip(maximo_por_minuto: int):
     """Dependencia de FastAPI: responde 429 si la IP ya hizo `maximo_por_minuto` peticiones
-    en el último minuto. Uso:  dependencies=[Depends(limitar_por_ip(60))]"""
+    en el último minuto. Uso:  dependencies=[Depends(limitar_por_ip(60))]
+
+    Cada límite lleva su PROPIA cuenta: ver 20 anuncios no gasta los intentos de login."""
+
+    # ip -> horas (en segundos) de sus últimas peticiones dentro de la ventana
+    _peticiones_por_ip: dict[str, deque[float]] = {}
 
     async def dependencia(request: Request) -> None:
-        ip = request.client.host if request.client else "desconocida"
+        ip = obtener_ip_cliente(request)
         ahora = time.monotonic()
         historial = _peticiones_por_ip.setdefault(ip, deque())
 

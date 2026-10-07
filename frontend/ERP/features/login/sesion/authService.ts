@@ -17,6 +17,7 @@ export interface User {
   name: string;
   role: Role;
   empresasVisibles: number[];
+  debeCambiarPassword: boolean;
 }
 
 export const login = async (email: string, password: string): Promise<User> => {
@@ -33,10 +34,17 @@ export const login = async (email: string, password: string): Promise<User> => {
 
   // Nueva sesión: nada de lo que se guardó en memoria (de otra persona) debe verse.
   vaciarCache();
-  const { rol, nombre, empresasVisibles } = await res.json();
+  const { rol, nombre, empresasVisibles, debeCambiarPassword } = await res.json();
   // No tenemos un id numérico real acá (el JWT que lo trae nunca llega al
   // cliente); el email alcanza como identificador único de UI.
-  return { id: email, email, name: nombre, role: rol as Role, empresasVisibles: empresasVisibles ?? [] };
+  return {
+    id: email,
+    email,
+    name: nombre,
+    role: rol as Role,
+    empresasVisibles: empresasVisibles ?? [],
+    debeCambiarPassword: Boolean(debeCambiarPassword),
+  };
 };
 
 export async function cerrarSesionApi(): Promise<void> {

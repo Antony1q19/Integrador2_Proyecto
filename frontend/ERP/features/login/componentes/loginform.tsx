@@ -31,13 +31,13 @@ export default function LoginForm() {
       // filtrar qué ve cada rol que no sea Admin-.
       document.cookie = `userEmpresas=${encodeURIComponent(JSON.stringify(user.empresasVisibles))}; path=/; max-age=3600`;
 
-      // REDIRECCIÓN SEGÚN ROL (#12)
-      if (user.role === 'Admin') {
-        router.push("/dashboard");
+      // REDIRECCIÓN SEGÚN ROL (#12). Con contraseña temporal, primero tiene que cambiarla.
+      if (user.debeCambiarPassword) {
+        router.push("/perfil");
       } else if (user.role === 'RRHH') {
-        router.push("/postulantes");
+        router.push("/postulantes"); // RRHH no ve el Dashboard
       } else {
-        router.push("/perfil"); // Supervisor
+        router.push("/dashboard"); // Admin y Supervisor
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo iniciar sesión");

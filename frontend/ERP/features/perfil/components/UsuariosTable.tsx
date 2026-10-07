@@ -103,6 +103,14 @@ export function UsuariosTable({
                 <td className="py-4 font-medium text-sm text-slate-800">
                   {usuario.nombre}
                   {esUnoMismo && <span className="ml-2 text-[10px] text-slate-400">(tú)</span>}
+                  {usuario.debeCambiarPassword && (
+                    <span
+                      className="ml-2 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700"
+                      title="Aún no ingresó a cambiar la contraseña temporal"
+                    >
+                      Clave temporal
+                    </span>
+                  )}
                 </td>
                 <td className="py-4 text-sm text-slate-500">{usuario.email}</td>
                 <td className="py-4">
@@ -139,7 +147,7 @@ export function UsuariosTable({
                     <button
                       type="button"
                       onClick={() => onRestablecerPassword(usuario)}
-                      title="Restablecer contraseña a 123456"
+                      title="Generar una nueva contraseña temporal"
                       className="p-2 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
                     >
                       <KeyRound size={16} />

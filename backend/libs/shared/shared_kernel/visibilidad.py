@@ -16,14 +16,13 @@ Algunos servicios necesitan preguntarle algo a otro (ej. procesos-seleccion preg
 empresas-vacantes qué anuncios puede ver el usuario). Para eso está `llamar_a_servicio`:
 firma la llamada igual que el Gateway y reenvía la identidad del usuario.
 """
-import time
 from typing import Any
 from urllib.parse import quote
 
 import httpx
 
 from shared_kernel.exceptions import ServicioNoDisponible
-from shared_kernel.security import firmar_peticion_gateway
+from shared_kernel.firma_http import gancho_de_firma
 
 # Roles a los que se les limitan las empresas.
 ROLES_CON_EMPRESAS_ASIGNADAS = {"RRHH", "Supervisor"}
@@ -52,33 +51,44 @@ def cabeceras_de_usuario(usuario: dict[str, Any]) -> dict[str, str]:
     }
     if usuario.get("empresas") is not None:
         cabeceras["X-Usuario-Empresas"] = ",".join(str(i) for i in sorted(usuario["empresas"]))
+    if usuario.get("postulante_id"):
+        cabeceras["X-Usuario-Postulante-Id"] = str(usuario["postulante_id"])
     return cabeceras
 
 
 async def llamar_a_servicio(
-    url_base: str | None, ruta: str, usuario: dict[str, Any], secreto_gateway: str
+    url_base: str | None,
+    ruta: str,
+    usuario: dict[str, Any],
+    secreto_gateway: str,
+    permitir_404: bool = False,
+    metodo: str = "GET",
+    json: Any = None,
 ) -> Any:
-    """Hace un GET a otro microservicio, en nombre del usuario, y devuelve su JSON.
+    """Hace una petición (GET por defecto) a otro microservicio, en nombre del usuario, y
+    devuelve su JSON.
 
     La llamada lleva la firma del Gateway (misma clave compartida) y la identidad del
     usuario, así el otro servicio aplica el mismo filtro de empresas. Si el servicio no
     responde, se lanza `ServicioNoDisponible` (503): no se "adivina" una respuesta.
+
+    Con `permitir_404=True`, un 404 ("no existe" o "no lo puedes ver") devuelve None en vez
+    de error: sirve para preguntar "¿existe este anuncio?".
     """
     if not url_base:
         raise ServicioNoDisponible("Falta configurar la dirección de otro servicio interno")
 
-    timestamp = str(time.time())
-    cabeceras = {
-        "X-Gateway-Timestamp": timestamp,
-        "X-Gateway-Signature": firmar_peticion_gateway(secreto_gateway, timestamp),
-        **cabeceras_de_usuario(usuario),
-    }
     try:
-        async with httpx.AsyncClient(timeout=_TIEMPO_MAXIMO_SEGUNDOS) as cliente:
-            respuesta = await cliente.get(f"{url_base}{ruta}", headers=cabeceras)
+        # La firma la pone el "gancho" justo antes de enviar (ver shared_kernel/firma_http.py).
+        async with httpx.AsyncClient(
+            timeout=_TIEMPO_MAXIMO_SEGUNDOS, event_hooks={"request": [gancho_de_firma(secreto_gateway)]}
+        ) as cliente:
+            respuesta = await cliente.request(metodo, f"{url_base}{ruta}", headers=cabeceras_de_usuario(usuario), json=json)
     except httpx.HTTPError as exc:
         raise ServicioNoDisponible("No se pudo consultar otro servicio interno. Intenta nuevamente.") from exc
 
+    if permitir_404 and respuesta.status_code == 404:
+        return None
     if respuesta.status_code != 200:
         raise ServicioNoDisponible("Otro servicio interno respondió con un error. Intenta nuevamente.")
     return respuesta.json()

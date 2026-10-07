@@ -5,12 +5,12 @@ firmadas con HMAC (ver app/api/deps.py -> verificar_peticion_del_gateway).
 """
 import hashlib
 import secrets
-from datetime import date, datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone
 
 from urllib.parse import quote
 
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Header, HTTPException, Response, UploadFile, status
-from sqlalchemy import select, update
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
@@ -22,9 +22,13 @@ from app.domain.postulantes import (
     VERSION_TERMINOS,
     validar_archivo,
     validar_consentimiento_obligatorio,
+    validar_documento,
+    validar_lista_libre,
+    validar_telefono,
 )
+from shared_kernel.fechas import hoy_en_peru
 from app.infrastructure.correo import enviar_correo_recuperacion
-from app.infrastructure.models import Documento, Postulante, TokenRecuperacion, Usuario
+from app.infrastructure.models import Documento, InvitacionCuenta, Postulante, TokenRecuperacion, Usuario
 from app.infrastructure.storage import descargar_archivo, eliminar_archivo, subir_archivo
 from app.schemas.auth import (
     AceptarTerminosEntrada,
@@ -61,6 +65,10 @@ async def registrar_cuenta_postulante(
     # 1. Validar consentimiento obligatorio de tratamiento de datos personales (Ley N.º 29733)
     validar_consentimiento_obligatorio(datos.aceptaTratamientoDatos, "Postulante")
 
+    # 1b. Formato del documento de identidad y del teléfono
+    validar_documento(datos.documentoTipo, datos.documentoNumero)
+    validar_telefono(datos.telefono)
+
     # 2. Validar política de seguridad de la contraseña
     es_valida, motivo_error = validar_politica_password(datos.password, str(datos.email))
     if not es_valida:
@@ -75,11 +83,41 @@ async def registrar_cuenta_postulante(
         # Respuesta neutra para evitar enumeración de correos
         raise ConflictoDeEstado("Si el correo ya está registrado, inicia sesión o recupera tu contraseña")
 
-    # 4. ¿Existe un postulante previo registrado por RRHH con este correo?
-    consulta_postulante = select(Postulante).where(Postulante.email == email_limpio)
-    postulante = (await sesion.execute(consulta_postulante)).scalar_one_or_none()
-
     ahora = datetime.now(timezone.utc)
+
+    # 4. ¿La persona ya estaba registrada por RRHH? Entonces SOLO puede crear la cuenta con el enlace
+    # de invitación que llegó a su correo: así nadie que conozca su correo puede quedarse con su
+    # perfil (DNI, teléfono, CV).
+    if datos.invitacion:
+        invitacion = (
+            await sesion.execute(
+                select(InvitacionCuenta).where(
+                    InvitacionCuenta.token_hash == hashlib.sha256(datos.invitacion.encode("utf-8")).hexdigest(),
+                    InvitacionCuenta.usado_en.is_(None),
+                    InvitacionCuenta.expira_en > ahora,
+                )
+            )
+        ).scalar_one_or_none()
+        postulante = await sesion.get(Postulante, invitacion.postulante_id) if invitacion else None
+        if postulante is None:
+            raise SolicitudInvalida(
+                "El enlace de invitación no es válido o venció. Pide a la consultora que te envíe uno nuevo."
+            )
+        if postulante.email.strip().lower() != email_limpio:
+            raise SolicitudInvalida("Usa el mismo correo al que te llegó la invitación")
+        ya_tiene_cuenta = select(Usuario.id).where(Usuario.postulante_id == postulante.id)
+        if (await sesion.execute(ya_tiene_cuenta)).first() is not None:
+            raise ConflictoDeEstado("Este perfil ya tiene una cuenta: inicia sesión o recupera tu contraseña")
+        invitacion.usado_en = ahora
+    else:
+        # lower(): los postulantes que RRHH registró antes de normalizar el correo pueden tenerlo con mayúsculas.
+        consulta_postulante = select(Postulante).where(func.lower(Postulante.email) == email_limpio)
+        postulante = (await sesion.execute(consulta_postulante)).scalar_one_or_none()
+        if postulante is not None:
+            raise ConflictoDeEstado(
+                "Este correo ya está en nuestra base de postulantes. Para crear tu cuenta usa el enlace de "
+                "invitación que te enviamos por correo (o pide a la consultora que te lo reenvíe)."
+            )
 
     if postulante is not None:
         # Enlazar la cuenta de usuario al postulante existente sin sobrescribir datos ya llenados
@@ -114,7 +152,7 @@ async def registrar_cuenta_postulante(
             fecha_aceptacion_consentimiento=ahora,
             version_terminos_aceptados=VERSION_TERMINOS,
             ip_aceptacion=datos.ip,
-            fecha_registro=date.today(),
+            fecha_registro=hoy_en_peru(),
         )
         sesion.add(postulante)
         await sesion.flush()  # Obtener el id generado
@@ -305,6 +343,23 @@ async def restablecer_password(
     return MensajeRespuesta(mensaje="Tu contraseña ha sido restablecida exitosamente")
 
 
+@router.get("/estado-sesion")
+async def obtener_estado_sesion(
+    x_usuario_id: str = Header(...),
+    sesion: AsyncSession = Depends(obtener_sesion_lectura),
+) -> dict:
+    """Lo mínimo para que el Gateway decida si un token de postulante sigue valiendo (lo consulta en
+    cada petición con sesión, ver gateway/app/api/deps.py): si la cuenta está activa y cuándo cambió
+    su contraseña por última vez. Liviano a propósito: no trae el perfil."""
+    usuario = await sesion.get(Usuario, x_usuario_id)
+    if usuario is None:
+        raise RecursoNoEncontrado("Usuario no encontrado")
+    return {
+        "estado": usuario.estado,
+        "passwordCambiadaEn": usuario.password_cambiada_en.isoformat() if usuario.password_cambiada_en else None,
+    }
+
+
 @router.get("/me", response_model=MePostulanteRespuesta)
 async def obtener_perfil_me(
     x_usuario_id: str = Header(...),
@@ -367,6 +422,22 @@ async def actualizar_perfil_me(
     p = usuario.postulante
     cambios = datos.model_dump(exclude_unset=True)
 
+    # El documento de identidad no se cambia desde el perfil: es lo que identifica a la persona ante
+    # la consultora (y no puede repetirse). Si el formulario lo manda igual que estaba, se ignora.
+    for campo_json, actual in (("documentoTipo", p.documento_tipo), ("documentoNumero", p.documento_numero)):
+        if campo_json in cambios:
+            if (cambios[campo_json] or "").strip() != (actual or ""):
+                raise SolicitudInvalida(
+                    "El documento de identidad no se puede cambiar desde tu perfil. "
+                    "Si hay un error, comunícate con la consultora."
+                )
+            del cambios[campo_json]
+    if "telefono" in cambios:
+        validar_telefono(cambios["telefono"])
+    validar_lista_libre("Formación académica", cambios.get("formacionAcademica"))
+    validar_lista_libre("Idiomas", cambios.get("idiomas"))
+    validar_lista_libre("Experiencia", cambios.get("experiencia"))
+
     # Mapeo de camelCase a snake_case
     mapeo = {
         "nombres": "nombres",
@@ -426,6 +497,11 @@ async def aceptar_terminos_vigentes(
     postulante = await sesion.get(Postulante, usuario.postulante_id)
     if postulante is None:
         raise RecursoNoEncontrado("Postulante no encontrado")
+
+    # Solo se puede aceptar la versión VIGENTE: guardar otra dejaría una constancia falsa de qué
+    # texto aceptó la persona (la prueba del consentimiento que pide la Ley N.º 29733).
+    if datos.version != VERSION_TERMINOS:
+        raise SolicitudInvalida(f"La versión vigente de los términos es {VERSION_TERMINOS}")
 
     ahora = datetime.now(timezone.utc)
     postulante.version_terminos_aceptados = datos.version
@@ -498,7 +574,7 @@ async def subir_cv_me(
 
     # Se lee como máximo 1 byte más del límite: alcanza para saber que se pasó.
     contenido = await archivo.read(TAMANO_MAXIMO_BYTES + 1)
-    validar_archivo(_TIPO_CV, archivo.content_type, len(contenido))
+    validar_archivo(_TIPO_CV, archivo.content_type, contenido)
 
     # Se sube el archivo NUEVO primero; recién si salió bien se borra el viejo.
     subido = await subir_archivo(contenido, archivo.content_type, postulante.id)
@@ -536,7 +612,10 @@ async def obtener_cv_me(
     return Response(
         content=contenido,
         media_type=documento.tipo_contenido or tipo_de_archivo,
-        headers={"Content-Disposition": f"inline; filename*=UTF-8''{quote(documento.nombre_archivo)}"},
+        headers={
+            "Content-Disposition": f"inline; filename*=UTF-8''{quote(documento.nombre_archivo)}",
+            "X-Content-Type-Options": "nosniff",
+        },
     )
 
 

@@ -58,7 +58,7 @@ async def _leer_y_validar(archivo: UploadFile, tipo: str) -> bytes:
     # Se lee como máximo 1 byte más del límite: alcanza para saber que se pasó,
     # sin cargar en memoria un archivo enorme.
     contenido = await archivo.read(TAMANO_MAXIMO_BYTES + 1)
-    validar_archivo(tipo, archivo.content_type, len(contenido))
+    validar_archivo(tipo, archivo.content_type, contenido)
     return contenido
 
 
@@ -100,7 +100,12 @@ async def obtener_contenido_documento(
     return Response(
         content=contenido,
         media_type=documento.tipo_contenido or tipo_de_archivo,
-        headers={"Content-Disposition": f"inline; filename*=UTF-8''{quote(documento.nombre_archivo)}"},
+        headers={
+            "Content-Disposition": f"inline; filename*=UTF-8''{quote(documento.nombre_archivo)}",
+            # Que el navegador respete el tipo declarado y no "adivine" (evita que un archivo
+            # disfrazado se ejecute como HTML/JS).
+            "X-Content-Type-Options": "nosniff",
+        },
     )
 
 

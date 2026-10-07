@@ -5,6 +5,7 @@
 // GATEWAY_INTERNAL_URL; esta ruta expone los mismos datos al cliente.)
 import { NextRequest, NextResponse } from 'next/server';
 import { reenviarAlGateway } from '@/lib/gatewayProxy';
+import { cabecerasIpCliente } from '@/lib/ipCliente';
 
 export async function GET(request: NextRequest) {
   const limite = request.nextUrl.searchParams.get('limite') ?? '100';
@@ -12,7 +13,7 @@ export async function GET(request: NextRequest) {
   try {
     const respuestaGateway = await reenviarAlGateway(
       `/publico/anuncios?limite=${encodeURIComponent(limite)}`,
-      { method: 'GET' }
+      { method: 'GET', headers: cabecerasIpCliente(request) }
     );
     const data = await respuestaGateway.json().catch(() => []);
     return NextResponse.json(data, { status: respuestaGateway.status });

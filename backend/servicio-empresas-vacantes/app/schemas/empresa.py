@@ -39,7 +39,25 @@ class _EmpresaCamposComunes(BaseModel):
     def validar_razon_social(cls, valor: str) -> str:
         if len(valor.strip()) < 3:
             raise ValueError("La razón social debe tener al menos 3 caracteres")
+        if len(valor) > 255:
+            raise ValueError("La razón social no puede exceder 255 caracteres")
         return valor.strip()
+
+    @field_validator("contactoNombre")
+    @classmethod
+    def validar_contacto_nombre(cls, valor: str) -> str:
+        if not valor.strip():
+            raise ValueError("Indica el nombre del contacto")
+        if len(valor) > 150:
+            raise ValueError("El nombre del contacto no puede exceder 150 caracteres")
+        return valor.strip()
+
+    @field_validator("sector")
+    @classmethod
+    def validar_sector(cls, valor: str | None) -> str | None:
+        if valor is not None and len(valor) > 100:
+            raise ValueError("El sector no puede exceder 100 caracteres")
+        return valor.strip() if valor else valor
 
     @field_validator("ruc")
     @classmethod
@@ -51,9 +69,9 @@ class _EmpresaCamposComunes(BaseModel):
     @field_validator("contactoEmail")
     @classmethod
     def validar_email(cls, valor: str) -> str:
-        if not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", valor):
+        if len(valor) > 255 or not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", valor):
             raise ValueError("Ingresa un email válido (ej: nombre@empresa.com)")
-        return valor
+        return valor.strip().lower()
 
     @field_validator("contactoTelefono")
     @classmethod
@@ -61,7 +79,9 @@ class _EmpresaCamposComunes(BaseModel):
         solo_numeros = re.sub(r"\D", "", valor)
         if len(solo_numeros) < 9:
             raise ValueError("El teléfono debe tener al menos 9 dígitos")
-        return valor
+        if len(valor) > 30 or not re.fullmatch(r"\+?[0-9 ()-]+", valor.strip()):
+            raise ValueError("El teléfono solo puede tener números, +, espacios o guiones (máx. 30)")
+        return valor.strip()
 
 
 class EmpresaCrear(_EmpresaCamposComunes):

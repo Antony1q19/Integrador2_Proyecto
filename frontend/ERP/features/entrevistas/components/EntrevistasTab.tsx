@@ -9,7 +9,7 @@ import { CalendarClock, ExternalLink, MapPin, Phone, Plus, Video } from "lucide-
 import { Skeleton } from "@/components/shared/Skeleton";
 import { ToastContainer, useToast } from "@/components/shared/Toast";
 import { useReferenciasSeleccion } from "@/features/postulantes/hooks/useReferenciasSeleccion";
-import { useCookieValue } from "@/lib/useCookieValue";
+import { usePermisos } from "@/lib/usePermisos";
 import { useCargaConCache } from "@/lib/cacheCliente";
 import { formatoFechaHora } from "@/lib/fechasLima";
 import { claveEntrevistas, fetchEntrevistas } from "../services/entrevistasService";
@@ -44,7 +44,8 @@ export function EntrevistasTab({ postulanteId, onCambio }: EntrevistasTabProps) 
   const { vacante } = useReferenciasSeleccion();
   const { toasts, mostrarToast } = useToast();
   const [programando, setProgramando] = useState(false);
-  const puedeEditar = useCookieValue("userRole") !== "Supervisor";
+  // Admin, Supervisor y RRHH gestionan entrevistas y contrataciones (ver lib/permisos.ts).
+  const puedeEditar = usePermisos().puedeGestionarSeleccion;
 
   // Primero las próximas (por fecha), luego las cerradas (la más reciente arriba).
   const ordenadas = useMemo(() => {

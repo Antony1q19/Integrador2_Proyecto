@@ -3,6 +3,7 @@
 // Solicita el enlace de recuperación de contraseña al Gateway.
 import { NextRequest, NextResponse } from 'next/server';
 import { reenviarAlGateway } from '@/lib/gatewayProxy';
+import { cabecerasIpCliente } from '@/lib/ipCliente';
 import { esOrigenValido } from '@/lib/csrf';
 
 export async function POST(request: NextRequest) {
@@ -18,6 +19,7 @@ export async function POST(request: NextRequest) {
   try {
     const respuestaGateway = await reenviarAlGateway('/publico/auth/recuperar-password', {
       method: 'POST',
+      headers: cabecerasIpCliente(request),
       body: JSON.stringify({ email: cuerpo.email }),
     });
 

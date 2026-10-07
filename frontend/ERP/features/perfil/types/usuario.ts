@@ -10,6 +10,8 @@ export interface Usuario {
   estado: EstadoUsuario;
   empresasVisibles: number[];
   fechaCreacion: string;
+  // true = aún no cambió la contraseña temporal que se le generó.
+  debeCambiarPassword?: boolean;
 }
 
 // Solo la trae la respuesta de crear/restablecer contraseña, nunca el listado.

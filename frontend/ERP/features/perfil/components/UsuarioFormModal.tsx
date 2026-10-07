@@ -14,7 +14,7 @@ import { RolInterno, Usuario } from "../types/usuario";
 
 interface UsuarioFormModalProps {
   usuarioExistente: Usuario | null; // null = modo "crear"
-  onGuardado: (usuarioCreadoConPasswordTemporal?: string) => void;
+  onGuardado: (creado?: { nombre: string; passwordTemporal: string }) => void;
   onCerrar: () => void;
 }
 
@@ -64,7 +64,7 @@ export function UsuarioFormModal({ usuarioExistente, onGuardado, onCerrar }: Usu
         onGuardado();
       } else {
         const creado = await crearUsuario({ nombre, email, rol, empresasVisibles });
-        onGuardado(creado.passwordTemporal);
+        onGuardado({ nombre: creado.nombre, passwordTemporal: creado.passwordTemporal });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo guardar");
@@ -170,8 +170,8 @@ export function UsuarioFormModal({ usuarioExistente, onGuardado, onCerrar }: Usu
 
           {!esEdicion && (
             <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-lg p-3">
-              La contraseña temporal será <strong>123456</strong>. Compártela con el trabajador; puede
-              cambiarla luego desde su propio &quot;Mi Perfil&quot;.
+              Se generará una contraseña temporal aleatoria y se mostrará una sola vez. Compártela con el
+              trabajador; debe cambiarla luego desde su propio &quot;Mi Perfil&quot;.
             </p>
           )}
 

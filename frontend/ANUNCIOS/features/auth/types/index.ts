@@ -25,4 +25,6 @@ export interface DatosRegistroPostulante {
   password: string;
   aceptaTratamientoDatos: boolean;
   aceptaComunicaciones: boolean;
+  // Token del enlace de invitación de RRHH (?invitacion=...), si se llegó por ahí.
+  invitacion?: string;
 }

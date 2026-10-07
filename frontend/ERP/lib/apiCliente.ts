@@ -10,7 +10,7 @@ import { vaciarCache } from "@/lib/cacheCliente";
 export function sesionVencida(): string {
   vaciarCache();
   if (typeof document !== "undefined") {
-    for (const nombre of ["userRole", "userName", "userEmail", "userEmpresas"]) {
+    for (const nombre of ["userRole", "userName", "userEmail", "userEmpresas", "cambioPassword"]) {
       document.cookie = `${nombre}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
     }
     // Recarga completa (no router.push) a propósito: así se descarta todo el estado en memoria.

@@ -5,33 +5,40 @@ Actualizar...) o los que se le devuelven (Respuesta).
 """
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 
 class UsuarioCrear(BaseModel):
-    """Datos para crear un trabajador. NO incluye contraseña: se le asigna 123456."""
+    """Datos para crear un trabajador. NO incluye contraseña: se le genera una temporal aleatoria."""
 
-    nombre: str
-    email: EmailStr
-    rol: str  # Admin | RRHH | Supervisor (se valida en el endpoint)
-    empresasVisibles: list[int] = []
+    nombre: str = Field(min_length=2, max_length=255)
+    email: EmailStr = Field(max_length=255)
+    rol: str = Field(max_length=50)  # Admin | RRHH | Supervisor (se valida en el endpoint)
+    empresasVisibles: list[int] = Field(default=[], max_length=500)
+
+    @field_validator("email")
+    @classmethod
+    def normalizar_email(cls, valor: str) -> str:
+        """Siempre en minúsculas: así el login no depende de cómo se escribió."""
+        return valor.strip().lower()
 
 
 class UsuarioActualizar(BaseModel):
     """Datos que se pueden editar. Todos opcionales: solo se cambia lo que se envíe."""
 
-    nombre: str | None = None
-    rol: str | None = None
-    empresasVisibles: list[int] | None = None
+    nombre: str | None = Field(default=None, min_length=2, max_length=255)
+    rol: str | None = Field(default=None, max_length=50)
+    empresasVisibles: list[int] | None = Field(default=None, max_length=500)
 
 
 class CambiarEstadoRequest(BaseModel):
-    estado: str  # Activo | Suspendido | Eliminado
+    estado: str = Field(max_length=20)  # Activo | Suspendido | Eliminado
 
 
 class CambiarPasswordPropio(BaseModel):
-    passwordActual: str
-    passwordNuevo: str = Field(min_length=6)
+    passwordActual: str = Field(max_length=128)
+    # La política completa (mayúscula, minúscula, número...) se valida en el endpoint.
+    passwordNuevo: str = Field(min_length=8, max_length=128)
 
 
 class UsuarioRespuesta(BaseModel):
@@ -48,6 +55,8 @@ class UsuarioRespuesta(BaseModel):
     # validation_alias dice: "lee este campo desde la columna con este otro nombre".
     empresasVisibles: list[int] = Field(validation_alias="empresas_visibles")
     fechaCreacion: datetime = Field(validation_alias="fecha_creacion")
+    # True = sigue con la contraseña temporal (aún no ingresó a cambiarla).
+    debeCambiarPassword: bool = Field(default=False, validation_alias="debe_cambiar_password")
 
 
 class UsuarioCreadoRespuesta(UsuarioRespuesta):

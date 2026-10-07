@@ -8,9 +8,11 @@ import ConfirmacionModal from "@/components/shared/ConfirmacionModal";
 interface EmpresasViewProps {
   empresas: Empresa[];
   onEliminar: (id: number) => Promise<void>;
+  /** Solo Admin puede eliminar empresas. */
+  puedeEliminar?: boolean;
 }
 
-export function EmpresasView({ empresas, onEliminar }: EmpresasViewProps) {
+export function EmpresasView({ empresas, onEliminar, puedeEliminar = true }: EmpresasViewProps) {
     const [empresaAEliminar, setEmpresaAEliminar] = useState<Empresa | null>(null);
     const [eliminando, setEliminando] = useState(false);
     const [errorPorFila, setErrorPorFila] = useState<Record<number, string>>({});
@@ -96,6 +98,7 @@ export function EmpresasView({ empresas, onEliminar }: EmpresasViewProps) {
                     {empresa.anunciosActivos}
                   </td>
                   <td className="px-6 py-4 text-center">
+                    {puedeEliminar && (
                     <button
                       type="button"
                       onClick={() => setEmpresaAEliminar(empresa)}
@@ -117,6 +120,7 @@ export function EmpresasView({ empresas, onEliminar }: EmpresasViewProps) {
                         />
                       </svg>
                     </button>
+                    )}
                     {errorPorFila[empresa.id] && (
                       <p className="mt-1 max-w-[160px] text-xs text-red-500">
                         {errorPorFila[empresa.id]}

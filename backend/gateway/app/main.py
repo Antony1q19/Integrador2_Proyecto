@@ -30,6 +30,7 @@ from app.api.v1 import auth, proxy, publico, publico_auth, publico_procesos, usu
 from app.core.config import settings
 from app.core.database import engine
 from app.core.http_client import cerrar_cliente
+from app.infrastructure.migraciones import aplicar_migraciones
 from app.infrastructure.seed import sembrar_datos_de_prueba
 from shared_kernel.database import calentar_conexiones, crear_tablas
 from shared_kernel.exceptions import registrar_manejadores_excepciones
@@ -48,6 +49,9 @@ async def lifespan(app: FastAPI):
     # tablas que ya existen (un cambio de columnas se hace a mano en Supabase).
     if settings.entorno == "desarrollo":
         await crear_tablas(engine)
+    # En cualquier entorno: agrega las columnas nuevas que falten en tablas ya existentes.
+    await aplicar_migraciones(engine)
+    if settings.entorno == "desarrollo":
         await sembrar_datos_de_prueba()
 
     # Abre las conexiones a la base ahora (en segundo plano) y no cuando llegue la primera petición.
@@ -69,6 +73,10 @@ app = FastAPI(
     description="Puerta de entrada: login, usuarios del ERP y reenvío hacia los microservicios.",
     version="1.0.0",
     lifespan=lifespan,
+    # La documentación interactiva (/docs) describe TODAS las rutas: solo se publica en desarrollo.
+    docs_url="/docs" if settings.entorno == "desarrollo" else None,
+    redoc_url="/redoc" if settings.entorno == "desarrollo" else None,
+    openapi_url="/openapi.json" if settings.entorno == "desarrollo" else None,
 )
 
 # CORS: sin esto, el navegador bloquearía las llamadas desde los frontends.
@@ -82,6 +90,20 @@ app.add_middleware(
 )
 
 registrar_manejadores_excepciones(app)
+
+
+@app.middleware("http")
+async def cabeceras_de_seguridad(request, call_next):
+    """Cabeceras de seguridad en TODAS las respuestas (también las que vienen de los microservicios):
+      - nosniff: el navegador respeta el tipo de archivo declarado (un "PDF" no se ejecuta como HTML).
+      - DENY: ninguna página puede mostrar estas respuestas dentro de un <iframe> (clickjacking).
+      - no-referrer: no se filtran URLs internas a otros sitios."""
+    respuesta = await call_next(request)
+    respuesta.headers.setdefault("X-Content-Type-Options", "nosniff")
+    respuesta.headers.setdefault("X-Frame-Options", "DENY")
+    respuesta.headers.setdefault("Referrer-Policy", "no-referrer")
+    return respuesta
+
 
 # Rutas. IMPORTANTE: el orden importa. FastAPI prueba las rutas en el orden
 # en que se registran, y "proxy" acepta CUALQUIER dirección bajo /api/v1, por

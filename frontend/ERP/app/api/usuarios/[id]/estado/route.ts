@@ -8,7 +8,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   if (!token) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
   const cuerpoPeticion = await request.text();
-  const respuesta = await reenviarAlGateway(token, `/usuarios/${id}/estado`, {
+  const respuesta = await reenviarAlGateway(token, `/usuarios/${encodeURIComponent(id)}/estado`, {
     method: "PATCH",
     body: cuerpoPeticion,
   });

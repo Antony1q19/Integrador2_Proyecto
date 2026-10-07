@@ -2,13 +2,18 @@
 
 Rutas (prefijo /entrevistas). El navegador las llama a través del Gateway, como /api/v1/entrevistas...:
     GET    /entrevistas?postulanteId=&anuncioId=&estado=&desde=&hasta=   → agenda / historial de entrevistas
-    POST   /entrevistas                                                  → programar una entrevista (Admin, RRHH)
-    PATCH  /entrevistas/{id}                                             → reprogramar, cerrar o anotar cómo salió (Admin, RRHH)
+    POST   /entrevistas                                                  → programar una entrevista (Admin, RRHH, Supervisor)
+    PATCH  /entrevistas/{id}                                             → reprogramar, cerrar o anotar cómo salió (Admin, RRHH, Supervisor)
 
 Como en todo el servicio, RRHH y Supervisor solo ven las entrevistas de postulaciones a anuncios de las
 empresas que un Admin les asignó; lo demás responde 404.
+
+Reglas del flujo:
+  - Solo se programan entrevistas en anuncios que no estén "Cerrado" y en una fecha y hora futura.
+  - Un entrevistador no puede tener dos entrevistas "Programadas" que se crucen en el horario.
+  - "Realizada" o "No asistió" solo se marcan cuando la hora de la entrevista ya pasó.
 """
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, status
 from sqlalchemy import select
@@ -17,13 +22,14 @@ from sqlalchemy.orm import contains_eager, joinedload
 
 from app.api.comunes import USUARIO_POR_DEFECTO, buscar_proceso, con_zona_horaria, entrevista_a_respuesta
 from app.api.deps import requerir_rol
-from app.api.visibilidad import anuncios_visibles
+from app.api.visibilidad import anuncios_visibles, obtener_anuncio
 from app.core.database import obtener_sesion, obtener_sesion_lectura
 from app.domain.dashboard import limites_del_rango
 from app.domain.seleccion import (
     ESTADOS_ENTREVISTA,
     MODALIDADES_ENTREVISTA,
     RESULTADOS_ENTREVISTA,
+    ZONA_PERU,
     exigir_postulacion_abierta,
     validar_opcion,
 )
@@ -32,6 +38,43 @@ from app.schemas.seleccion import EntrevistaActualizar, EntrevistaCrear, Entrevi
 from shared_kernel.exceptions import ConflictoDeEstado, RecursoNoEncontrado, SolicitudInvalida
 
 router = APIRouter(prefix="/entrevistas", tags=["entrevistas"])
+
+# Estados que dicen que la entrevista YA ocurrió (o debió ocurrir).
+_ESTADOS_QUE_EXIGEN_HORA_PASADA = {"Realizada", "No asistió"}
+
+
+def _con_zona(fecha: datetime) -> datetime:
+    """Las fechas que vuelven de la base pueden venir sin zona (SQLite): se entienden en UTC."""
+    return fecha if fecha.tzinfo is not None else fecha.replace(tzinfo=timezone.utc)
+
+
+def _exigir_futura(fecha_hora: datetime) -> None:
+    if _con_zona(fecha_hora) <= datetime.now(timezone.utc):
+        raise SolicitudInvalida("La entrevista debe programarse en una fecha y hora futura")
+
+
+async def _exigir_sin_cruce(
+    sesion: AsyncSession, entrevistador: str, inicio: datetime, duracion_min: int, excluir_id: str | None = None
+) -> None:
+    """El entrevistador no puede tener otra entrevista "Programada" que se cruce con este horario."""
+    inicio = _con_zona(inicio)
+    fin = inicio + timedelta(minutes=duracion_min)
+    # Las entrevistas duran como máximo 8 h (ver schemas): basta revisar las que empiezan 8 h antes.
+    candidatas = await sesion.execute(
+        select(Entrevista).where(
+            Entrevista.entrevistador == entrevistador,
+            Entrevista.estado == "Programada",
+            Entrevista.fecha_hora < fin,
+            Entrevista.fecha_hora > inicio - timedelta(hours=8),
+        )
+    )
+    for otra in candidatas.scalars().all():
+        if otra.id == excluir_id:
+            continue
+        otra_inicio = _con_zona(otra.fecha_hora)
+        if otra_inicio + timedelta(minutes=otra.duracion_min) > inicio:
+            hora = otra_inicio.astimezone(ZONA_PERU).strftime("%d/%m/%Y %H:%M")
+            raise ConflictoDeEstado(f"{entrevistador} ya tiene una entrevista programada que se cruza ({hora})")
 
 
 # ---------------------------------------------------------------------------
@@ -81,13 +124,14 @@ async def listar_entrevistas(
 async def programar_entrevista(
     datos: EntrevistaCrear,
     sesion: AsyncSession = Depends(obtener_sesion),
-    usuario: dict = Depends(requerir_rol("Admin", "RRHH")),
+    usuario: dict = Depends(requerir_rol("Admin", "RRHH", "Supervisor")),
 ) -> EntrevistaRespuesta:
-    # PASO 1: datos válidos y anuncio de una empresa que el usuario puede ver.
+    # PASO 1: datos válidos, fecha futura y anuncio (no cerrado) de una empresa que el usuario puede ver.
     validar_opcion(datos.modalidad, MODALIDADES_ENTREVISTA, "Modalidad")
-    visibles = await anuncios_visibles(usuario)
-    if visibles is not None and datos.anuncioId not in visibles:
-        raise RecursoNoEncontrado("Anuncio no encontrado")
+    _exigir_futura(con_zona_horaria(datos.fechaHora))
+    anuncio = await obtener_anuncio(usuario, datos.anuncioId)
+    if anuncio.get("estado") == "Cerrado":
+        raise ConflictoDeEstado("El anuncio está cerrado: ya no se programan entrevistas")
 
     # PASO 2: la postulación debe existir y seguir abierta.
     proceso = await buscar_proceso(sesion, datos.postulanteId, datos.anuncioId)
@@ -99,6 +143,7 @@ async def programar_entrevista(
 
     # PASO 3: crear la entrevista. Si nadie indicó quién entrevista, es quien la programa.
     nombre = usuario["nombre"] or USUARIO_POR_DEFECTO
+    await _exigir_sin_cruce(sesion, datos.entrevistador or nombre, con_zona_horaria(datos.fechaHora), datos.duracionMin)
     entrevista = Entrevista(
         proceso=proceso,
         fecha_hora=con_zona_horaria(datos.fechaHora),
@@ -135,7 +180,7 @@ async def actualizar_entrevista(
     entrevista_id: str,
     datos: EntrevistaActualizar,
     sesion: AsyncSession = Depends(obtener_sesion),
-    usuario: dict = Depends(requerir_rol("Admin", "RRHH")),
+    usuario: dict = Depends(requerir_rol("Admin", "RRHH", "Supervisor")),
 ) -> EntrevistaRespuesta:
     resultado = await sesion.execute(
         select(Entrevista).options(joinedload(Entrevista.proceso)).where(Entrevista.id == entrevista_id)
@@ -150,10 +195,22 @@ async def actualizar_entrevista(
     validar_opcion(cambios.get("estado"), ESTADOS_ENTREVISTA, "Estado")
     validar_opcion(cambios.get("resultado"), RESULTADOS_ENTREVISTA, "Resultado")
 
-    estado_final = cambios.get("estado", entrevista.estado)
+    estado_final = cambios.get("estado") or entrevista.estado
     # El resultado solo tiene sentido en una entrevista ya realizada.
     if cambios.get("resultado") and estado_final != "Realizada":
         raise SolicitudInvalida("El resultado solo se registra en una entrevista realizada")
+
+    # Cómo queda la entrevista después del cambio (para validar el horario).
+    fecha_final = con_zona_horaria(cambios["fechaHora"]) if cambios.get("fechaHora") else entrevista.fecha_hora
+    duracion_final = cambios.get("duracionMin") or entrevista.duracion_min
+    entrevistador_final = cambios.get("entrevistador") or entrevista.entrevistador
+    if estado_final in _ESTADOS_QUE_EXIGEN_HORA_PASADA and _con_zona(fecha_final) > datetime.now(timezone.utc):
+        raise SolicitudInvalida(f"No se puede marcar como \"{estado_final}\" una entrevista que aún no ocurre")
+    if estado_final == "Programada":
+        if cambios.get("fechaHora"):
+            _exigir_futura(fecha_final)
+        if cambios.get("fechaHora") or cambios.get("duracionMin") or cambios.get("entrevistador") or cambios.get("estado"):
+            await _exigir_sin_cruce(sesion, entrevistador_final, fecha_final, duracion_final, excluir_id=entrevista.id)
 
     if "fechaHora" in cambios and cambios["fechaHora"] is not None:
         entrevista.fecha_hora = con_zona_horaria(cambios["fechaHora"])

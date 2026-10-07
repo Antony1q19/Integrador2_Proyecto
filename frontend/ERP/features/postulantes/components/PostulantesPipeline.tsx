@@ -140,8 +140,9 @@ export function PostulantesPipeline() {
         `${tarjeta.postulante.datosPersonales.nombres} ${tarjeta.postulante.datosPersonales.apellidos} · "${tarjeta.anuncio.cargo}" pasó a "${ESTILOS_ESTADO[estadoDestino].label}"`,
         "success"
       );
-    } catch {
-      mostrarToast("No se pudo actualizar el estado. Intenta nuevamente.", "error");
+    } catch (err) {
+      // El backend explica por qué rechaza un cambio (ej. sacar una tarjeta de "Descartado" sin revertir).
+      mostrarToast(err instanceof Error ? err.message : "No se pudo actualizar el estado. Intenta nuevamente.", "error");
     }
   };
 

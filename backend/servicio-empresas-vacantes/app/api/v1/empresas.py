@@ -2,24 +2,27 @@
 
 Rutas (prefijo /empresas). El navegador las llama a través del Gateway, como
 /api/v1/empresas...:
-    GET    /empresas        → listar las empresas que el usuario puede ver
-    GET    /empresas/{id}   → ver una
-    POST   /empresas        → crear una
-    PUT    /empresas/{id}   → editar una
-    DELETE /empresas/{id}   → eliminar una (borrado lógico)
+    GET    /empresas        → listar las empresas que el usuario puede ver (todos los roles)
+    GET    /empresas/{id}   → ver una                                        (todos los roles)
+    POST   /empresas        → crear una                                      (Admin)
+    PUT    /empresas/{id}   → editar una                                     (Admin, Supervisor)
+    DELETE /empresas/{id}   → eliminar una (borrado lógico)                  (Admin)
 
 Un Admin ve todas; RRHH y Supervisor solo las que un Admin les asignó en /perfil
 (ver shared_kernel/visibilidad.py).
 
-Un Admin ve/edita todas las empresas; RRHH solo las que un Admin le asignó en
-/perfil (ver shared_kernel/visibilidad.py).
+Permisos (matriz de roles del sistema):
+  - Admin: todo.
+  - Supervisor: ve y gestiona lo de las empresas que tiene asignadas: crea, edita, cambia de estado
+    y elimina sus ANUNCIOS; edita los datos de sus empresas (no crea ni elimina empresas).
+  - RRHH (reclutamiento): solo VE anuncios y empresas (de sus empresas asignadas); no los crea ni
+    los modifica.
 
 Una empresa "eliminada" (borrado lógico) nunca aparece en estas consultas, como
 si de verdad no existiera.
 """
 from fastapi import APIRouter, Depends
 from sqlalchemy import func, select
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import requerir_rol
@@ -27,7 +30,7 @@ from app.core.database import obtener_sesion_lectura, obtener_sesion
 from app.infrastructure.models import Anuncio, Empresa
 from app.schemas.empresa import EmpresaRespuesta, EmpresaActualizar, EmpresaCrear
 from app.domain import empresas as empresas_domain
-from shared_kernel.exceptions import RecursoNoEncontrado, ConflictoDeEstado
+from shared_kernel.exceptions import RecursoNoEncontrado
 
 router = APIRouter(prefix="/empresas", tags=["empresas"])
 
@@ -105,7 +108,8 @@ async def obtener_empresa(
 async def crear_empresa(
     datos: EmpresaCrear,
     sesion: AsyncSession = Depends(obtener_sesion),
-    usuario: dict = Depends(requerir_rol("Admin", "RRHH")),
+    # Solo Admin: una empresa nueva no está asignada a nadie todavía.
+    usuario: dict = Depends(requerir_rol("Admin")),
 ) -> EmpresaRespuesta:
     empresa = await empresas_domain.crear_empresa(sesion, datos)
     return _a_respuesta(empresa, 0)
@@ -115,7 +119,7 @@ async def actualizar_empresa(
     empresa_id: int,
     datos: EmpresaActualizar,
     sesion: AsyncSession = Depends(obtener_sesion),
-    usuario: dict = Depends(requerir_rol("Admin", "RRHH")),
+    usuario: dict = Depends(requerir_rol("Admin", "Supervisor")),  # Supervisor: solo sus empresas
 ) -> EmpresaRespuesta:
     empresa = await _buscar_empresa_o_404(sesion, empresa_id, usuario)
     await empresas_domain.actualizar_empresa(sesion, empresa, datos)
@@ -128,7 +132,7 @@ async def actualizar_empresa(
 async def eliminar_empresa(
     empresa_id: int,
     sesion: AsyncSession = Depends(obtener_sesion),
-    usuario: dict = Depends(requerir_rol("Admin", "RRHH")),
+    usuario: dict = Depends(requerir_rol("Admin")),
 ) -> None:
     empresa = await _buscar_empresa_o_404(sesion, empresa_id, usuario)
     await empresas_domain.eliminar_empresa(sesion, empresa)

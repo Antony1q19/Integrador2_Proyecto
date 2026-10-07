@@ -10,6 +10,7 @@ import { UsuariosTable } from "./UsuariosTable";
 import { UsuarioFormModal } from "./UsuarioFormModal";
 import { ConfirmarEliminacionModal } from "./ConfirmarEliminacionModal";
 import ConfirmacionModal from "@/components/shared/ConfirmacionModal";
+import { PasswordTemporalModal } from "./PasswordTemporalModal";
 import {
   listarUsuarios,
   restablecerPassword,
@@ -30,6 +31,8 @@ export function PerfilView() {
   // Restablecer la contraseña pide confirmación antes (ver ConfirmacionModal al final).
   const [usuarioARestablecer, setUsuarioARestablecer] = useState<Usuario | null>(null);
   const [restableciendo, setRestableciendo] = useState(false);
+  // Contraseña temporal recién generada: se muestra una sola vez en su propia ventana.
+  const [passwordGenerada, setPasswordGenerada] = useState<{ titulo: string; nombre: string; password: string } | null>(null);
   const { toasts, mostrarToast } = useToast();
 
   // Lectura síncrona de cookies (sin useEffect+setState) para no disparar
@@ -39,7 +42,10 @@ export function PerfilView() {
   const userEmail = decodeURIComponent(useCookieValue("userEmail"));
   const misDatos = { name: userName, role: userRole, email: userEmail };
 
-  const esAdmin = misDatos.role === "Admin";
+  // Entró con una contraseña temporal (cookie que pone app/api/auth/login): hasta cambiarla, el
+  // Gateway solo le permite eso, así que se oculta la gestión de trabajadores.
+  const cambioPendiente = useCookieValue("cambioPassword") === "1";
+  const esAdmin = misDatos.role === "Admin" && !cambioPendiente;
 
   const cargarUsuarios = async () => {
     setCargandoUsuarios(true);
@@ -62,14 +68,13 @@ export function PerfilView() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [esAdmin, activeTab]);
 
-  const handleGuardado = (passwordTemporal?: string) => {
+  const handleGuardado = (creado?: { nombre: string; passwordTemporal: string }) => {
     setModalUsuario({ abierto: false, usuario: null });
-    mostrarToast(
-      passwordTemporal
-        ? `Trabajador creado. Contraseña temporal: ${passwordTemporal}`
-        : "Trabajador actualizado",
-      "success"
-    );
+    if (creado) {
+      setPasswordGenerada({ titulo: "Trabajador creado", nombre: creado.nombre, password: creado.passwordTemporal });
+    } else {
+      mostrarToast("Trabajador actualizado", "success");
+    }
     cargarUsuarios();
   };
 
@@ -80,7 +85,11 @@ export function PerfilView() {
     setRestableciendo(true);
     try {
       const actualizado = await restablecerPassword(usuarioARestablecer.id);
-      mostrarToast(`Nueva contraseña temporal de ${usuarioARestablecer.nombre}: ${actualizado.passwordTemporal}`, "success");
+      setPasswordGenerada({
+        titulo: "Contraseña restablecida",
+        nombre: usuarioARestablecer.nombre,
+        password: actualizado.passwordTemporal,
+      });
       setUsuarioARestablecer(null);
     } catch (err) {
       mostrarToast(err instanceof Error ? err.message : "No se pudo restablecer", "error");
@@ -126,6 +135,13 @@ export function PerfilView() {
         <h1 className="text-3xl font-bold text-slate-800 tracking-tight">Configuración de Cuenta</h1>
         <p className="text-slate-500 mt-1">Gestiona tu información personal y los accesos del equipo.</p>
       </div>
+
+      {cambioPendiente && (
+        <div role="alert" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+          <strong>Estás usando una contraseña temporal.</strong> Por seguridad, cámbiala ahora para poder usar el
+          resto del sistema. Después tendrás que iniciar sesión otra vez con tu nueva contraseña.
+        </div>
+      )}
 
       <div className="flex gap-4 border-b border-slate-200">
         <button
@@ -222,13 +238,22 @@ export function PerfilView() {
       {usuarioARestablecer && (
         <ConfirmacionModal
           titulo="¿Restablecer la contraseña?"
-          mensaje={`La contraseña de ${usuarioARestablecer.nombre} volverá a ser "123456". Compártela con el trabajador: puede cambiarla desde "Mi perfil".`}
+          mensaje={`Se generará una nueva contraseña temporal aleatoria para ${usuarioARestablecer.nombre} y la actual dejará de funcionar.`}
           labelConfirmar="Restablecer"
           labelConfirmando="Restableciendo…"
           variante="primario"
           confirmando={restableciendo}
           onConfirmar={() => void confirmarRestablecerPassword()}
           onCancelar={() => setUsuarioARestablecer(null)}
+        />
+      )}
+
+      {passwordGenerada && (
+        <PasswordTemporalModal
+          titulo={passwordGenerada.titulo}
+          nombreTrabajador={passwordGenerada.nombre}
+          password={passwordGenerada.password}
+          onCerrar={() => setPasswordGenerada(null)}
         />
       )}
 

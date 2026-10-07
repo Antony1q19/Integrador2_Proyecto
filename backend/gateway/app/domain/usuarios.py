@@ -1,9 +1,11 @@
 """Reglas de negocio de los trabajadores del ERP.
 
 "Reglas de negocio" = las decisiones propias de tu sistema (qué roles existen,
-cuál es la contraseña por defecto...). Están separadas de las rutas HTTP para
+cómo se genera la contraseña temporal...). Están separadas de las rutas HTTP para
 que si una regla cambia, se cambie aquí y en ningún otro sitio.
 """
+import secrets
+
 from shared_kernel.exceptions import SolicitudInvalida
 
 # Los únicos roles que puede tener un trabajador del ERP (y los únicos que pueden entrar al ERP).
@@ -13,8 +15,30 @@ ROLES_INTERNOS_ERP = {"Admin", "RRHH", "Supervisor"}
 # Los tres estados posibles de una cuenta.
 ESTADOS_VALIDOS = {"Activo", "Suspendido", "Eliminado"}
 
-# Contraseña con la que se crea a un trabajador nuevo o se le restablece la clave.
-PASSWORD_POR_DEFECTO = "123456"
+# Largo de la contraseña temporal que se genera al crear un trabajador o restablecer su clave.
+LARGO_PASSWORD_TEMPORAL = 12
+# Sin caracteres que se confunden al dictarlos o copiarlos (0/O, 1/l/I).
+_LETRAS_MAYUSCULAS = "ABCDEFGHJKLMNPQRSTUVWXYZ"
+_LETRAS_MINUSCULAS = "abcdefghijkmnopqrstuvwxyz"
+_DIGITOS = "23456789"
+
+
+def generar_password_temporal() -> str:
+    """Genera una contraseña temporal ALEATORIA (antes era siempre "123456", que cualquiera podía adivinar).
+
+    Usa `secrets` (generador criptográfico, no `random`) y siempre incluye al menos una
+    mayúscula, una minúscula y un número, para cumplir la política de contraseñas.
+    """
+    alfabeto = _LETRAS_MAYUSCULAS + _LETRAS_MINUSCULAS + _DIGITOS
+    obligatorios = [
+        secrets.choice(_LETRAS_MAYUSCULAS),
+        secrets.choice(_LETRAS_MINUSCULAS),
+        secrets.choice(_DIGITOS),
+    ]
+    resto = [secrets.choice(alfabeto) for _ in range(LARGO_PASSWORD_TEMPORAL - len(obligatorios))]
+    caracteres = obligatorios + resto
+    secrets.SystemRandom().shuffle(caracteres)
+    return "".join(caracteres)
 
 
 def validar_rol_interno(rol: str) -> None:

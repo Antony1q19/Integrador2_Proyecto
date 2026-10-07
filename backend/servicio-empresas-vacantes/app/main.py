@@ -49,6 +49,10 @@ app = FastAPI(
     description="Empresas cliente y sus anuncios (vacantes). Por ahora solo lectura de anuncios.",
     version="0.2.0",
     lifespan=lifespan,
+    # La documentación interactiva (/docs) describe TODAS las rutas: solo se publica en desarrollo.
+    docs_url="/docs" if settings.entorno == "desarrollo" else None,
+    redoc_url="/redoc" if settings.entorno == "desarrollo" else None,
+    openapi_url="/openapi.json" if settings.entorno == "desarrollo" else None,
 )
 
 registrar_manejadores_excepciones(app)  # convierte errores de negocio en respuestas HTTP

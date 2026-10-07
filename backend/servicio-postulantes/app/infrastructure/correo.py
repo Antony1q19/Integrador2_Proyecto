@@ -88,12 +88,14 @@ def _motivo_del_rechazo(respuesta: httpx.Response) -> str:
     return "El servicio de correo rechazó el envío. Revisa la configuración de Mailjet."
 
 
-def correo_solicitud_cuenta(nombres: str, email: str) -> tuple[str, str, str]:
+def correo_solicitud_cuenta(nombres: str, email: str, token_invitacion: str) -> tuple[str, str, str]:
     """Arma el correo que invita a un postulante a crear su cuenta en la bolsa de trabajo.
 
-    Devuelve (asunto, html, texto). El enlace lleva el correo ya escrito en el registro.
+    Devuelve (asunto, html, texto). El enlace lleva el correo ya escrito en el registro y el token
+    de invitación (de un solo uso, 7 días): sin él no se puede crear la cuenta de ese perfil.
     """
-    enlace = f"{settings.url_anuncios.rstrip('/')}/registro?{urlencode({'email': email})}"
+    parametros = urlencode({"invitacion": token_invitacion, "email": email})
+    enlace = f"{settings.url_anuncios.rstrip('/')}/registro?{parametros}"
     asunto = "Crea tu cuenta para seguir tu postulación"
 
     # html.escape: el nombre lo escribió una persona; así no puede "romper" ni inyectar nada en el HTML.
@@ -115,7 +117,8 @@ def correo_solicitud_cuenta(nombres: str, email: str) -> tuple[str, str, str]:
       Crear mi cuenta
     </a>
   </p>
-  <p style="line-height: 1.6;">Usa este mismo correo (<strong>{email_html}</strong>) al registrarte.</p>
+  <p style="line-height: 1.6;">Usa este mismo correo (<strong>{email_html}</strong>) al registrarte.
+    El enlace es personal, vale por 7 días y solo puede usarse una vez.</p>
   <p style="font-size: 12px; color: #64748b; margin-top: 32px;">
     Si el botón no funciona, copia este enlace en tu navegador:<br>
     <a href="{enlace_html}" style="color: #4f46e5;">{html.escape(enlace)}</a>

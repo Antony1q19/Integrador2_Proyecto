@@ -11,6 +11,8 @@ El Gateway reenvía al microservicio servicio-procesos-seleccion, añadiendo las
 cabeceras internas firmadas (X-Usuario-Id, X-Usuario-Rol, X-Usuario-Postulante-Id)
 que ese servicio ya sabe interpretar.
 """
+from urllib.parse import quote
+
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 
 from app.api.deps import obtener_postulante_actual
@@ -25,7 +27,9 @@ def _cabeceras_internas(postulante: dict, incluir_content_type: bool = False) ->
     cabeceras = {
         "X-Usuario-Id": str(postulante.get("sub", "")),
         "X-Usuario-Rol": "Postulante",
-        "X-Usuario-Nombre": str(postulante.get("nombre", "")),
+        # Codificado con quote() (ej. "José" → "Jos%C3%A9"): las cabeceras HTTP solo admiten
+        # ASCII y un nombre con tilde o ñ haría fallar la petición. El microservicio lo decodifica.
+        "X-Usuario-Nombre": quote(str(postulante.get("nombre", ""))),
         # Este es el dato clave: el microservicio lo usará para validar que el
         # postulante solo vea/crea SUS PROPIOS procesos.
         "X-Usuario-Postulante-Id": str(postulante.get("postulanteId", "")),
@@ -54,9 +58,10 @@ async def listar_mis_procesos(
         raise HTTPException(status_code=403, detail="Token sin postulanteId")
 
     cliente = obtener_cliente()
+    # /procesos/mias: el microservicio toma el postulante de la cabecera firmada (no de la URL) y
+    # devuelve el historial SIN comentarios internos ni nombres del personal de RRHH.
     respuesta = await cliente.get(
-        f"{settings.url_servicio_procesos_seleccion}/procesos",
-        params={"postulanteId": postulante_id},
+        f"{settings.url_servicio_procesos_seleccion}/procesos/mias",
         headers=_cabeceras_internas(postulante),
     )
     return _reenviar(respuesta)
@@ -72,9 +77,15 @@ async def crear_mi_proceso(
     if not postulante_id:
         raise HTTPException(status_code=403, detail="Token sin postulanteId")
 
-    cuerpo = await request.json()
-    # Se fuerza el postulanteId al del token (evita que un postulante postule por otro).
-    cuerpo["postulanteId"] = postulante_id
+    try:
+        recibido = await request.json()
+    except ValueError:
+        recibido = None
+    if not isinstance(recibido, dict):
+        raise HTTPException(status_code=422, detail="Cuerpo inválido: se espera {\"anuncioId\": <número>}")
+    # Solo se reenvía el anuncio; el postulanteId se fuerza al del token (evita que un
+    # postulante postule por otro).
+    cuerpo = {"postulanteId": postulante_id, "anuncioId": recibido.get("anuncioId")}
 
     cliente = obtener_cliente()
     respuesta = await cliente.post(

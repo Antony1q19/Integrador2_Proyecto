@@ -13,19 +13,21 @@ Estas funciones son "delgadas" a propósito: reciben la petición, aplican la
 regla de negocio (domain/postulantes.py) y guardan/leen en la base de datos.
 """
 import asyncio
+import hashlib
+import secrets
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, status
-from sqlalchemy import select
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import obtener_usuario_actual, requerir_rol
 from app.api.visibilidad import exigir_postulante_visible, postulantes_ocultos
 from app.core.database import obtener_sesion, obtener_sesion_lectura
-from app.domain.postulantes import validar_consentimiento_obligatorio
+from app.domain.postulantes import validar_consentimiento_obligatorio, validar_documento, validar_telefono
 from app.infrastructure.correo import correo_solicitud_cuenta, enviar_correo
-from app.infrastructure.models import Postulante, Usuario
+from app.infrastructure.models import InvitacionCuenta, Postulante, Usuario
 from app.schemas.postulante import (
     PostulanteActualizar,
     PostulanteCrear,
@@ -132,12 +134,14 @@ async def crear_postulante(
     # PASO 1: si se registra por su cuenta, debe aceptar el tratamiento de datos
     # (RRHH y Admin pueden registrarlo sin ese consentimiento, ver domain/postulantes.py).
     validar_consentimiento_obligatorio(datos.consentimientos.tratamientoDatos, usuario["rol"])
+    validar_documento(datos.documentoTipo, datos.documentoNumero)
+    validar_telefono(datos.telefono)
 
     # PASO 1b: no puede haber dos postulantes con el mismo documento ni el mismo correo.
     mismo_documento = select(Postulante.id).where(Postulante.documento_numero == datos.documentoNumero)
     if (await sesion.execute(mismo_documento)).first():
         raise ConflictoDeEstado("Ya existe un postulante con ese número de documento")
-    mismo_correo = select(Postulante.id).where(Postulante.email == datos.email)
+    mismo_correo = select(Postulante.id).where(func.lower(Postulante.email) == datos.email)
     if (await sesion.execute(mismo_correo)).first():
         raise ConflictoDeEstado("Ya existe un postulante con ese correo")
 
@@ -186,6 +190,8 @@ async def actualizar_postulante(
 
     # Solo los campos que realmente se enviaron (lo demás queda como estaba).
     cambios = datos.model_dump(exclude_unset=True)
+    if "telefono" in cambios:
+        validar_telefono(cambios["telefono"])
 
     # Nombre del campo en el JSON (camelCase) → nombre de la columna en la base.
     # Los campos que no aparecen aquí (nombres, apellidos, telefono) se llaman igual en ambos.
@@ -209,6 +215,7 @@ async def actualizar_postulante(
 # Un mismo postulante no puede recibir otra invitación hasta que pase este tiempo: evita
 # mandarle varios correos por un doble clic (o que alguien llene su bandeja de entrada).
 _ESPERA_ENTRE_INVITACIONES_SEGUNDOS = 120
+_DIAS_VIGENCIA_INVITACION = 7
 _ultima_invitacion: dict[str, float] = {}  # postulante_id -> hora (monotonic) del último envío
 
 
@@ -219,7 +226,7 @@ _ultima_invitacion: dict[str, float] = {}  # postulante_id -> hora (monotonic) d
 )
 async def solicitar_cuenta(
     postulante_id: str,
-    sesion: AsyncSession = Depends(obtener_sesion_lectura),
+    sesion: AsyncSession = Depends(obtener_sesion),
     _usuario: dict = Depends(requerir_rol("Admin", "RRHH", "Supervisor")),
 ) -> SolicitudCuentaRespuesta:
     """Envía (con Mailjet) un correo al postulante invitándolo a crear su cuenta en ANUNCIOS."""
@@ -232,8 +239,25 @@ async def solicitar_cuenta(
     if anterior is not None and ahora - anterior < _ESPERA_ENTRE_INVITACIONES_SEGUNDOS:
         raise ConflictoDeEstado("Ya se le envió una invitación hace un momento. Espera unos minutos para reenviarla.")
 
-    asunto, html_cuerpo, texto = correo_solicitud_cuenta(postulante.nombres, postulante.email)
+    # Invitación de un solo uso (7 días). Las anteriores sin usar dejan de valer: solo sirve la última.
+    momento = datetime.now(timezone.utc)
+    await sesion.execute(
+        update(InvitacionCuenta)
+        .where(InvitacionCuenta.postulante_id == postulante_id, InvitacionCuenta.usado_en.is_(None))
+        .values(usado_en=momento)
+    )
+    token = secrets.token_urlsafe(32)
+    sesion.add(
+        InvitacionCuenta(
+            postulante_id=postulante_id,
+            token_hash=hashlib.sha256(token.encode("utf-8")).hexdigest(),
+            expira_en=momento + timedelta(days=_DIAS_VIGENCIA_INVITACION),
+        )
+    )
+
+    asunto, html_cuerpo, texto = correo_solicitud_cuenta(postulante.nombres, postulante.email, token)
     nombre_completo = f"{postulante.nombres} {postulante.apellidos}"
     await enviar_correo(postulante.email, nombre_completo, asunto, html_cuerpo, texto)
+    await sesion.commit()  # se guarda solo si el correo salió
     _ultima_invitacion[postulante_id] = ahora
     return SolicitudCuentaRespuesta(enviadoA=postulante.email)

@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/shared/Skeleton";
 import { ToastContainer, useToast } from "@/components/shared/Toast";
 import { useReferenciasSeleccion } from "@/features/postulantes/hooks/useReferenciasSeleccion";
 import { useCargaConCache } from "@/lib/cacheCliente";
-import { useCookieValue } from "@/lib/useCookieValue";
+import { usePermisos } from "@/lib/usePermisos";
 import { claveContrataciones, fetchContrataciones } from "../services/contratacionesService";
 import { Contratacion } from "../types/contratacion.types";
 import { ContratacionDetalle } from "./ContratacionDetalle";
@@ -25,7 +25,8 @@ export function ContratacionTab({ postulanteId, onCambio }: ContratacionTabProps
   );
   const { vacante } = useReferenciasSeleccion();
   const { toasts, mostrarToast } = useToast();
-  const puedeEditar = useCookieValue("userRole") !== "Supervisor";
+  // Admin, Supervisor y RRHH gestionan entrevistas y contrataciones (ver lib/permisos.ts).
+  const puedeEditar = usePermisos().puedeGestionarSeleccion;
 
   const alCambiar = (mensaje: string, tipo: "success" | "error" = "success") => {
     mostrarToast(mensaje, tipo);

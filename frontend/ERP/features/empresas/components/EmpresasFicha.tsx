@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
+import { permisosDe } from "@/lib/permisos";
 import { mapearEmpresaDeApi } from "@/features/empresas/services/empresasApi";
 import { mapearAnuncioDeApi } from "@/features/anuncios/services/anunciosApi";
 import AnunciosPorEmpresa from "@/features/anuncios/components/AnunciosPorEmpresa";
@@ -22,6 +24,8 @@ export default async function EmpresasFicha({
 
     const anunciosApi = (await obtenerDelGateway<Record<string, unknown>[]>("/anuncios")) ?? [];
     const anuncios = anunciosApi.map(mapearAnuncioDeApi).filter((a) => a.empresaId === empresa.id);
+    // Editar la empresa: Admin y Supervisor (ver lib/permisos.ts). El backend aplica la misma regla.
+    const { puedeEditarEmpresas } = permisosDe((await cookies()).get("userRole")?.value);
 
     return (
     <div className="min-h-screen bg-slate-50 p-8">
@@ -42,12 +46,14 @@ export default async function EmpresasFicha({
             </h1>
             <p className="mt-1 text-sm text-slate-500">RUC: {empresa.ruc}</p>
           </div>
-          <Link
-            href={`/empresas/${empresa.id}/editar`}
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
-          >
-            Editar
-          </Link>
+          {puedeEditarEmpresas && (
+            <Link
+              href={`/empresas/${empresa.id}/editar`}
+              className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
+            >
+              Editar
+            </Link>
+          )}
         </div>
 
         {/* Tarjeta de información */}

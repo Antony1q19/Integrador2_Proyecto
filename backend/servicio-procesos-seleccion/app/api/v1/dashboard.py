@@ -23,7 +23,7 @@ from app.api.visibilidad import postulantes_ocultos
 from app.core.config import settings
 from app.core.database import obtener_sesion_lectura
 from app.domain.dashboard import MAXIMO_DIAS_DE_RANGO, ZONA_PERU, calcular_dashboard
-from app.infrastructure.models import Contratacion, Entrevista, Evaluacion, ProcesoPostulacion, SeguimientoPostingreso
+from app.infrastructure.models import Contratacion, Entrevista, Evaluacion, ProcesoPostulacion
 from shared_kernel.exceptions import RecursoNoEncontrado, SolicitudInvalida
 from shared_kernel.visibilidad import llamar_a_servicio
 
@@ -36,7 +36,8 @@ async def obtener_dashboard(
     hasta: date | None = None,
     empresaId: int | None = None,
     sesion: AsyncSession = Depends(obtener_sesion_lectura),
-    usuario: dict = Depends(requerir_rol("Admin", "RRHH", "Supervisor")),
+    # RRHH (reclutamiento) no ve el Dashboard: es para Admin y Supervisor.
+    usuario: dict = Depends(requerir_rol("Admin", "Supervisor")),
 ) -> dict:
     # PASO 1: el rango de fechas (por defecto, los últimos 30 días).
     hasta = hasta or datetime.now(ZONA_PERU).date()

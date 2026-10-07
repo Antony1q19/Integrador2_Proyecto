@@ -3,20 +3,24 @@
 Rutas (prefijo /evaluaciones). El navegador las llama a través del Gateway,
 como /api/v1/evaluaciones...:
     GET    /evaluaciones?postulanteId=...   → ver las evaluaciones de un postulante
-    POST   /evaluaciones                    → registrar una evaluación (Admin, RRHH)
+    POST   /evaluaciones                    → registrar una evaluación (Admin, RRHH, Supervisor)
 RRHH y Supervisor no ven las evaluaciones de postulantes de empresas que no tienen asignadas.
 """
+from urllib.parse import quote
+
 from fastapi import APIRouter, Depends, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import requerir_rol
 from app.api.visibilidad import postulantes_ocultos
+from app.core.config import settings
 from app.core.database import obtener_sesion, obtener_sesion_lectura
 from app.domain.evaluaciones import calcular_puntaje_total, calcular_resultado
 from app.infrastructure.models import Evaluacion
 from app.schemas.evaluacion import Competencias, EvaluacionCrear, EvaluacionRespuesta
 from shared_kernel.exceptions import RecursoNoEncontrado
+from shared_kernel.visibilidad import llamar_a_servicio
 
 router = APIRouter(prefix="/evaluaciones", tags=["evaluaciones"])
 
@@ -65,11 +69,21 @@ async def listar_evaluaciones(
 async def crear_evaluacion(
     datos: EvaluacionCrear,
     sesion: AsyncSession = Depends(obtener_sesion),
-    usuario: dict = Depends(requerir_rol("Admin", "RRHH")),
+    usuario: dict = Depends(requerir_rol("Admin", "RRHH", "Supervisor")),
 ) -> EvaluacionRespuesta:
-    # PASO 0: el postulante no debe ser de una empresa que el usuario no puede ver.
+    # PASO 0: el postulante debe existir y no ser de una empresa que el usuario no puede ver.
     if datos.postulanteId in await postulantes_ocultos(sesion, usuario):
         raise RecursoNoEncontrado("Postulante no encontrado")
+    if settings.url_servicio_postulantes:  # (si no está configurado, no se comprueba)
+        existe = await llamar_a_servicio(
+            settings.url_servicio_postulantes,
+            f"/postulantes/{quote(datos.postulanteId, safe='')}",
+            usuario,
+            settings.gateway_shared_secret,
+            permitir_404=True,
+        )
+        if existe is None:
+            raise RecursoNoEncontrado("Postulante no encontrado")
 
     c = datos.competencias
 

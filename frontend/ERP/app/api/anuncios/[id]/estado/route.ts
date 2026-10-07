@@ -14,7 +14,7 @@ export async function PATCH(
 
   const { id } = await params;
   const cuerpoPeticion = await request.text();
-  const respuesta = await reenviarAlGateway(token, `/anuncios/${id}/estado`, {
+  const respuesta = await reenviarAlGateway(token, `/anuncios/${encodeURIComponent(id)}/estado`, {
     method: "PATCH",
     body: cuerpoPeticion,
   });

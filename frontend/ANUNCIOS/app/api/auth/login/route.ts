@@ -4,6 +4,7 @@
 // El navegador NUNCA recibe el token en su JavaScript.
 import { NextRequest, NextResponse } from 'next/server';
 import { reenviarAlGateway } from '@/lib/gatewayProxy';
+import { cabecerasIpCliente } from '@/lib/ipCliente';
 import { esOrigenValido } from '@/lib/csrf';
 
 const DURACION_COOKIE_SEGUNDOS = 60 * 60; // 1 hora
@@ -21,6 +22,7 @@ export async function POST(request: NextRequest) {
   try {
     const respuestaGateway = await reenviarAlGateway('/publico/auth/login', {
       method: 'POST',
+      headers: cabecerasIpCliente(request),
       body: JSON.stringify({ email: cuerpo.email, password: cuerpo.password }),
     });
 

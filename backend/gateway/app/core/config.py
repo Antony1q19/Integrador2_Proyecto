@@ -28,6 +28,11 @@ class Settings(BaseServiceSettings):
         default="http://localhost:3000,http://localhost:3001", alias="CORS_ORIGINS"
     )
 
+    # Clave que comparten el Gateway y los servidores de Next.js (ERP y ANUNCIOS). Con ella Next.js
+    # demuestra que la IP que manda en "X-Cliente-IP" es la del usuario real (ver
+    # core/limite_peticiones.py). Si falta, los límites por IP cuentan la IP del servidor de Next.js.
+    frontend_proxy_secret: str | None = Field(default=None, alias="FRONTEND_PROXY_SECRET")
+
     @property
     def lista_cors_origins(self) -> list[str]:
         """Convierte el texto "a,b" en la lista ["a", "b"]."""

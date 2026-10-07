@@ -84,6 +84,7 @@ export default function AnunciosPage() {
 "use client";
 
 import Link from "next/link";
+import { usePermisos } from "@/lib/usePermisos";
 import { useAnuncios } from "@/features/anuncios/hooks/useAnuncios";
 import { useAnunciosFilters } from "@/features/anuncios/hooks/useAnunciosFilters";
 import { useEmpresas } from "@/features/empresas/hooks/useEmpresas";
@@ -93,6 +94,8 @@ import AnunciosView from "@/features/anuncios/components/AnunciosView";
 export default function AnunciosPage() {
   const { anuncios, cargando, error, eliminar, cambiarEstado } = useAnuncios();
   const { empresas } = useEmpresas();
+  // RRHH solo ve los anuncios; crearlos, cerrarlos o eliminarlos es de Admin y Supervisor.
+  const { puedeGestionarAnuncios } = usePermisos();
   const {
     filtros,
     actualizarFiltro,
@@ -113,12 +116,14 @@ export default function AnunciosPage() {
                 : `${anunciosFiltrados.length} de ${anuncios.length} anuncios`}
             </p>
           </div>
-          <Link
-            href="/anuncios/nuevo"
-            className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 transition-colors"
-          >
-            + Nuevo Anuncio
-          </Link>
+          {puedeGestionarAnuncios && (
+            <Link
+              href="/anuncios/nuevo"
+              className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 transition-colors"
+            >
+              + Nuevo Anuncio
+            </Link>
+          )}
         </div>
 
         {cargando && (
@@ -146,6 +151,7 @@ export default function AnunciosPage() {
               anuncios={anunciosFiltrados}
               onEliminar={eliminar}
               onCambiarEstado={cambiarEstado}
+              puedeGestionar={puedeGestionarAnuncios}
             />
           </>
         )}

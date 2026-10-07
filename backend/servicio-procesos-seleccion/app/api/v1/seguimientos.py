@@ -2,8 +2,8 @@
 
 Rutas (prefijo /seguimientos). El navegador las llama a través del Gateway, como /api/v1/seguimientos...:
     GET    /seguimientos?postulanteId=&contratacionId=&estado=&soloVencidos=   → listar controles
-    POST   /seguimientos                                                       → agregar un control adicional (Admin, RRHH)
-    PATCH  /seguimientos/{id}                                                  → registrar cómo salió o reprogramar (Admin, RRHH)
+    POST   /seguimientos                                                       → agregar un control adicional (Admin, RRHH, Supervisor)
+    PATCH  /seguimientos/{id}                                                  → registrar cómo salió o reprogramar (Admin, RRHH, Supervisor)
 
 Los controles de 30, 60 y 90 días se crean solos al registrar la contratación (ver contrataciones.py).
 """
@@ -26,7 +26,7 @@ from app.domain.seleccion import (
 )
 from app.infrastructure.models import Contratacion, ProcesoPostulacion, SeguimientoPostingreso
 from app.schemas.seleccion import SeguimientoActualizar, SeguimientoCrear, SeguimientoRespuesta
-from shared_kernel.exceptions import ConflictoDeEstado, RecursoNoEncontrado
+from shared_kernel.exceptions import ConflictoDeEstado, RecursoNoEncontrado, SolicitudInvalida
 
 router = APIRouter(prefix="/seguimientos", tags=["seguimientos"])
 
@@ -91,7 +91,7 @@ async def listar_seguimientos(
 async def agregar_seguimiento(
     datos: SeguimientoCrear,
     sesion: AsyncSession = Depends(obtener_sesion),
-    usuario: dict = Depends(requerir_rol("Admin", "RRHH")),
+    usuario: dict = Depends(requerir_rol("Admin", "RRHH", "Supervisor")),
 ) -> SeguimientoRespuesta:
     resultado = await sesion.execute(
         select(Contratacion).options(joinedload(Contratacion.proceso)).where(Contratacion.id == datos.contratacionId)
@@ -102,6 +102,8 @@ async def agregar_seguimiento(
         raise RecursoNoEncontrado("Contratación no encontrada")
     if contratacion.estado in ("Cancelado", "Finalizado"):
         raise ConflictoDeEstado("Esta contratación ya está cerrada")
+    if datos.fechaProgramada and datos.fechaProgramada < contratacion.fecha_ingreso:
+        raise SolicitudInvalida("El control no puede programarse antes de la fecha de ingreso")
 
     seguimiento = SeguimientoPostingreso(
         contratacion=contratacion,
@@ -122,16 +124,26 @@ async def actualizar_seguimiento(
     seguimiento_id: str,
     datos: SeguimientoActualizar,
     sesion: AsyncSession = Depends(obtener_sesion),
-    usuario: dict = Depends(requerir_rol("Admin", "RRHH")),
+    usuario: dict = Depends(requerir_rol("Admin", "RRHH", "Supervisor")),
 ) -> SeguimientoRespuesta:
     seguimiento = await _cargar(sesion, seguimiento_id, usuario)
     cambios = datos.model_dump(exclude_unset=True)
     validar_opcion(cambios.get("estado"), ESTADOS_SEGUIMIENTO, "Estado")
     validar_opcion(cambios.get("valoracion"), VALORACIONES_SEGUIMIENTO, "Valoración")
 
-    estado_final = cambios.get("estado", seguimiento.estado)
+    estado_final = cambios.get("estado") or seguimiento.estado
     valoracion_final = cambios.get("valoracion", seguimiento.valoracion)
     validar_cierre_de_seguimiento(estado_final, valoracion_final)
+
+    # Fechas coherentes: nada antes del ingreso, y "realizado" no puede ser en el futuro.
+    ingreso = seguimiento.contratacion.fecha_ingreso
+    if cambios.get("fechaProgramada") and cambios["fechaProgramada"] < ingreso:
+        raise SolicitudInvalida("El control no puede programarse antes de la fecha de ingreso")
+    fecha_realizada = cambios.get("fechaRealizada")
+    if fecha_realizada and fecha_realizada > hoy_en_peru():
+        raise SolicitudInvalida("La fecha en que se realizó el control no puede ser futura")
+    if fecha_realizada and fecha_realizada < ingreso:
+        raise SolicitudInvalida("La fecha en que se realizó el control no puede ser anterior al ingreso")
 
     if cambios.get("fechaProgramada"):
         seguimiento.fecha_programada = cambios["fechaProgramada"]

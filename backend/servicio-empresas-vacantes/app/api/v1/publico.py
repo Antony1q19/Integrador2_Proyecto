@@ -14,7 +14,7 @@ Seguridad (por qué es seguro que no pidan sesión):
   - Igual exige la FIRMA del Gateway: nadie puede llamar a este servicio directo; el límite de
     peticiones por IP lo aplica el Gateway (ver gateway/app/api/v1/publico.py).
 """
-from datetime import date
+from shared_kernel.fechas import hoy_en_peru
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import select
@@ -45,7 +45,7 @@ def _publicados():
             Anuncio.eliminado.is_(False),
             Empresa.eliminado.is_(False),
             Anuncio.estado == "Abierto",
-            Anuncio.fecha_limite >= date.today(),
+            Anuncio.fecha_limite >= hoy_en_peru(),  # hora de Perú (el servidor corre en UTC)
         )
     )
 

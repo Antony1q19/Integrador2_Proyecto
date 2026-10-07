@@ -7,6 +7,7 @@ Tablas de este servicio:
   - postulantes → los datos personales de cada postulante.
   - documentos  → sus archivos (CV, DNI...).
   - usuarios    → sus CUENTAS DE ACCESO a la app ANUNCIOS (correo + contraseña).
+  - invitaciones_cuenta → enlaces de un solo uso con los que RRHH invita a crear la cuenta.
                   Son distintas e independientes de los usuarios del ERP, que
                   viven en otra base de datos (usuario_db, en el Gateway).
 
@@ -155,3 +156,24 @@ class TokenRecuperacion(Base):
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
     ip: Mapped[str | None] = mapped_column(String(45), nullable=True)
+
+
+class InvitacionCuenta(Base):
+    """Invitación de un solo uso para que un postulante registrado por RRHH cree su cuenta.
+
+    Sin esto, cualquiera que supiera el correo de ese postulante podía "registrarse" con él y quedarse
+    con su perfil (DNI, teléfono, CV). Ahora el registro solo se enlaza a un perfil existente si trae
+    el token que llegó a ESE correo. Como en la recuperación de contraseña, se guarda solo el hash
+    SHA-256 del token, nunca el token en texto plano. Vigencia: 7 días.
+    """
+
+    __tablename__ = "invitaciones_cuenta"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_nuevo_id)
+    postulante_id: Mapped[str] = mapped_column(ForeignKey("postulantes.id"), nullable=False, index=True)
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True, nullable=False)
+    expira_en: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    usado_en: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    creado_en: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )

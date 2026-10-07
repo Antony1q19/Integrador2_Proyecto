@@ -7,6 +7,7 @@
 import { useState } from "react";
 import { Key } from "lucide-react";
 import { cambiarMiPassword } from "../services/usuariosService";
+import { vaciarCache } from "@/lib/cacheCliente";
 
 export function CambiarPasswordCard() {
   const [passwordActual, setPasswordActual] = useState("");
@@ -23,14 +24,33 @@ export function CambiarPasswordCard() {
       setMensaje({ texto: "La confirmación no coincide con la nueva contraseña", esError: true });
       return;
     }
-    if (passwordNuevo.length < 6) {
-      setMensaje({ texto: "La nueva contraseña debe tener al menos 6 caracteres", esError: true });
+    // Misma política que valida el backend (que además rechaza claves comunes o iguales al correo).
+    if (passwordNuevo.length < 8 || !/[A-Z]/.test(passwordNuevo) || !/[a-z]/.test(passwordNuevo) || !/[0-9]/.test(passwordNuevo)) {
+      setMensaje({
+        texto: "La nueva contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número",
+        esError: true,
+      });
       return;
     }
 
     setGuardando(true);
     try {
-      await cambiarMiPassword(passwordActual, passwordNuevo);
+      const sesionCerrada = await cambiarMiPassword(passwordActual, passwordNuevo);
+      if (sesionCerrada) {
+        // Al cambiar la contraseña el servidor cierra la sesión (los tokens anteriores dejan de valer).
+        // Se limpian las cookies de pantalla y se vuelve al login para entrar con la contraseña nueva.
+        setMensaje({ texto: "Contraseña actualizada. Inicia sesión nuevamente con tu nueva contraseña…", esError: false });
+        for (const nombre of ["userRole", "userName", "userEmail", "userEmpresas"]) {
+          document.cookie = `${nombre}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+        }
+        vaciarCache();
+        setTimeout(() => {
+          // Recarga completa a propósito (igual que sesionVencida en lib/apiCliente.ts): descarta todo el estado en memoria.
+          // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+          window.location.href = "/login";
+        }, 2000);
+        return;
+      }
       setMensaje({ texto: "Contraseña actualizada correctamente", esError: false });
       setPasswordActual("");
       setPasswordNuevo("");
@@ -64,7 +84,7 @@ export function CambiarPasswordCard() {
           <input
             type="password"
             required
-            minLength={6}
+            minLength={8}
             value={passwordNuevo}
             onChange={(e) => setPasswordNuevo(e.target.value)}
             placeholder="••••••••"
@@ -76,7 +96,7 @@ export function CambiarPasswordCard() {
           <input
             type="password"
             required
-            minLength={6}
+            minLength={8}
             value={passwordConfirmar}
             onChange={(e) => setPasswordConfirmar(e.target.value)}
             placeholder="••••••••"

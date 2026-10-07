@@ -9,26 +9,26 @@ frontend (frontend/ERP/features/postulantes/types/postulante.types.ts).
 """
 from datetime import date
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 # --- Piezas pequeñas que van dentro del postulante -------------------------
 class FormacionAcademicaItem(BaseModel):
-    institucion: str
-    titulo: str
-    anioFin: int | None = None
+    institucion: str = Field(max_length=150)
+    titulo: str = Field(max_length=150)
+    anioFin: int | None = Field(default=None, ge=1950, le=2100)
 
 
 class IdiomaItem(BaseModel):
-    idioma: str
-    nivel: str
+    idioma: str = Field(max_length=50)
+    nivel: str = Field(max_length=50)
 
 
 class ExperienciaItem(BaseModel):
-    empresa: str
-    cargo: str
-    fechaInicio: str
-    fechaFin: str | None = None
+    empresa: str = Field(max_length=150)
+    cargo: str = Field(max_length=150)
+    fechaInicio: str = Field(max_length=20)
+    fechaFin: str | None = Field(default=None, max_length=20)
 
 
 class ConsentimientosCrear(BaseModel):
@@ -40,38 +40,48 @@ class ConsentimientosCrear(BaseModel):
 class PostulanteCrear(BaseModel):
     """Datos para registrar un postulante nuevo."""
 
-    nombres: str
-    apellidos: str
-    documentoTipo: str
-    documentoNumero: str = Field(min_length=8, max_length=20)
-    email: EmailStr
-    telefono: str | None = None
-    cargoPostulado: str | None = None
-    empresaCliente: str | None = None
+    # Los largos máximos son los de las columnas (infrastructure/models.py): si se pasaran, la base de
+    # datos fallaría con un error 500 en vez de un mensaje claro. El formato del documento y del
+    # teléfono se valida en el endpoint (domain/postulantes.py) para responder un mensaje legible.
+    nombres: str = Field(min_length=1, max_length=150)
+    apellidos: str = Field(min_length=1, max_length=150)
+    documentoTipo: str = Field(max_length=20)
+    documentoNumero: str = Field(min_length=6, max_length=20)
+    email: EmailStr = Field(max_length=255)
+    telefono: str | None = Field(default=None, max_length=30)
+    cargoPostulado: str | None = Field(default=None, max_length=150)
+    empresaCliente: str | None = Field(default=None, max_length=150)
     fechaNacimiento: date | None = None
-    direccion: str | None = None
-    fuenteReclutamiento: str | None = None
-    formacionAcademica: list[FormacionAcademicaItem] = []
-    idiomas: list[IdiomaItem] = []
-    experiencia: list[ExperienciaItem] = []
+    direccion: str | None = Field(default=None, max_length=255)
+    fuenteReclutamiento: str | None = Field(default=None, max_length=100)
+    formacionAcademica: list[FormacionAcademicaItem] = Field(default=[], max_length=20)
+    idiomas: list[IdiomaItem] = Field(default=[], max_length=20)
+    experiencia: list[ExperienciaItem] = Field(default=[], max_length=20)
     consentimientos: ConsentimientosCrear
+
+    @field_validator("email")
+    @classmethod
+    def normalizar_email(cls, valor: str) -> str:
+        """El correo se guarda siempre en minúsculas y sin espacios: así coincide con el que la
+        persona escribe al crear su cuenta en ANUNCIOS (que también se normaliza)."""
+        return valor.strip().lower()
 
 
 class PostulanteActualizar(BaseModel):
     """Datos que se pueden editar. Todos opcionales: solo se cambia lo que se envíe.
     (El documento y el correo no se pueden cambiar.)"""
 
-    nombres: str | None = None
-    apellidos: str | None = None
-    telefono: str | None = None
-    cargoPostulado: str | None = None
-    empresaCliente: str | None = None
+    nombres: str | None = Field(default=None, min_length=1, max_length=150)
+    apellidos: str | None = Field(default=None, min_length=1, max_length=150)
+    telefono: str | None = Field(default=None, max_length=30)
+    cargoPostulado: str | None = Field(default=None, max_length=150)
+    empresaCliente: str | None = Field(default=None, max_length=150)
     fechaNacimiento: date | None = None
-    direccion: str | None = None
-    fuenteReclutamiento: str | None = None
-    formacionAcademica: list[FormacionAcademicaItem] | None = None
-    idiomas: list[IdiomaItem] | None = None
-    experiencia: list[ExperienciaItem] | None = None
+    direccion: str | None = Field(default=None, max_length=255)
+    fuenteReclutamiento: str | None = Field(default=None, max_length=100)
+    formacionAcademica: list[FormacionAcademicaItem] | None = Field(default=None, max_length=20)
+    idiomas: list[IdiomaItem] | None = Field(default=None, max_length=20)
+    experiencia: list[ExperienciaItem] | None = Field(default=None, max_length=20)
 
 
 # --- Lo que se DEVUELVE al frontend ----------------------------------------

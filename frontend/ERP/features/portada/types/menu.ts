@@ -31,7 +31,7 @@ export const menuItems: MenuItem[] = [
         name: "Dashboard",
         href: "/dashboard",
         icon: LayoutDashboard,
-        roles: ["Admin", "RRHH", "Supervisor"],
+        roles: ["Admin", "Supervisor"], // RRHH no ve el Dashboard (ver lib/permisos.ts)
     },
     {
         name: "Postulantes",

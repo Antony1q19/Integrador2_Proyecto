@@ -4,12 +4,12 @@ Rutas (prefijo /anuncios). El navegador las llama a través del Gateway, como
 /api/v1/anuncios...:
     GET  /anuncios        → listar todos los anuncios (con el nombre de su empresa)
     GET  /anuncios/{id}   → ver uno
-    POST   /anuncios              → crear uno (Admin, RRHH)
-    PUT    /anuncios/{id}         → editar uno (Admin, RRHH)
-    PATCH  /anuncios/{id}/estado  → cambiar solo el estado (Admin, RRHH)
-    DELETE /anuncios/{id}         → eliminar uno (Admin, RRHH) — borrado lógico
+    POST   /anuncios              → crear uno (Admin, Supervisor)
+    PUT    /anuncios/{id}         → editar uno (Admin, Supervisor)
+    PATCH  /anuncios/{id}/estado  → cambiar solo el estado (Admin, Supervisor)
+    DELETE /anuncios/{id}         → eliminar uno (Admin, Supervisor) — borrado lógico
 
-Lectura: Admin, RRHH y Supervisor. Escritura: solo Admin y RRHH.
+Lectura: Admin, RRHH y Supervisor. Escritura: Admin y Supervisor (RRHH solo los ve).
 RRHH y Supervisor solo ven/editan los anuncios de las empresas que un Admin
 les asignó (los demás anuncios ni aparecen ni se pueden abrir: 404).
 
@@ -18,7 +18,6 @@ si de verdad no existiera.
 """
 from fastapi import APIRouter, Depends
 from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import requerir_rol
@@ -29,6 +28,10 @@ from app.domain import anuncios as anuncios_domain
 from shared_kernel.exceptions import RecursoNoEncontrado, SolicitudInvalida
 
 router = APIRouter(prefix="/anuncios", tags=["anuncios"])
+
+# Quién crea/edita/cierra/elimina anuncios (siempre de sus empresas asignadas, salvo el Admin).
+# RRHH solo los ve. Ver la matriz de roles en servicio-empresas-vacantes/app/api/v1/empresas.py.
+_ROLES_QUE_GESTIONAN_ANUNCIOS = ("Admin", "Supervisor")
 
 
 def _a_respuesta(a: Anuncio, razon_social: str) -> AnuncioRespuesta:
@@ -119,7 +122,7 @@ async def obtener_anuncio(
 async def crear_anuncio(
     datos: AnuncioCrear,
     sesion: AsyncSession = Depends(obtener_sesion),
-    usuario: dict = Depends(requerir_rol("Admin", "RRHH")),
+    usuario: dict = Depends(requerir_rol(*_ROLES_QUE_GESTIONAN_ANUNCIOS)),
 ) -> AnuncioRespuesta:
     anuncio = await anuncios_domain.crear_anuncio(sesion, datos, usuario)
     razon_social = await _razon_social_de(sesion, datos.empresaId)
@@ -131,7 +134,7 @@ async def actualizar_anuncio(
     anuncio_id: int,
     datos: AnuncioActualizar,
     sesion: AsyncSession = Depends(obtener_sesion),
-    usuario: dict = Depends(requerir_rol("Admin", "RRHH")),
+    usuario: dict = Depends(requerir_rol(*_ROLES_QUE_GESTIONAN_ANUNCIOS)),
 ) -> AnuncioRespuesta:
     anuncio = await _buscar_anuncio_o_404(sesion, anuncio_id, usuario)
     await anuncios_domain.actualizar_anuncio(sesion, anuncio, datos, usuario)
@@ -144,7 +147,7 @@ async def cambiar_estado_anuncio(
     anuncio_id: int,
     datos: AnuncioCambiarEstado,
     sesion: AsyncSession = Depends(obtener_sesion),
-    usuario: dict = Depends(requerir_rol("Admin", "RRHH")),
+    usuario: dict = Depends(requerir_rol(*_ROLES_QUE_GESTIONAN_ANUNCIOS)),
 ) -> AnuncioRespuesta:
     anuncio = await _buscar_anuncio_o_404(sesion, anuncio_id, usuario)
     await anuncios_domain.cambiar_estado(sesion, anuncio, datos.estado)
@@ -156,7 +159,7 @@ async def cambiar_estado_anuncio(
 async def eliminar_anuncio(
     anuncio_id: int,
     sesion: AsyncSession = Depends(obtener_sesion),
-    usuario: dict = Depends(requerir_rol("Admin", "RRHH")),
+    usuario: dict = Depends(requerir_rol(*_ROLES_QUE_GESTIONAN_ANUNCIOS)),
 ) -> None:
     anuncio = await _buscar_anuncio_o_404(sesion, anuncio_id, usuario)
     await anuncios_domain.eliminar_anuncio(sesion, anuncio)

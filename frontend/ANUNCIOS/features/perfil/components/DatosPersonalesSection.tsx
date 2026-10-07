@@ -82,12 +82,16 @@ export function DatosPersonalesSection({
           </div>
           <div>
             <label className={labelClass}>Tipo de documento</label>
+            {/* El documento no se cambia desde el perfil (el backend lo rechaza): identifica a la
+                persona ante la consultora. Si está mal, se corrige desde el ERP. */}
             <select
               value={form.documentoTipo}
+              disabled
+              title="El documento no se puede cambiar desde tu perfil"
               onChange={(e) =>
                 setForm({ ...form, documentoTipo: e.target.value as TipoDocumento })
               }
-              className={inputClass}
+              className={`${inputClass} cursor-not-allowed opacity-70`}
             >
               <option value="DNI">DNI</option>
               <option value="CE">Carné de extranjería</option>
@@ -98,10 +102,14 @@ export function DatosPersonalesSection({
             <label className={labelClass}>N.º de documento</label>
             <input
               required
+              readOnly
+              title="El documento no se puede cambiar desde tu perfil"
               value={form.documentoNumero}
-              onChange={(e) => setForm({ ...form, documentoNumero: e.target.value })}
-              className={inputClass}
+              className={`${inputClass} cursor-not-allowed opacity-70`}
             />
+            <p className="mt-1 text-xs text-slate-500">
+              Si tu documento tiene un error, comunícate con la consultora.
+            </p>
           </div>
           <div>
             <label className={labelClass}>Correo electrónico</label>

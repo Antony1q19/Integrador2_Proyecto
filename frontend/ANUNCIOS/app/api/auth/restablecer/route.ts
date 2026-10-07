@@ -3,6 +3,7 @@
 // Restablece la contraseña enviando el token y la nueva contraseña al Gateway.
 import { NextRequest, NextResponse } from 'next/server';
 import { reenviarAlGateway } from '@/lib/gatewayProxy';
+import { cabecerasIpCliente } from '@/lib/ipCliente';
 import { esOrigenValido } from '@/lib/csrf';
 
 export async function POST(request: NextRequest) {
@@ -18,6 +19,7 @@ export async function POST(request: NextRequest) {
   try {
     const respuestaGateway = await reenviarAlGateway('/publico/auth/restablecer-password', {
       method: 'POST',
+      headers: cabecerasIpCliente(request),
       body: JSON.stringify({ token: cuerpo.token, nuevaPassword: cuerpo.nuevaPassword }),
     });
 

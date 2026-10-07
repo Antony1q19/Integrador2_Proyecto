@@ -56,7 +56,9 @@ export async function cambiarEstadoUsuario(
   return leerJsonOFallar(res, "No se pudo cambiar el estado");
 }
 
-export async function cambiarMiPassword(passwordActual: string, passwordNuevo: string): Promise<void> {
+// Devuelve true si el servidor cerró la sesión (siempre que la contraseña cambia: el Gateway invalida
+// los tokens anteriores y hay que volver a entrar con la nueva).
+export async function cambiarMiPassword(passwordActual: string, passwordNuevo: string): Promise<boolean> {
   const res = await fetch("/api/usuarios/me/password", {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
@@ -66,6 +68,7 @@ export async function cambiarMiPassword(passwordActual: string, passwordNuevo: s
     const cuerpo = await res.json().catch(() => null);
     throw new Error(cuerpo?.detail ?? "No se pudo cambiar la contraseña");
   }
+  return res.headers.get("X-Sesion-Cerrada") === "1";
 }
 
 export const ROLES_INTERNOS: RolInterno[] = ["Admin", "RRHH", "Supervisor"];

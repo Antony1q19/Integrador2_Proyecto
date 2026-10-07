@@ -7,13 +7,15 @@ class RegistroPostulanteGateway(BaseModel):
     nombres: str = Field(min_length=1, max_length=150)
     apellidos: str = Field(min_length=1, max_length=150)
     documentoTipo: str = Field(default="DNI", max_length=20)
-    documentoNumero: str = Field(min_length=8, max_length=20)
+    documentoNumero: str = Field(min_length=6, max_length=20)
     email: EmailStr
     telefono: str | None = Field(default=None, max_length=30)
     fechaNacimiento: date | None = None
     password: str = Field(min_length=8, max_length=128)
     aceptaTratamientoDatos: bool
     aceptaComunicaciones: bool = False
+    # Token del enlace de invitación (solo cuando RRHH ya había registrado a la persona).
+    invitacion: str | None = Field(default=None, min_length=10, max_length=100)
 
     model_config = ConfigDict(extra="forbid")
 
@@ -48,7 +50,7 @@ class PerfilActualizarGateway(BaseModel):
     nombres: str | None = Field(default=None, min_length=1, max_length=150)
     apellidos: str | None = Field(default=None, min_length=1, max_length=150)
     documentoTipo: str | None = Field(default=None, max_length=20)
-    documentoNumero: str | None = Field(default=None, min_length=8, max_length=20)
+    documentoNumero: str | None = Field(default=None, min_length=6, max_length=20)
     telefono: str | None = Field(default=None, max_length=30)
     fechaNacimiento: date | None = None
     direccion: str | None = Field(default=None, max_length=255)

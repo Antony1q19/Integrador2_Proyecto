@@ -14,11 +14,14 @@ export default async function EmpresasPage() {
 "use client";
 
 import Link from "next/link";
+import { usePermisos } from "@/lib/usePermisos";
 import { useEmpresas } from "@/features/empresas/hooks/useEmpresas";
 import { EmpresasView } from "@/features/empresas/components/EmpresasView";
 
 export default function EmpresasPage() {
   const { empresas, cargando, error, eliminar } = useEmpresas();
+  // Crear y eliminar empresas: solo Admin (ver lib/permisos.ts).
+  const { puedeCrearEliminarEmpresas } = usePermisos();
 
   return (
     <div className="min-h-screen bg-slate-50 p-8">
@@ -32,12 +35,14 @@ export default function EmpresasPage() {
               {cargando ? "Cargando..." : `${empresas.length} empresas registradas`}
             </p>
           </div>
-          <Link
-            href="/empresas/nueva"
-            className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 transition-colors"
-          >
-            + Nueva Empresa
-          </Link>
+          {puedeCrearEliminarEmpresas && (
+            <Link
+              href="/empresas/nueva"
+              className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 transition-colors"
+            >
+              + Nueva Empresa
+            </Link>
+          )}
         </div>
 
         {cargando && (
@@ -52,7 +57,9 @@ export default function EmpresasPage() {
           </div>
         )}
 
-        {!cargando && !error && <EmpresasView empresas={empresas} onEliminar={eliminar} />}
+        {!cargando && !error && (
+          <EmpresasView empresas={empresas} onEliminar={eliminar} puedeEliminar={puedeCrearEliminarEmpresas} />
+        )}
       </div>
     </div>
   );

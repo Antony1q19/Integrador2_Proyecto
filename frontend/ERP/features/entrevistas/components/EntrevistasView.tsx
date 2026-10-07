@@ -12,7 +12,7 @@ import { ToastContainer, useToast } from "@/components/shared/Toast";
 import { useReferenciasSeleccion } from "@/features/postulantes/hooks/useReferenciasSeleccion";
 import { useCargaConCache } from "@/lib/cacheCliente";
 import { formatoDia, formatoHora, hoyEnLima, sumarDiasATexto } from "@/lib/fechasLima";
-import { useCookieValue } from "@/lib/useCookieValue";
+import { usePermisos } from "@/lib/usePermisos";
 import { claveEntrevistas, fetchEntrevistas } from "../services/entrevistasService";
 import { Entrevista, FiltrosEntrevistas } from "../types/entrevista.types";
 import { EntrevistaAcciones } from "./EntrevistaAcciones";
@@ -48,7 +48,8 @@ export function EntrevistasView() {
   const [vista, setVista] = useState<Vista>("proximas");
   const [programando, setProgramando] = useState(false);
   const { toasts, mostrarToast } = useToast();
-  const puedeEditar = useCookieValue("userRole") !== "Supervisor";
+  // Admin, Supervisor y RRHH gestionan entrevistas y contrataciones (ver lib/permisos.ts).
+  const puedeEditar = usePermisos().puedeGestionarSeleccion;
 
   const filtros = useMemo(() => filtrosDeVista(vista, hoyEnLima()), [vista]);
   const { datos, cargando, actualizando, error, recargar } = useCargaConCache<Entrevista[]>(

@@ -1,7 +1,7 @@
 // app/registro/page.tsx
 'use client';
 
-import { useState, FormEvent, Suspense, useEffect, useRef } from 'react';
+import { useState, FormEvent, Suspense, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/features/auth/hooks/useAuth';
@@ -68,23 +68,20 @@ function RegistroFormulario() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const emailParam = searchParams.get('email');
+  // Enlace de invitación de RRHH: sin este token no se puede crear la cuenta de un perfil que la
+  // consultora ya tenía registrado (ver servicio-postulantes, registro).
+  const invitacionParam = searchParams.get('invitacion');
   const siguienteParam = searchParams.get('siguiente');
 
   const { registrar } = useAuth();
 
-  const [form, setForm] = useState<FormState>(FORM_INICIAL);
+  // El correo de la invitación de RRHH (?email=...) se precarga desde el primer render.
+  const [form, setForm] = useState<FormState>(() => ({ ...FORM_INICIAL, email: emailParam ?? '' }));
   const [error, setError] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
 
   const nombresRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
-
-  // Precargar correo si viene en la URL (?email=...) desde la invitación de RRHH
-  useEffect(() => {
-    if (emailParam) {
-      setForm((prev) => ({ ...prev, email: emailParam }));
-    }
-  }, [emailParam]);
 
   const set = <K extends keyof FormState>(campo: K, valor: FormState[K]) =>
     setForm((f) => ({ ...f, [campo]: valor }));
@@ -104,6 +101,18 @@ function RegistroFormulario() {
     ) {
       setError('Completa tus datos personales requeridos (Nombres, Apellidos, Documento y Correo).');
       nombresRef.current?.focus();
+      return;
+    }
+
+    // 1b. Formato del documento (mismas reglas que valida el backend)
+    const formatoDocumento: Record<string, [RegExp, string]> = {
+      DNI: [/^\d{8}$/, 'El DNI debe tener exactamente 8 dígitos.'],
+      CE: [/^[A-Za-z0-9]{8,12}$/, 'El carné de extranjería debe tener entre 8 y 12 letras o números.'],
+      PASAPORTE: [/^[A-Za-z0-9]{6,12}$/, 'El pasaporte debe tener entre 6 y 12 letras o números.'],
+    };
+    const regla = formatoDocumento[form.documentoTipo];
+    if (regla && !regla[0].test(form.documentoNumero.trim())) {
+      setError(regla[1]);
       return;
     }
 
@@ -152,6 +161,7 @@ function RegistroFormulario() {
         password: form.password,
         aceptaTratamientoDatos: form.aceptaTratamientoDatos,
         aceptaComunicaciones: form.aceptaComunicaciones,
+        invitacion: invitacionParam || undefined,
       });
 
       const destino = siguienteParam && siguienteParam.startsWith('/') ? siguienteParam : '/perfil';

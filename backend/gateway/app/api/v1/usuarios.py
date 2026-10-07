@@ -4,23 +4,25 @@ Rutas (prefijo /usuarios + /api/v1):
     GET    /usuarios                          → listar trabajadores           (Admin)
     POST   /usuarios                          → crear trabajador              (Admin)
     PATCH  /usuarios/{id}                     → editar nombre/rol/empresas    (Admin)
-    POST   /usuarios/{id}/restablecer-password→ volver la clave a 123456      (Admin)
+    POST   /usuarios/{id}/restablecer-password→ nueva clave temporal aleatoria (Admin)
     PATCH  /usuarios/{id}/estado              → Activo / Suspendido / Eliminado (Admin)
     PATCH  /usuarios/me/password              → cambiar MI PROPIA contraseña  (cualquier usuario)
 
 Todo es solo para Admin, salvo "cambiar mi propia contraseña".
 """
+from datetime import datetime, timezone
+
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import obtener_usuario_actual, requerir_rol
-from app.core import cache_empresas
+from app.api.deps import obtener_usuario_con_cambio_pendiente, requerir_rol
+from app.core import cache_cuentas
 from app.core.database import obtener_sesion, obtener_sesion_lectura
-from app.core.security import hash_password, verificar_password
+from app.core.security import hash_password, validar_politica_password, verificar_password
 from app.domain.usuarios import (
-    PASSWORD_POR_DEFECTO,
     ROLES_INTERNOS_ERP,
+    generar_password_temporal,
     validar_estado,
     validar_rol_interno,
 )
@@ -53,12 +55,13 @@ async def _obtener_o_404(sesion: AsyncSession, usuario_id: str) -> Usuario:
     return usuario
 
 
-def _con_password_temporal(usuario: Usuario) -> UsuarioCreadoRespuesta:
-    """Respuesta que incluye la contraseña temporal (123456), para que el Admin
-    pueda comunicársela al trabajador. Solo se usa al crear o al restablecer."""
+def _con_password_temporal(usuario: Usuario, password_temporal: str) -> UsuarioCreadoRespuesta:
+    """Respuesta que incluye la contraseña temporal (aleatoria), para que el Admin
+    pueda comunicársela al trabajador. Solo se usa al crear o al restablecer: es la
+    ÚNICA vez que se muestra (en la base de datos solo queda su hash)."""
     return UsuarioCreadoRespuesta(
         **UsuarioRespuesta.model_validate(usuario).model_dump(),
-        passwordTemporal=PASSWORD_POR_DEFECTO,
+        passwordTemporal=password_temporal,
     )
 
 
@@ -90,7 +93,7 @@ async def crear_usuario(
 
     # PASO 2: el correo no debe estar ya usado en esta tabla (ni siquiera por una cuenta
     # antigua de Postulante: un mismo correo no puede ser a la vez postulante y trabajador).
-    busqueda = await sesion.execute(select(Usuario).where(Usuario.email == datos.email))
+    busqueda = await sesion.execute(select(Usuario).where(func.lower(Usuario.email) == datos.email))
     existente = busqueda.scalar_one_or_none()
     if existente is not None:
         detalle = (
@@ -100,18 +103,20 @@ async def crear_usuario(
         )
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=detalle)
 
-    # PASO 3: crear al trabajador con la contraseña por defecto (123456).
+    # PASO 3: crear al trabajador con una contraseña temporal aleatoria.
+    password_temporal = generar_password_temporal()
     nuevo = Usuario(
         nombre=datos.nombre,
         email=datos.email,
-        password_hash=hash_password(PASSWORD_POR_DEFECTO),
+        password_hash=hash_password(password_temporal),
+        debe_cambiar_password=True,  # en su primer ingreso tendrá que cambiarla
         rol=datos.rol,
         empresas_visibles=datos.empresasVisibles,
     )
     sesion.add(nuevo)
     await sesion.commit()
     await sesion.refresh(nuevo)
-    return _con_password_temporal(nuevo)
+    return _con_password_temporal(nuevo, password_temporal)
 
 
 # ---------------------------------------------------------------------------
@@ -123,7 +128,9 @@ async def crear_usuario(
 async def cambiar_mi_password(
     datos: CambiarPasswordPropio,
     sesion: AsyncSession = Depends(obtener_sesion),
-    usuario_actual: dict = Depends(obtener_usuario_actual),  # cualquier rol del ERP
+    # Cualquier rol del ERP, incluso quien todavía tiene la contraseña temporal (es justo la ruta
+    # que necesita para dejar de tenerla).
+    usuario_actual: dict = Depends(obtener_usuario_con_cambio_pendiente),
 ) -> None:
     # "sub" es el id del usuario, tomado de su token (no de lo que envíe).
     usuario = await _obtener_o_404(sesion, usuario_actual["sub"])
@@ -133,8 +140,20 @@ async def cambiar_mi_password(
     if not verificar_password(datos.passwordActual, usuario.password_hash):
         raise SolicitudInvalida("La contraseña actual no es correcta")
 
+    # La nueva debe cumplir la misma política que la de los postulantes (8+ caracteres, mayúscula,
+    # minúscula, número, no ser común ni igual al correo) y ser distinta de la actual.
+    es_valida, motivo = validar_politica_password(datos.passwordNuevo, usuario.email)
+    if not es_valida:
+        raise SolicitudInvalida(motivo or "La contraseña no cumple la política de seguridad")
+    if datos.passwordNuevo == datos.passwordActual:
+        raise SolicitudInvalida("La nueva contraseña debe ser distinta de la actual")
+
     usuario.password_hash = hash_password(datos.passwordNuevo)
+    usuario.debe_cambiar_password = False
+    # Las sesiones abiertas (en este u otro equipo) dejan de valer: hay que entrar con la clave nueva.
+    usuario.password_cambiada_en = datetime.now(timezone.utc)
     await sesion.commit()
+    cache_cuentas.olvidar(f"erp:{usuario.id}")
 
 
 # ---------------------------------------------------------------------------
@@ -162,7 +181,7 @@ async def actualizar_usuario(
         usuario.empresas_visibles = cambios["empresasVisibles"]
 
     await sesion.commit()
-    cache_empresas.olvidar(usuario_id)  # sus empresas o su rol pudieron cambiar: que valga al instante
+    cache_cuentas.olvidar(f"erp:{usuario_id}")  # sus empresas o su rol pudieron cambiar: que valga al instante
     await sesion.refresh(usuario)
     return usuario
 
@@ -173,12 +192,16 @@ async def restablecer_password(
     sesion: AsyncSession = Depends(obtener_sesion),
     _usuario: dict = Depends(requerir_rol("Admin")),
 ) -> UsuarioCreadoRespuesta:
-    """Vuelve la contraseña de ese trabajador a 123456 (por si la olvidó)."""
+    """Le asigna a ese trabajador una nueva contraseña temporal aleatoria (por si olvidó la suya)."""
     usuario = await _obtener_o_404(sesion, usuario_id)
-    usuario.password_hash = hash_password(PASSWORD_POR_DEFECTO)
+    password_temporal = generar_password_temporal()
+    usuario.password_hash = hash_password(password_temporal)
+    usuario.debe_cambiar_password = True  # al volver a entrar tendrá que cambiarla
+    usuario.password_cambiada_en = datetime.now(timezone.utc)  # cierra las sesiones que tuviera abiertas
     await sesion.commit()
+    cache_cuentas.olvidar(f"erp:{usuario_id}")
     await sesion.refresh(usuario)
-    return _con_password_temporal(usuario)
+    return _con_password_temporal(usuario, password_temporal)
 
 
 @router.patch("/{usuario_id}/estado", response_model=UsuarioRespuesta)
@@ -198,6 +221,6 @@ async def cambiar_estado(
     usuario = await _obtener_o_404(sesion, usuario_id)
     usuario.estado = datos.estado
     await sesion.commit()
-    cache_empresas.olvidar(usuario_id)  # una cuenta suspendida o eliminada deja de ver empresas al instante
+    cache_cuentas.olvidar(f"erp:{usuario_id}")  # una cuenta suspendida o eliminada pierde el acceso al instante
     await sesion.refresh(usuario)
     return usuario

@@ -14,21 +14,17 @@ Se usan en los endpoints así:
 """
 from urllib.parse import unquote
 
-from fastapi import Depends, Header, HTTPException, status
+from fastapi import Depends, Header, HTTPException, Request, status
 
 from app.core.config import settings
-from shared_kernel.security import verificar_firma_gateway
+from shared_kernel.firma_http import peticion_firmada_por_gateway
 from shared_kernel.visibilidad import parsear_empresas
 
 
-async def verificar_peticion_del_gateway(
-    x_gateway_timestamp: str = Header(...),
-    x_gateway_signature: str = Header(...),
-) -> None:
-    """Rechaza (403) toda petición que no traiga una firma válida del Gateway."""
-    if not verificar_firma_gateway(
-        settings.gateway_shared_secret, x_gateway_timestamp, x_gateway_signature
-    ):
+async def verificar_peticion_del_gateway(request: Request) -> None:
+    """Rechaza (403) toda petición que no traiga una firma válida del Gateway: correcta para ESTE
+    método, ESTA ruta y ESTA identidad, reciente (30 s) y no repetida (ver shared_kernel/firma_http.py)."""
+    if not peticion_firmada_por_gateway(request, settings.gateway_shared_secret):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Petición rechazada: no proviene del Gateway",

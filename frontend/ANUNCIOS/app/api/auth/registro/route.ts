@@ -3,6 +3,7 @@
 // Registra una nueva cuenta de postulante y almacena el JWT en una cookie httpOnly segura.
 import { NextRequest, NextResponse } from 'next/server';
 import { reenviarAlGateway } from '@/lib/gatewayProxy';
+import { cabecerasIpCliente } from '@/lib/ipCliente';
 import { esOrigenValido } from '@/lib/csrf';
 
 const DURACION_COOKIE_SEGUNDOS = 60 * 60; // 1 hora
@@ -20,6 +21,7 @@ export async function POST(request: NextRequest) {
   try {
     const respuestaGateway = await reenviarAlGateway('/publico/auth/registro', {
       method: 'POST',
+      headers: cabecerasIpCliente(request),
       body: JSON.stringify(cuerpo),
     });
 

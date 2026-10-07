@@ -132,8 +132,9 @@ export function PostulacionesTab({
       await onActualizarEstado(anuncioId, estado, comentarios[anuncioId] || undefined);
       setComentarios((prev) => ({ ...prev, [anuncioId]: "" }));
       mostrarToast(`Postulación a "${cargo}" actualizada a "${ESTILOS_ESTADO[estado].label}"`, "success");
-    } catch {
-      mostrarToast("No se pudo actualizar la postulación. Intenta nuevamente.", "error");
+    } catch (err) {
+      // El backend explica por qué rechaza un cambio (ej. "Primero revierte la decisión").
+      mostrarToast(err instanceof Error ? err.message : "No se pudo actualizar la postulación. Intenta nuevamente.", "error");
     }
   };
 
@@ -158,8 +159,8 @@ export function PostulacionesTab({
     try {
       await onActualizarEstado(anuncioId, "POSTULADO", "Se revirtió la decisión anterior");
       mostrarToast(`Se revirtió la decisión sobre la postulación a "${cargo}"`, "info");
-    } catch {
-      mostrarToast("No se pudo revertir la decisión. Intenta nuevamente.", "error");
+    } catch (err) {
+      mostrarToast(err instanceof Error ? err.message : "No se pudo revertir la decisión. Intenta nuevamente.", "error");
     }
   };
 

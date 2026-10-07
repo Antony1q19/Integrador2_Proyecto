@@ -30,7 +30,7 @@ export async function GET(
   if (!token) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
   const { id } = await params;
-  const respuesta = await reenviarAlGateway(token, `/empresas/${id}`);
+  const respuesta = await reenviarAlGateway(token, `/empresas/${encodeURIComponent(id)}`);
   return reenviarYResponder(respuesta);
 }
 
@@ -43,7 +43,7 @@ export async function PUT(
 
   const { id } = await params;
   const cuerpoPeticion = await request.text();
-  const respuesta = await reenviarAlGateway(token, `/empresas/${id}`, {
+  const respuesta = await reenviarAlGateway(token, `/empresas/${encodeURIComponent(id)}`, {
     method: "PUT",
     body: cuerpoPeticion,
   });
@@ -58,7 +58,7 @@ export async function DELETE(
   if (!token) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
   const { id } = await params;
-  const respuesta = await reenviarAlGateway(token, `/empresas/${id}`, {
+  const respuesta = await reenviarAlGateway(token, `/empresas/${encodeURIComponent(id)}`, {
     method: "DELETE",
   });
   return reenviarYResponder(respuesta);

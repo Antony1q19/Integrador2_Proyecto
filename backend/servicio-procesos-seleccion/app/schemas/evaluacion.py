@@ -28,9 +28,9 @@ class EvaluacionCrear(BaseModel):
     """Datos para registrar una evaluación. El puntaje y el resultado NO se envían:
     los calcula el servidor. Tampoco el evaluador: es la persona con sesión iniciada."""
 
-    postulanteId: str
+    postulanteId: str = Field(max_length=36)
     competencias: Competencias
-    comentarios: str = ""
+    comentarios: str = Field(default="", max_length=2000)
 
 
 # --- Lo que se DEVUELVE al frontend ----------------------------------------

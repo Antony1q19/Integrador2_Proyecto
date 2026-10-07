@@ -2,20 +2,27 @@
 
 Rutas (prefijo /contrataciones). El navegador las llama a través del Gateway, como /api/v1/contrataciones...:
     GET    /contrataciones?postulanteId=&anuncioId=&estado=   → listar (cada una con sus seguimientos)
-    POST   /contrataciones                                    → registrar la contratación (Admin, RRHH)
-    PATCH  /contrataciones/{id}                               → corregir datos o cambiar el estado (Admin, RRHH)
+    POST   /contrataciones                                    → registrar la contratación (Admin, RRHH, Supervisor)
+    PATCH  /contrataciones/{id}                               → corregir datos o cambiar el estado (Admin, RRHH, Supervisor)
 
 Al registrar una contratación pasan tres cosas juntas (o ninguna): la postulación se marca "Contratado" (con su
 línea en el historial), se guarda la contratación y se programan los controles de 30, 60 y 90 días.
+
+Reglas del flujo:
+  - No se contrata más personas que las vacantes del anuncio. Al cubrirse la última, el anuncio pasa a
+    "Cerrado" solo (y deja de recibir postulaciones).
+  - Cancelar una contratación (la persona no ingresó) pasa la postulación a "Descartado", con su línea
+    en el historial. Una contratación cancelada no se reactiva: se revierte la postulación y se vuelve
+    a registrar (así se vuelve a revisar que haya vacantes).
 """
 from fastapi import APIRouter, Depends, status
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import contains_eager, joinedload
 
 from app.api.comunes import USUARIO_POR_DEFECTO, buscar_proceso, contratacion_a_respuesta
 from app.api.deps import requerir_rol
-from app.api.visibilidad import anuncios_visibles
+from app.api.visibilidad import anuncios_visibles, cerrar_anuncio_por_vacantes, obtener_anuncio
 from app.core.database import obtener_sesion, obtener_sesion_lectura
 from app.domain.seleccion import (
     ESTADOS_CONTRATACION,
@@ -74,22 +81,46 @@ async def listar_contrataciones(
 async def registrar_contratacion(
     datos: ContratacionCrear,
     sesion: AsyncSession = Depends(obtener_sesion),
-    usuario: dict = Depends(requerir_rol("Admin", "RRHH")),
+    usuario: dict = Depends(requerir_rol("Admin", "RRHH", "Supervisor")),
 ) -> ContratacionRespuesta:
-    # PASO 1: datos válidos y anuncio de una empresa que el usuario puede ver.
+    # PASO 1: datos válidos y anuncio (con sus vacantes) de una empresa que el usuario puede ver.
     validar_opcion(datos.tipoContrato, TIPOS_CONTRATO, "Tipo de contrato")
-    visibles = await anuncios_visibles(usuario)
-    if visibles is not None and datos.anuncioId not in visibles:
-        raise RecursoNoEncontrado("Anuncio no encontrado")
+    anuncio = await obtener_anuncio(usuario, datos.anuncioId)
 
-    # PASO 2: la postulación debe existir, no estar descartada y no tener ya una contratación.
+    # PASO 2: la postulación debe existir, no estar descartada y no tener ya una contratación vigente.
     proceso = await buscar_proceso(sesion, datos.postulanteId, datos.anuncioId)
     if proceso is None:
         raise RecursoNoEncontrado("Ese postulante no está postulado a ese anuncio")
     exigir_postulacion_abierta(proceso.estado_actual)
-    ya_existe = await sesion.execute(select(Contratacion.id).where(Contratacion.proceso_id == proceso.id))
-    if ya_existe.first() is not None:
+    # (con sus seguimientos ya cargados: si hay que borrarla, se borran con ella sin otra consulta)
+    anterior = (
+        await sesion.execute(
+            select(Contratacion)
+            .options(joinedload(Contratacion.seguimientos))
+            .where(Contratacion.proceso_id == proceso.id)
+        )
+    ).unique().scalar_one_or_none()
+    if anterior is not None and anterior.estado != "Cancelado":
         raise ConflictoDeEstado("Esta postulación ya tiene una contratación registrada")
+
+    # PASO 2b: ¿quedan vacantes? Cuentan todas las contrataciones del anuncio que no se cancelaron.
+    vacantes = int(anuncio.get("numeroVacantes") or 1)
+    ocupadas = (
+        await sesion.execute(
+            select(func.count(Contratacion.id))
+            .join(ProcesoPostulacion, Contratacion.proceso_id == ProcesoPostulacion.id)
+            .where(ProcesoPostulacion.anuncio_id == datos.anuncioId, Contratacion.estado != "Cancelado")
+        )
+    ).scalar_one()
+    if ocupadas >= vacantes:
+        raise ConflictoDeEstado(
+            f"El anuncio ya cubrió sus {vacantes} vacante(s). Para contratar a alguien más, primero "
+            "aumenta el número de vacantes del anuncio."
+        )
+    if anterior is not None:
+        # Era una contratación cancelada de esta misma postulación: se reemplaza por la nueva.
+        await sesion.delete(anterior)
+        await sesion.flush()
 
     # PASO 3: contratar = pasar la postulación a "Contratado" (con su línea en el historial)...
     nombre = usuario["nombre"] or USUARIO_POR_DEFECTO
@@ -122,6 +153,10 @@ async def registrar_contratacion(
     ]
     sesion.add(contratacion)
     await sesion.commit()
+
+    # PASO 5: si con esta se cubrieron todas las vacantes, el anuncio se cierra solo.
+    if ocupadas + 1 >= vacantes and anuncio.get("estado") != "Cerrado":
+        await cerrar_anuncio_por_vacantes(usuario, datos.anuncioId)
     return contratacion_a_respuesta(contratacion)
 
 
@@ -133,7 +168,7 @@ async def actualizar_contratacion(
     contratacion_id: str,
     datos: ContratacionActualizar,
     sesion: AsyncSession = Depends(obtener_sesion),
-    usuario: dict = Depends(requerir_rol("Admin", "RRHH")),
+    usuario: dict = Depends(requerir_rol("Admin", "RRHH", "Supervisor")),
 ) -> ContratacionRespuesta:
     resultado = await sesion.execute(
         select(Contratacion)
@@ -148,6 +183,13 @@ async def actualizar_contratacion(
     cambios = datos.model_dump(exclude_unset=True)
     validar_opcion(cambios.get("tipoContrato"), TIPOS_CONTRATO, "Tipo de contrato")
     validar_opcion(cambios.get("estado"), ESTADOS_CONTRATACION, "Estado")
+
+    estado_anterior = contratacion.estado
+    estado_nuevo = cambios.get("estado") or estado_anterior
+    if estado_anterior == "Cancelado" and estado_nuevo != "Cancelado":
+        raise ConflictoDeEstado(
+            "Una contratación cancelada no se reactiva: revierte la postulación y vuelve a registrar la contratación"
+        )
 
     for campo, columna in (
         ("cargo", "cargo"),
@@ -174,6 +216,19 @@ async def actualizar_contratacion(
         for seguimiento in contratacion.seguimientos:
             if seguimiento.estado == "Pendiente":
                 seguimiento.estado = "Omitido"
+
+    # Cancelar la contratación = la persona no ingresó: la postulación pasa a "Descartado" (queda en el
+    # historial y se puede revertir desde la ficha del postulante).
+    if estado_nuevo == "Cancelado" and estado_anterior != "Cancelado" and contratacion.proceso.estado_actual == "CONTRATADO":
+        contratacion.proceso.estado_actual = "DESCARTADO"
+        sesion.add(
+            HistorialEstado(
+                proceso_id=contratacion.proceso.id,
+                estado="DESCARTADO",
+                usuario_responsable=usuario["nombre"] or USUARIO_POR_DEFECTO,
+                comentario="Contratación cancelada" + (f": {contratacion.observaciones}" if contratacion.observaciones else ""),
+            )
+        )
 
     await sesion.commit()
     return contratacion_a_respuesta(contratacion)

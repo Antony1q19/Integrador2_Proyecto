@@ -12,7 +12,7 @@ import { ToastContainer, useToast } from "@/components/shared/Toast";
 import { useReferenciasSeleccion } from "@/features/postulantes/hooks/useReferenciasSeleccion";
 import { useCargaConCache } from "@/lib/cacheCliente";
 import { formatoFecha } from "@/lib/fechasLima";
-import { useCookieValue } from "@/lib/useCookieValue";
+import { usePermisos } from "@/lib/usePermisos";
 import { claveContrataciones, fetchContrataciones } from "../services/contratacionesService";
 import { Contratacion, ESTADOS_CONTRATACION, EstadoContratacion } from "../types/contratacion.types";
 import { EstadoContratacionBadge, PuntosDeSeguimiento } from "./ContratacionBadges";
@@ -24,7 +24,8 @@ export function ContratacionesView() {
   const [filtro, setFiltro] = useState<Filtro>("todas");
   const [abierta, setAbierta] = useState<string | null>(null);
   const { toasts, mostrarToast } = useToast();
-  const puedeEditar = useCookieValue("userRole") !== "Supervisor";
+  // Admin, Supervisor y RRHH gestionan entrevistas y contrataciones (ver lib/permisos.ts).
+  const puedeEditar = usePermisos().puedeGestionarSeleccion;
 
   // Se piden todas una vez y se filtran aquí: cambiar de filtro es instantáneo.
   const { datos, cargando, actualizando, error, recargar } = useCargaConCache<Contratacion[]>(claveContrataciones({}), () => fetchContrataciones());

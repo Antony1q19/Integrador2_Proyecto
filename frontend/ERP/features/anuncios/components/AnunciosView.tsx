@@ -10,9 +10,11 @@ interface AnunciosViewProps {
     anuncios: Anuncio[];
     onEliminar: (id: number) => Promise<void>;
     onCambiarEstado: (id: number, estado: EstadoAnuncio) => Promise<void>;
+    /** false = solo lectura (RRHH): sin cambiar estado ni eliminar. */
+    puedeGestionar?: boolean;
 }
 
-export default function AnunciosView({ anuncios, onEliminar, onCambiarEstado }: AnunciosViewProps) {
+export default function AnunciosView({ anuncios, onEliminar, onCambiarEstado, puedeGestionar = true }: AnunciosViewProps) {
     
     const [anuncioAEliminar, setAnuncioAEliminar] = useState<Anuncio | null>(null);
     const [eliminando, setEliminando] = useState(false);
@@ -112,6 +114,11 @@ export default function AnunciosView({ anuncios, onEliminar, onCambiarEstado }: 
                                 {anuncio.fechaLimite}
                             </td>
                             <td className="px-6 py-4 text-center">
+                                {!puedeGestionar ? (
+                                    <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${colorEstado(anuncio.estado)}`}>
+                                        {anuncio.estado}
+                                    </span>
+                                ) : (
                                 <button
                                     type="button"
                                     onClick={() => alternarEstado(anuncio)}
@@ -127,8 +134,10 @@ export default function AnunciosView({ anuncios, onEliminar, onCambiarEstado }: 
                                 >
                                     {cambiandoEstadoId === anuncio.id ? "…" : anuncio.estado}
                                 </button>
+                                )}
                             </td>
                             <td className="px-6 py-4 text-center">
+                                {puedeGestionar && (
                                 <button
                                     type="button"
                                     onClick={() => setAnuncioAEliminar(anuncio)}
@@ -150,6 +159,7 @@ export default function AnunciosView({ anuncios, onEliminar, onCambiarEstado }: 
                                         />
                                     </svg>
                                 </button>
+                                )}
                                 {errorPorFila[anuncio.id] && (
                                     <p className="mt-1 max-w-[160px] text-xs text-red-500">
                                         {errorPorFila[anuncio.id]}

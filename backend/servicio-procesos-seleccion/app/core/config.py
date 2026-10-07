@@ -13,6 +13,8 @@ class Settings(BaseServiceSettings):
     # Docker). Se usa para saber qué anuncios (y por tanto qué empresas) puede ver cada
     # usuario. Si falta, RRHH/Supervisor no podrán consultar postulaciones (error 503).
     url_servicio_empresas_vacantes: str | None = Field(default=None, alias="URL_SERVICIO_EMPRESAS_VACANTES")
+    # Para comprobar que un postulante existe antes de evaluarlo. Opcional: si falta, no se comprueba.
+    url_servicio_postulantes: str | None = Field(default=None, alias="URL_SERVICIO_POSTULANTES")
 
 
 # Se crea UNA sola vez; el resto del código usa `settings`.

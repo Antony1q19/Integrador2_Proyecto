@@ -13,14 +13,14 @@ from pydantic import BaseModel, Field
 class EntrevistaCrear(BaseModel):
     """Datos para programar una entrevista de una postulación."""
 
-    postulanteId: str
+    postulanteId: str = Field(max_length=36)
     anuncioId: int
     fechaHora: datetime
     duracionMin: int = Field(default=30, ge=10, le=480)
     modalidad: str
     lugarOEnlace: str | None = Field(default=None, max_length=500)
     entrevistador: str | None = Field(default=None, max_length=150)  # si no se envía, es quien la programa
-    notas: str | None = None
+    notas: str | None = Field(default=None, max_length=2000)
 
 
 class EntrevistaActualizar(BaseModel):
@@ -33,13 +33,13 @@ class EntrevistaActualizar(BaseModel):
     entrevistador: str | None = Field(default=None, max_length=150)
     estado: str | None = None
     resultado: str | None = None
-    notas: str | None = None
+    notas: str | None = Field(default=None, max_length=2000)
 
 
 class EntrevistaRespuesta(BaseModel):
     id: str
     procesoId: str
-    postulanteId: str
+    postulanteId: str = Field(max_length=36)
     anuncioId: int
     fechaHora: datetime
     duracionMin: int
@@ -60,7 +60,7 @@ class SeguimientoCrear(BaseModel):
     contratacionId: str
     hitoDias: int = Field(ge=1, le=730)
     fechaProgramada: date | None = None  # si no se envía: ingreso + hitoDias
-    observaciones: str | None = None
+    observaciones: str | None = Field(default=None, max_length=2000)
 
 
 class SeguimientoActualizar(BaseModel):
@@ -70,13 +70,13 @@ class SeguimientoActualizar(BaseModel):
     estado: str | None = None
     fechaRealizada: date | None = None  # si se marca "Realizado" y no se envía: hoy
     valoracion: str | None = None
-    observaciones: str | None = None
+    observaciones: str | None = Field(default=None, max_length=2000)
 
 
 class SeguimientoRespuesta(BaseModel):
     id: str
     contratacionId: str
-    postulanteId: str
+    postulanteId: str = Field(max_length=36)
     anuncioId: int
     hitoDias: int
     fechaProgramada: date
@@ -92,14 +92,14 @@ class SeguimientoRespuesta(BaseModel):
 class ContratacionCrear(BaseModel):
     """Datos para registrar la contratación de una postulación (y marcarla como "Contratado")."""
 
-    postulanteId: str
+    postulanteId: str = Field(max_length=36)
     anuncioId: int
     fechaIngreso: date
     cargo: str = Field(min_length=2, max_length=150)
     tipoContrato: str
     salario: Decimal | None = Field(default=None, ge=0, max_digits=10, decimal_places=2)
-    moneda: str = Field(default="PEN", min_length=3, max_length=3)
-    observaciones: str | None = None
+    moneda: str = Field(default="PEN", pattern=r"^[A-Za-z]{3}$")  # código ISO, ej. PEN o USD
+    observaciones: str | None = Field(default=None, max_length=2000)
 
 
 class ContratacionActualizar(BaseModel):
@@ -107,15 +107,15 @@ class ContratacionActualizar(BaseModel):
     cargo: str | None = Field(default=None, min_length=2, max_length=150)
     tipoContrato: str | None = None
     salario: Decimal | None = Field(default=None, ge=0, max_digits=10, decimal_places=2)
-    moneda: str | None = Field(default=None, min_length=3, max_length=3)
+    moneda: str | None = Field(default=None, pattern=r"^[A-Za-z]{3}$")
     estado: str | None = None
-    observaciones: str | None = None
+    observaciones: str | None = Field(default=None, max_length=2000)
 
 
 class ContratacionRespuesta(BaseModel):
     id: str
     procesoId: str
-    postulanteId: str
+    postulanteId: str = Field(max_length=36)
     anuncioId: int
     fechaIngreso: date
     cargo: str

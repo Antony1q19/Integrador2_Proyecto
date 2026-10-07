@@ -2,7 +2,9 @@
 
 A diferencia de las rutas del ERP (/api/v1/auth/login), estas rutas:
   - Están dirigidas a personas externas (postulantes).
-  - Tienen límite de peticiones por IP más estricto (15/min).
+  - Las rutas SIN sesión (registro, login, recuperar y restablecer contraseña) tienen límite de
+    peticiones por IP estricto (15/min). Las rutas CON sesión (/me, /perfil, /cv...) no: ya exigen
+    un token válido, y la app las llama en cada pantalla.
   - Tienen bloqueo temporal por intentos fallidos de login (5 fallos en 15 min).
   - Tienen límite para recuperación de contraseñas (3 por correo/hora, 10 por IP/hora).
   - Emiten tokens JWT firmados con rol "Postulante" y audiencia "anuncios".
@@ -15,6 +17,7 @@ from app.core.config import settings
 from app.core.http_client import cabeceras_firmadas, obtener_cliente
 from app.core.limite_peticiones import (
     limitar_por_ip,
+    obtener_ip_cliente,
     limpiar_fallos_login,
     registrar_fallo_login,
     registrar_solicitud_recuperacion,
@@ -34,19 +37,10 @@ from app.schemas.publico_auth import (
     PerfilActualizarGateway,
 )
 
-router = APIRouter(
-    prefix="/publico/auth",
-    tags=["publico-auth"],
-    dependencies=[Depends(limitar_por_ip(15))],  # Límite estricto de 15 peticiones por minuto por IP
-)
+router = APIRouter(prefix="/publico/auth", tags=["publico-auth"])
 
-
-def _obtener_ip_cliente(request: Request) -> str:
-    """Extrae la IP del cliente de la cabecera X-Forwarded-For o de la conexión directa."""
-    cabecera_forwarded = request.headers.get("x-forwarded-for")
-    if cabecera_forwarded:
-        return cabecera_forwarded.split(",")[0].strip()
-    return request.client.host if request.client else "desconocida"
+# Límite estricto (15 peticiones por minuto por IP) para las rutas que no piden sesión.
+_LIMITE_SIN_SESION = [Depends(limitar_por_ip(15))]
 
 
 def _emitir_token_postulante(usuario_dto: UsuarioPostulanteDto) -> str:
@@ -67,13 +61,18 @@ def _emitir_token_postulante(usuario_dto: UsuarioPostulanteDto) -> str:
     )
 
 
-@router.post("/registro", response_model=TokenPostulanteRespuesta, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/registro",
+    response_model=TokenPostulanteRespuesta,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=_LIMITE_SIN_SESION,
+)
 async def registrar_postulante(
     datos: RegistroPostulanteGateway,
     request: Request,
 ) -> TokenPostulanteRespuesta:
     """Registra una nueva cuenta de postulante o enlaza la invitación de RRHH."""
-    ip = _obtener_ip_cliente(request)
+    ip = obtener_ip_cliente(request)
     cliente = obtener_cliente()
     url = f"{settings.url_servicio_postulantes}/auth/registro"
 
@@ -109,13 +108,13 @@ async def registrar_postulante(
     return TokenPostulanteRespuesta(access_token=token, usuario=usuario_dto)
 
 
-@router.post("/login", response_model=TokenPostulanteRespuesta)
+@router.post("/login", response_model=TokenPostulanteRespuesta, dependencies=_LIMITE_SIN_SESION)
 async def login_postulante(
     datos: LoginPostulanteGateway,
     request: Request,
 ) -> TokenPostulanteRespuesta:
     """Inicia sesión para postulantes con protección anti-fuerza bruta."""
-    ip = _obtener_ip_cliente(request)
+    ip = obtener_ip_cliente(request)
 
     # 1. Comprobar bloqueo temporal previo (5 fallos en 15 minutos)
     verificar_bloqueo_login(ip, datos.email)
@@ -159,13 +158,13 @@ async def login_postulante(
     return TokenPostulanteRespuesta(access_token=token, usuario=usuario_dto)
 
 
-@router.post("/recuperar-password", response_model=MensajePublicoRespuesta)
+@router.post("/recuperar-password", response_model=MensajePublicoRespuesta, dependencies=_LIMITE_SIN_SESION)
 async def recuperar_password(
     datos: RecuperarPasswordGateway,
     request: Request,
 ) -> MensajePublicoRespuesta:
     """Solicita envío de correo de restablecimiento con límite de solicitudes (spam)."""
-    ip = _obtener_ip_cliente(request)
+    ip = obtener_ip_cliente(request)
 
     # Límite anti-spam: máx 3 por correo/hora y 10 por IP/hora
     verificar_limite_recuperacion(ip, datos.email)
@@ -195,13 +194,13 @@ async def recuperar_password(
     )
 
 
-@router.post("/restablecer-password", response_model=MensajePublicoRespuesta)
+@router.post("/restablecer-password", response_model=MensajePublicoRespuesta, dependencies=_LIMITE_SIN_SESION)
 async def restablecer_password(
     datos: RestablecerPasswordGateway,
     request: Request,
 ) -> MensajePublicoRespuesta:
     """Aplica la nueva contraseña usando el token único de recuperación."""
-    ip = _obtener_ip_cliente(request)
+    ip = obtener_ip_cliente(request)
     cliente = obtener_cliente()
     url = f"{settings.url_servicio_postulantes}/auth/restablecer-password"
 
@@ -273,7 +272,7 @@ async def aceptar_terminos(
     postulante: dict = Depends(obtener_postulante_actual),
 ) -> MensajePublicoRespuesta:
     """Permite a un postulante autenticado aceptar una nueva versión de términos y condiciones."""
-    ip = _obtener_ip_cliente(request)
+    ip = obtener_ip_cliente(request)
     cliente = obtener_cliente()
     usuario_id = str(postulante.get("sub", ""))
     url = f"{settings.url_servicio_postulantes}/auth/aceptar-terminos"

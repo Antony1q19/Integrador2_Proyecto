@@ -25,3 +25,5 @@ class TokenRespuesta(BaseModel):
     # Ids de las empresas que puede ver. El ERP los usa para filtrar /empresas.
     # (Vacío para un Admin: ve todas.)
     empresasVisibles: list[int] = []
+    # True = entró con una contraseña temporal y debe cambiarla antes de usar el ERP.
+    debeCambiarPassword: bool = False

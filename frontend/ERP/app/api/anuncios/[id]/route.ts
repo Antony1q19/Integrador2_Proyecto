@@ -1,7 +1,7 @@
 // app/api/anuncios/[id]/route.ts
 //
 // GET    → detalle de un anuncio (404 si no existe o no es visible para el usuario)
-// PUT    → edita un anuncio existente (Admin, RRHH), sin tocar su estado
+// PUT    → edita un anuncio existente (Admin, Supervisor), sin tocar su estado
 // DELETE → elimina un anuncio (borrado lógico; Admin, RRHH)
 import { NextRequest, NextResponse } from "next/server";
 import { reenviarAlGateway } from "@/lib/gatewayProxy";
@@ -25,7 +25,7 @@ export async function GET(
   if (!token) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
   const { id } = await params;
-  const respuesta = await reenviarAlGateway(token, `/anuncios/${id}`);
+  const respuesta = await reenviarAlGateway(token, `/anuncios/${encodeURIComponent(id)}`);
   return reenviarYResponder(respuesta);
 }
 
@@ -38,7 +38,7 @@ export async function PUT(
 
   const { id } = await params;
   const cuerpoPeticion = await request.text();
-  const respuesta = await reenviarAlGateway(token, `/anuncios/${id}`, {
+  const respuesta = await reenviarAlGateway(token, `/anuncios/${encodeURIComponent(id)}`, {
     method: "PUT",
     body: cuerpoPeticion,
   });
@@ -53,7 +53,7 @@ export async function DELETE(
   if (!token) return NextResponse.json({ error: "No autenticado" }, { status: 401 });
 
   const { id } = await params;
-  const respuesta = await reenviarAlGateway(token, `/anuncios/${id}`, {
+  const respuesta = await reenviarAlGateway(token, `/anuncios/${encodeURIComponent(id)}`, {
     method: "DELETE",
   });
   return reenviarYResponder(respuesta);

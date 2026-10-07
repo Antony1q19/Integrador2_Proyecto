@@ -1,11 +1,24 @@
 // middleware.ts
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { permisosDe } from '@/lib/permisos'
+import { esOrigenValido } from '@/lib/csrf'
+
+const METODOS_SEGUROS = ['GET', 'HEAD', 'OPTIONS'];
  
 export function middleware(request: NextRequest) {
   const role = request.cookies.get('userRole')?.value;
   const token = request.cookies.get('authToken')?.value;
   const { pathname } = request.nextUrl;
+
+  // Rutas /api (las que hablan con el Gateway): solo se revisa el origen de lo que modifica datos
+  // (protección CSRF, ver lib/csrf.ts). La sesión y los permisos los valida el backend.
+  if (pathname.startsWith('/api/')) {
+    if (!METODOS_SEGUROS.includes(request.method) && !esOrigenValido(request)) {
+      return NextResponse.json({ error: 'Petición no autorizada (origen inválido)' }, { status: 403 });
+    }
+    return NextResponse.next();
+  }
 
   // 0. Sesión vencida: el token (cookie httpOnly) dura 1 hora y desaparece solo, pero las
   // cookies de UI (userRole...) podrían seguir ahí. Sin token no hay sesión real: se limpian
@@ -14,7 +27,7 @@ export function middleware(request: NextRequest) {
     const respuesta = pathname.startsWith('/login')
       ? NextResponse.next()
       : NextResponse.redirect(new URL('/login', request.url));
-    for (const nombre of ['userRole', 'userName', 'userEmail', 'userEmpresas']) {
+    for (const nombre of ['userRole', 'userName', 'userEmail', 'userEmpresas', 'cambioPassword']) {
       respuesta.cookies.delete(nombre);
     }
     return respuesta;
@@ -37,15 +50,31 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/perfil', request.url));
   }
 
-  // 3. RUTAS PROTEGIDAS SEGÚN ROL (Ejemplo de reglas)
-  if (role) {
-    // Si es Supervisor, prohibirle entrar a /empresas o /anuncios
-    if (role === 'Supervisor' && (pathname.startsWith('/empresas') || pathname.startsWith('/anuncios'))) {
-      return NextResponse.redirect(new URL('/perfil', request.url));
-    }
+  // 2.c. Entró con una contraseña temporal: hasta cambiarla solo puede estar en /perfil (el Gateway
+  // igual rechaza todo lo demás; esto evita que vea pantallas llenas de errores).
+  if (role && request.cookies.get('cambioPassword')?.value && !pathname.startsWith('/perfil')) {
+    return NextResponse.redirect(new URL('/perfil', request.url));
+  }
 
-    // El Dashboard lo pueden ver los 3 roles: el backend solo entrega los datos de las empresas que
-    // cada persona tiene asignada (un Admin ve todas), así que no hace falta bloquearlo por rol.
+  // 3. RUTAS PROTEGIDAS SEGÚN ROL (matriz en lib/permisos.ts; el backend aplica las mismas reglas)
+  if (role) {
+    const permisos = permisosDe(role);
+    const inicio = role === 'RRHH' ? '/postulantes' : '/dashboard';
+    // RRHH (reclutamiento) no ve el Dashboard.
+    if (pathname.startsWith('/dashboard') && !permisos.puedeVerDashboard) {
+      return NextResponse.redirect(new URL(inicio, request.url));
+    }
+    // Crear/editar anuncios: Admin y Supervisor. (Ver la lista y el detalle: todos.)
+    if (/^\/anuncios\/(nuevo|[^/]+\/editar)(\/|$)/.test(pathname) && !permisos.puedeGestionarAnuncios) {
+      return NextResponse.redirect(new URL('/anuncios', request.url));
+    }
+    // Crear empresas: solo Admin. Editar: Admin y Supervisor.
+    if (/^\/empresas\/nueva(\/|$)/.test(pathname) && !permisos.puedeCrearEliminarEmpresas) {
+      return NextResponse.redirect(new URL('/empresas', request.url));
+    }
+    if (/^\/empresas\/[^/]+\/editar(\/|$)/.test(pathname) && !permisos.puedeEditarEmpresas) {
+      return NextResponse.redirect(new URL('/empresas', request.url));
+    }
   }
  
   return NextResponse.next();
@@ -53,6 +82,7 @@ export function middleware(request: NextRequest) {
  
 export const config = {
   // Proteger todo excepto estáticos de Next y favicon
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  // Todo excepto estáticos de Next y favicon. Incluye /api para la revisión CSRF (ver arriba).
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 }
 

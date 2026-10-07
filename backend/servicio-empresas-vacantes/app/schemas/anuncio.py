@@ -7,6 +7,13 @@ from datetime import date, datetime
 from typing import Literal
 from pydantic import BaseModel, field_validator, model_validator
 
+from shared_kernel.fechas import hoy_en_peru
+
+# Límites razonables (y que entran en las columnas: salario es NUMERIC(10, 2)).
+_MAXIMO_TEXTO_LARGO = 5000
+_MAXIMO_VACANTES = 500
+_MAXIMO_SALARIO = 99_999_999.99
+
 
 class AnuncioRespuesta(BaseModel):
     """Un anuncio de trabajo, con el nombre de su empresa ya incluido."""
@@ -52,6 +59,8 @@ class _AnuncioCamposComunes(BaseModel):
     def validar_descripcion(cls, valor: str) -> str:
         if len(valor.strip()) < 20:
             raise ValueError("La descripción debe tener al menos 20 caracteres")
+        if len(valor) > _MAXIMO_TEXTO_LARGO:
+            raise ValueError(f"La descripción no puede exceder {_MAXIMO_TEXTO_LARGO} caracteres")
         return valor.strip()
 
     @field_validator("requisitos")
@@ -59,6 +68,8 @@ class _AnuncioCamposComunes(BaseModel):
     def validar_requisitos(cls, valor: str) -> str:
         if len(valor.strip()) < 10:
             raise ValueError("Los requisitos deben tener al menos 10 caracteres")
+        if len(valor) > _MAXIMO_TEXTO_LARGO:
+            raise ValueError(f"Los requisitos no pueden exceder {_MAXIMO_TEXTO_LARGO} caracteres")
         return valor.strip()
 
     @field_validator("numeroVacantes")
@@ -66,6 +77,8 @@ class _AnuncioCamposComunes(BaseModel):
     def validar_numero_vacantes(cls, valor: int) -> int:
         if valor < 1:
             raise ValueError("Debe haber al menos 1 vacante")
+        if valor > _MAXIMO_VACANTES:
+            raise ValueError(f"No puede haber más de {_MAXIMO_VACANTES} vacantes en un anuncio")
         return valor
 
     @field_validator("salarioMin", "salarioMax")
@@ -73,12 +86,14 @@ class _AnuncioCamposComunes(BaseModel):
     def validar_salario_no_negativo(cls, valor: float) -> float:
         if valor < 0:
             raise ValueError("El salario no puede ser negativo")
+        if valor > _MAXIMO_SALARIO:
+            raise ValueError("El salario es demasiado alto")
         return valor
 
     @field_validator("fechaLimite")
     @classmethod
     def validar_fecha_futura(cls, valor: date) -> date:
-        if valor <= date.today():
+        if valor <= hoy_en_peru():  # hora de Perú: el servidor corre en UTC
             raise ValueError("La fecha límite debe ser una fecha futura")
         return valor
 
