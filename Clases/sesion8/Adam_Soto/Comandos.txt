@@ -1,0 +1,6 @@
+- npx kapso-emulator --webhook-url http://localhost:3000/webhooks/kapso
+- npx kapso-emulator --webhook-url http://localhost:3001/api/whatsapp/webhook --webhook-secret mi-secreto-de-prueba
+Invoke-RestMethod -Uri "http://localhost:4300/_kapso/simulate/inbound-message" `
+  -Method POST `
+  -ContentType "application/json" `
+  -Body '{"phone_number_id": "555111222333", "from": "51987654321", "text": "Hola, muy bien gracias. ¿Alguna novedad?"}'
