@@ -111,3 +111,20 @@ services:
       - ./backend/libs/shared/shared_kernel:/app/libs/shared_kernel
     env_file:
       - ./backend/servicio-procesos-seleccion/.env
+
+  servicio-comunicaciones:
+    container_name: comunicaciones-service
+    build:
+      context: ./backend
+      dockerfile: servicio-comunicaciones/Dockerfile
+    expose:
+      - "8004"
+    volumes:
+      - ./backend/servicio-comunicaciones/app:/app/app
+      - ./backend/libs/shared/shared_kernel:/app/libs/shared_kernel
+    env_file:
+      - ./backend/servicio-comunicaciones/.env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - gateway

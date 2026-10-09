@@ -39,6 +39,8 @@ _URL_POR_SERVICIO = {
     "entrevistas": settings.url_servicio_procesos_seleccion,            # servicio-procesos-seleccion
     "contrataciones": settings.url_servicio_procesos_seleccion,         # servicio-procesos-seleccion
     "seguimientos": settings.url_servicio_procesos_seleccion,           # servicio-procesos-seleccion
+    "comunicaciones": settings.url_servicio_comunicaciones,
+    "webhook": settings.url_servicio_comunicaciones,                    # para recibir webhooks
 }
 
 

@@ -39,5 +39,9 @@ class Settings(BaseServiceSettings):
         return [origen.strip() for origen in self.cors_origins.split(",") if origen.strip()]
 
 
+    url_servicio_comunicaciones: str | None = Field(
+    default=None, alias="URL_SERVICIO_COMUNICACIONES"
+    )
+    
 # Se crea UNA sola vez, al importar este archivo; el resto del código usa `settings`.
 settings = Settings()  # type: ignore[call-arg]

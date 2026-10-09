@@ -25,7 +25,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1 import auth, proxy, publico, publico_auth, publico_procesos, usuarios
+from app.api.v1 import auth, proxy, publico, publico_auth, publico_procesos, publico_webhook, usuarios
 
 from app.core.config import settings
 from app.core.database import engine
@@ -113,6 +113,7 @@ app.include_router(publico_auth.router, prefix="/api/v1")     # /api/v1/publico/
 app.include_router(publico_procesos.router, prefix="/api/v1") # /api/v1/publico/procesos (postulaciones de postulantes)
 app.include_router(usuarios.router, prefix="/api/v1")         # /api/v1/usuarios/...
 app.include_router(publico.router, prefix="/api/v1")          # /api/v1/publico/... (SIN sesión, app ANUNCIOS)
+app.include_router(publico_webhook.router, prefix="/api/v1")  # webhook de WhatsApp
 app.include_router(proxy.router, prefix="/api/v1")            # /api/v1/postulantes/... (y lo demás) — SIEMPRE AL FINAL
 
 

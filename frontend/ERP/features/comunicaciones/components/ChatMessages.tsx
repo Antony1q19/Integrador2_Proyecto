@@ -14,15 +14,15 @@ interface ChatMessagesProps {
 const getEstadoIcon = (estado: Mensaje["estado"]) => {
   switch (estado) {
     case "enviado":
-      return <Check className="h-3 w-3 text-slate-400" />;
+      return <Check className="h-3 w-3 text-slate-400" />;      // ✓ una gris
     case "entregado":
-      return <CheckCheck className="h-3 w-3 text-slate-400" />;
+      return <CheckCheck className="h-3 w-3 text-slate-400" />;  // ✓✓ dos grises
     case "leido":
-      return <CheckCheck className="h-3 w-3 text-blue-500" />;
+      return <CheckCheck className="h-3 w-3 text-blue-500" />;   // ✓✓ dos azules
     case "fallido":
-      return <XCircle className="h-3 w-3 text-red-500" />;
+      return <XCircle className="h-3 w-3 text-red-500" />;      // ✗ rojo
     default:
-      return <Clock className="h-3 w-3 text-slate-400" />;
+      return <Clock className="h-3 w-3 text-slate-400" />;       // 🕐 reloj
   }
 };
 

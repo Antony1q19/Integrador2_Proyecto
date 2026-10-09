@@ -129,12 +129,19 @@ export function useChatMessages() {
     return contenido;
   }, [contactoSeleccionado]);
 
+    // ============================================================
+  // POLLING: recargar mensajes cada 5 segundos
   // ============================================================
-  // SCROLL AUTOMÁTICO
-  // ============================================================
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [mensajes]);
+  // Al final del hook, antes de return:
+useEffect(() => {
+  if (!contactoSeleccionado) return;
+
+  const intervalo = setInterval(() => {
+    cargarMensajes(contactoSeleccionado.id);
+  }, 5000); // Cada 5 segundos
+
+  return () => clearInterval(intervalo);
+}, [contactoSeleccionado, cargarMensajes]);
 
   return {
     contactos,

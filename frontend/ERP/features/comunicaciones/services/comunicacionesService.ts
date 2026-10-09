@@ -1,109 +1,112 @@
 // features/comunicaciones/services/comunicacionesService.ts
-import { Contacto, Mensaje, Conversacion, PlantillaMensaje, PLANTILLAS } from "../types/comunicaciones.types";
-import { mockContactos, mockMensajes } from "../data/mockData";
+//
+// Servicio conectado al backend real (servicio-comunicaciones a través del Gateway).
+import { Contacto, Mensaje, PlantillaMensaje, PLANTILLAS } from "../types/comunicaciones.types";
 
-const LATENCIA_MOCK_MS = 300;
+// --- Formato que devuelve el backend ---
+interface ConversacionBackend {
+  id: string;
+  postulante_id: string;
+  nombre: string;
+  telefono: string;
+  ultima_actividad: string;
+  no_leidos: number;
+}
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+interface MensajeBackend {
+  id: string;
+  conversacion_id: string;
+  remitente: "yo" | "contacto";
+  texto: string;
+  fecha: string;
+  estado: "enviado" | "entregado" | "leido" | "fallido";
+  wamid: string | null;
+}
 
-// ============================================================
-// OBTENER CONTACTOS
-// ============================================================
-export async function fetchContactos(): Promise<Contacto[]> {
-  await delay(LATENCIA_MOCK_MS);
-  return structuredClone(mockContactos);
+// --- Mapeo backend → frontend ---
+function mapearConversacion(dto: ConversacionBackend): Contacto {
+  const partes = dto.nombre.trim().split(/\s+/);
+  const nombre = partes[0] ?? dto.nombre;
+  const apellido = partes.slice(1).join(" ") || "";
+
+  return {
+    id: dto.id,
+    nombre,
+    apellido,
+    telefono: dto.telefono,
+    email: "",
+    ultimaActividad: dto.ultima_actividad,
+    noLeidos: dto.no_leidos,
+    estado: "desconectado",
+  };
+}
+
+function mapearMensaje(dto: MensajeBackend): Mensaje {
+  return {
+    id: dto.id,
+    contactoId: dto.conversacion_id,
+    remitente: dto.remitente,
+    texto: dto.texto,
+    fecha: dto.fecha,
+    estado: dto.estado,
+  };
 }
 
 // ============================================================
-// OBTENER MENSAJES DE UN CONTACTO
+// OBTENER CONTACTOS (conversaciones)
+// ============================================================
+export async function fetchContactos(): Promise<Contacto[]> {
+  const respuesta = await fetch('/api/comunicaciones', { method: 'GET' });
+  if (!respuesta.ok) throw new Error('Error al cargar contactos');
+  const dtos: ConversacionBackend[] = await respuesta.json();
+  return dtos.map(mapearConversacion);
+}
+
+// ============================================================
+// OBTENER MENSAJES DE UNA CONVERSACIÓN
 // ============================================================
 export async function fetchMensajesByContactoId(contactoId: string): Promise<Mensaje[]> {
-  await delay(LATENCIA_MOCK_MS);
-  const mensajes = mockMensajes[contactoId] || [];
-  return structuredClone(mensajes);
+  const respuesta = await fetch(`/api/comunicaciones/${contactoId}/mensajes`, { method: 'GET' });
+  if (!respuesta.ok) throw new Error('Error al cargar mensajes');
+  const dtos: MensajeBackend[] = await respuesta.json();
+  return dtos.map(mapearMensaje);
 }
 
 // ============================================================
 // ENVIAR MENSAJE
 // ============================================================
 export async function sendMessage(contactoId: string, texto: string): Promise<Mensaje> {
-  await delay(LATENCIA_MOCK_MS);
-  
-  const nuevoMensaje: Mensaje = {
-    id: `m${Date.now()}`,
-    contactoId,
-    remitente: "yo",
-    texto,
-    fecha: new Date().toISOString(),
-    estado: "enviado",
-  };
-
-  // Simular entrega después de 2 segundos
-  setTimeout(() => {
-    nuevoMensaje.estado = "entregado";
-  }, 2000);
-
-  // Simular lectura después de 5 segundos
-  setTimeout(() => {
-    nuevoMensaje.estado = "leido";
-  }, 5000);
-
-  // Agregar al mock
-  if (!mockMensajes[contactoId]) {
-    mockMensajes[contactoId] = [];
+  const respuesta = await fetch(`/api/comunicaciones/${contactoId}/mensajes`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ texto }),
+  });
+  if (!respuesta.ok) {
+    const error = await respuesta.json().catch(() => ({}));
+    throw new Error(error?.detail ?? 'Error al enviar mensaje');
   }
-  mockMensajes[contactoId].push(nuevoMensaje);
-
-  return nuevoMensaje;
+  const dto: MensajeBackend = await respuesta.json();
+  return mapearMensaje(dto);
 }
 
 // ============================================================
 // OBTENER PLANTILLAS
 // ============================================================
 export async function fetchPlantillas(): Promise<PlantillaMensaje[]> {
-  await delay(LATENCIA_MOCK_MS);
   return structuredClone(PLANTILLAS);
 }
 
 // ============================================================
-// BUSCAR CONTACTOS
+// BUSCAR CONTACTOS (local, sobre los ya cargados)
 // ============================================================
 export async function searchContactos(query: string): Promise<Contacto[]> {
-  await delay(LATENCIA_MOCK_MS);
-  const queryLower = query.toLowerCase().trim();
-  if (!queryLower) return structuredClone(mockContactos);
-  
-  const resultados = mockContactos.filter(
+  const todos = await fetchContactos();
+  const q = query.toLowerCase().trim();
+  if (!q) return todos;
+  return todos.filter(
     (c) =>
-      c.nombre.toLowerCase().includes(queryLower) ||
-      c.apellido.toLowerCase().includes(queryLower) ||
-      c.telefono.includes(query)
+      c.nombre.toLowerCase().includes(q) ||
+      c.apellido.toLowerCase().includes(q) ||
+      c.telefono.includes(q)
   );
-  return structuredClone(resultados);
-}
-
-// ============================================================
-// OBTENER CONVERSACION COMPLETA
-// ============================================================
-export async function fetchConversacion(contactoId: string): Promise<Conversacion> {
-  await delay(LATENCIA_MOCK_MS);
-  
-  const contacto = mockContactos.find((c) => c.id === contactoId);
-  if (!contacto) throw new Error("Contacto no encontrado");
-  
-  const mensajes = mockMensajes[contactoId] || [];
-  const ultimoMensaje = mensajes.length > 0 ? mensajes[mensajes.length - 1] : null;
-  
-  return {
-    contacto: structuredClone(contacto),
-    mensajes: structuredClone(mensajes),
-    ultimoMensaje: ultimoMensaje ? structuredClone(ultimoMensaje) : {
-      id: "",
-      contactoId: "",
-      remitente: "yo",
-      texto: "No hay mensajes",
-      fecha: new Date().toISOString(),
-      estado: "enviado",
-    },
-  };
 }
