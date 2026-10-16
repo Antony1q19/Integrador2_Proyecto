@@ -46,7 +46,10 @@ configurar_logging("gateway", settings.log_level)
 async def lifespan(app: FastAPI):
     # AL ENCENDER: en modo "desarrollo" crea las tablas que falten y siembra
     # los datos de prueba (infrastructure/seed.py). Solo crea lo que falta: no modifica
-    # tablas que ya existen (un cambio de columnas se hace a mano en Supabase).
+    # tablas que ya existen (las columnas nuevas las agrega aplicar_migraciones).
+    # Producción (AWS) con base nueva: crea las tablas que falten, SIN datos de prueba.
+    if settings.inicializar_bd and settings.entorno != "desarrollo":
+        await crear_tablas(engine)
     if settings.entorno == "desarrollo":
         await crear_tablas(engine)
     # En cualquier entorno: agrega las columnas nuevas que falten en tablas ya existentes.

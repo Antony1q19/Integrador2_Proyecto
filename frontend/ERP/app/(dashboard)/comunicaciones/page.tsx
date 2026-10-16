@@ -3,10 +3,8 @@
 
 //import { useEffect } from "react";
 import { useChatMessages } from "@/features/comunicaciones/hooks/useChatMessages";
-import { useNotificaciones } from "@/features/comunicaciones/hooks/useNotificaciones";
 import { ConversationList } from "@/features/comunicaciones/components/ConversationList";
 import { ChatPanel } from "@/features/comunicaciones/components/ChatPanel";
-import { NotificacionesContainer } from "@/features/comunicaciones/components/NotificacionesContainer";
 
 export default function ComunicacionesPage() {
   const {
@@ -21,21 +19,9 @@ export default function ComunicacionesPage() {
     buscarContactos,
     seleccionarContacto,
     enviarMensaje,
+    agregarMensaje,
     insertarPlantilla,
   } = useChatMessages();
-
-  const {
-    notificaciones,
-    eliminarNotificacion,
-  } = useNotificaciones();
-
-  // Manejar click en notificación
-  const handleNotificacionClick = (contactoId: string) => {
-    const contacto = contactos.find((c) => c.id === contactoId);
-    if (contacto) {
-      seleccionarContacto(contacto);
-    }
-  };
 
   if (error) {
     return (
@@ -93,17 +79,12 @@ export default function ComunicacionesPage() {
               messagesEndRef={messagesEndRef}
               onSendMessage={enviarMensaje}
               onInsertTemplate={insertarPlantilla}
+              onPlantillaEnviada={agregarMensaje}
             />
           </div>
         </div>
       </div>
 
-      {/* Notificaciones flotantes */}
-      <NotificacionesContainer
-        notificaciones={notificaciones}
-        onClose={eliminarNotificacion}
-        onNotificacionClick={handleNotificacionClick}
-      />
     </>
   );
 }

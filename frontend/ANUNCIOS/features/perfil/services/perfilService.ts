@@ -18,7 +18,32 @@ import {
   IdiomaPerfil,
   ExperienciaLaboral,
   ConsentimientosPerfil,
+  TipoDocumento,
 } from '../types';
+
+// Lo que devuelve el backend (MePostulanteRespuesta), plano: aquí se pasa al formato del frontend.
+interface CvBackend {
+  nombreArchivo: string;
+  tamanioKb: number;
+  fechaCarga: string;
+}
+
+interface PerfilBackend {
+  postulanteId: string;
+  nombres?: string;
+  apellidos?: string;
+  documentoTipo: string;
+  documentoNumero: string;
+  email: string;
+  telefono?: string | null;
+  fechaNacimiento?: string | null;
+  direccion?: string | null;
+  resumenProfesional?: string | null;
+  formacionAcademica?: FormacionAcademica[];
+  idiomas?: IdiomaPerfil[];
+  experiencia?: ExperienciaLaboral[];
+  cv?: CvBackend | null;
+}
 export interface DatosRegistro {
   datosPersonales: DatosPersonalesPerfil;
   consentimientos: Omit<ConsentimientosPerfil, 'fechaAceptacion'>;
@@ -38,7 +63,7 @@ export async function fetchPerfil(): Promise<PerfilPostulante> {
   const res = await fetch('/api/auth/me');
   if (!res.ok) throw new Error('Error al obtener el perfil');
   const body = await res.json();
-  const data = body.usuario;
+  const data: PerfilBackend = body.usuario;
   
   // Mapeamos MePostulanteRespuesta a PerfilPostulante
   return {
@@ -46,7 +71,7 @@ export async function fetchPerfil(): Promise<PerfilPostulante> {
     datosPersonales: {
       nombres: data.nombres || '',
       apellidos: data.apellidos || '',
-      documentoTipo: data.documentoTipo as any,
+      documentoTipo: data.documentoTipo as TipoDocumento,
       documentoNumero: data.documentoNumero,
       email: data.email,
       telefono: data.telefono || '',
@@ -75,7 +100,7 @@ export async function updateFoto(archivo: File): Promise<string> {
 // El backend devuelve los datos del CV sin url: el archivo se ve a través de
 // /api/auth/cv/contenido (el bucket es privado). `?v=` evita que el navegador
 // muestre la versión anterior en caché después de reemplazarlo.
-function mapCv(cv: Record<string, any> | null | undefined): CurriculumAdjunto | undefined {
+function mapCv(cv: CvBackend | null | undefined): CurriculumAdjunto | undefined {
   if (!cv) return undefined;
   return {
     nombreArchivo: cv.nombreArchivo,
@@ -88,13 +113,13 @@ function mapCv(cv: Record<string, any> | null | undefined): CurriculumAdjunto | 
 // Convierte la respuesta plana del backend (MePostulanteRespuesta)
 // al formato anidado que espera el frontend (PerfilPostulante).
 // Se reutiliza en todas las funciones de actualización.
-function mapRespuesta(data: Record<string, any>): PerfilPostulante {
+function mapRespuesta(data: PerfilBackend): PerfilPostulante {
   return {
     id: data.postulanteId,
     datosPersonales: {
       nombres: data.nombres || '',
       apellidos: data.apellidos || '',
-      documentoTipo: data.documentoTipo as any,
+      documentoTipo: data.documentoTipo as TipoDocumento,
       documentoNumero: data.documentoNumero,
       email: data.email,
       telefono: data.telefono || '',

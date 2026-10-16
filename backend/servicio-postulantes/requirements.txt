@@ -17,3 +17,5 @@ python-multipart>=0.0.9
 pytest>=8.3,<9
 pytest-asyncio>=0.24,<0.25
 aiosqlite>=0.20,<0.21
+# AWS: S3 (archivos) y SES (correos). Los permisos vienen del rol de IAM de la tarea.
+boto3>=1.35,<2

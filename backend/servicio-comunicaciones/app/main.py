@@ -10,6 +10,7 @@ from fastapi import FastAPI
 from app.api.v1.router import router as router_v1
 from app.core.config import settings
 from app.core.database import engine
+from app.infrastructure.migraciones import aplicar_migraciones
 from shared_kernel.database import calentar_conexiones, crear_tablas
 from shared_kernel.exceptions import registrar_manejadores_excepciones
 from shared_kernel.logging import configurar_logging
@@ -19,8 +20,13 @@ configurar_logging("servicio-comunicaciones", settings.log_level)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Producción (AWS) con base nueva: crea las tablas que falten, SIN datos de prueba.
+    if settings.inicializar_bd and settings.entorno != "desarrollo":
+        await crear_tablas(engine)
     if settings.entorno == "desarrollo":
         await crear_tablas(engine)
+    # En cualquier entorno: índices nuevos y plantillas rápidas iniciales (si faltan).
+    await aplicar_migraciones(engine)
     tarea_calentamiento = asyncio.create_task(calentar_conexiones(engine))
     yield
     await tarea_calentamiento

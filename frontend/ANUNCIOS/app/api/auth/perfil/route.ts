@@ -20,9 +20,9 @@ export async function PATCH(req: NextRequest) {
     const data = await respuesta.json().catch(() => ({}));
 
     return NextResponse.json(data, { status: respuesta.status });
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json(
-      { detail: error.message || 'Error interno del servidor' },
+      { detail: (error instanceof Error && error.message) || 'Error interno del servidor' },
       { status: 500 }
     );
   }

@@ -91,10 +91,10 @@ class Documento(Base):
     tipo: Mapped[str] = mapped_column(String(50), nullable=False)  # CV, DNI, certificado, etc.
     nombre_archivo: Mapped[str] = mapped_column(String(255), nullable=False)
     # Dónde está guardado el archivo (el archivo en sí NO se guarda en la base de datos):
-    # "<bucket>/<ruta>" dentro de Supabase Storage.
+    # "<bucket o carpeta>/<ruta>" dentro del almacenamiento (S3 en AWS, carpeta local en desarrollo).
     referencia_almacenamiento: Mapped[str] = mapped_column(String(500), nullable=False)
 
-    # Datos del archivo en Supabase Storage (vacíos en los documentos que no se subieron ahí, como el
+    # Datos del archivo en el almacenamiento (vacíos en los documentos que no se subieron ahí, como el
     # de prueba). La ruta sirve para DESCARGARLO y BORRARLO después.
     ruta_archivo: Mapped[str] = mapped_column(String(255), nullable=True)  # ruta dentro del bucket
     tipo_contenido: Mapped[str] = mapped_column(String(100), nullable=True)  # ej. "application/pdf"

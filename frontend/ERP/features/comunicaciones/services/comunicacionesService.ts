@@ -1,7 +1,7 @@
 // features/comunicaciones/services/comunicacionesService.ts
 //
 // Servicio conectado al backend real (servicio-comunicaciones a través del Gateway).
-import { Contacto, Mensaje, PlantillaMensaje, PLANTILLAS } from "../types/comunicaciones.types";
+import { Contacto, Mensaje } from "../types/comunicaciones.types";
 
 // --- Formato que devuelve el backend ---
 interface ConversacionBackend {
@@ -11,6 +11,9 @@ interface ConversacionBackend {
   telefono: string;
   ultima_actividad: string;
   no_leidos: number;
+  ultimo_mensaje: string | null;
+  registrado: boolean;
+  ultimo_entrante: string | null;
 }
 
 interface MensajeBackend {
@@ -21,6 +24,7 @@ interface MensajeBackend {
   fecha: string;
   estado: "enviado" | "entregado" | "leido" | "fallido";
   wamid: string | null;
+  error: string | null;
 }
 
 // --- Mapeo backend → frontend ---
@@ -36,8 +40,11 @@ function mapearConversacion(dto: ConversacionBackend): Contacto {
     telefono: dto.telefono,
     email: "",
     ultimaActividad: dto.ultima_actividad,
+    ultimoMensaje: dto.ultimo_mensaje ?? undefined,
     noLeidos: dto.no_leidos,
     estado: "desconectado",
+    registrado: dto.registrado,
+    ultimoEntrante: dto.ultimo_entrante ?? undefined,
   };
 }
 
@@ -49,6 +56,7 @@ function mapearMensaje(dto: MensajeBackend): Mensaje {
     texto: dto.texto,
     fecha: dto.fecha,
     estado: dto.estado,
+    error: dto.error,
   };
 }
 
@@ -60,6 +68,39 @@ export async function fetchContactos(): Promise<Contacto[]> {
   if (!respuesta.ok) throw new Error('Error al cargar contactos');
   const dtos: ConversacionBackend[] = await respuesta.json();
   return dtos.map(mapearConversacion);
+}
+
+// ============================================================
+// MARCAR CONVERSACIÓN COMO LEÍDA (y mandar el visto azul a WhatsApp)
+// ============================================================
+export async function marcarConversacionLeida(conversacionId: string): Promise<void> {
+  await fetch(`/api/comunicaciones/${encodeURIComponent(conversacionId)}/leer`, { method: 'POST' });
+}
+
+// ============================================================
+// ABRIR CONVERSACIÓN CON UN POSTULANTE (la crea si no existe)
+// ============================================================
+// Devuelve el id de la conversación. El backend pone el +51 si el teléfono no trae código de país.
+export async function abrirConversacion(postulante: {
+  id: string;
+  nombre: string;
+  telefono: string;
+}): Promise<string> {
+  const respuesta = await fetch('/api/comunicaciones', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      postulante_id: postulante.id,
+      nombre: postulante.nombre,
+      telefono: postulante.telefono,
+    }),
+  });
+  if (!respuesta.ok) {
+    const error = await respuesta.json().catch(() => ({}));
+    throw new Error(error?.detail ?? 'No se pudo abrir la conversación');
+  }
+  const dto: ConversacionBackend = await respuesta.json();
+  return dto.id;
 }
 
 // ============================================================
@@ -87,26 +128,4 @@ export async function sendMessage(contactoId: string, texto: string): Promise<Me
   }
   const dto: MensajeBackend = await respuesta.json();
   return mapearMensaje(dto);
-}
-
-// ============================================================
-// OBTENER PLANTILLAS
-// ============================================================
-export async function fetchPlantillas(): Promise<PlantillaMensaje[]> {
-  return structuredClone(PLANTILLAS);
-}
-
-// ============================================================
-// BUSCAR CONTACTOS (local, sobre los ya cargados)
-// ============================================================
-export async function searchContactos(query: string): Promise<Contacto[]> {
-  const todos = await fetchContactos();
-  const q = query.toLowerCase().trim();
-  if (!q) return todos;
-  return todos.filter(
-    (c) =>
-      c.nombre.toLowerCase().includes(q) ||
-      c.apellido.toLowerCase().includes(q) ||
-      c.telefono.includes(q)
-  );
 }

@@ -1,6 +1,6 @@
 """Fechas "de calendario" del sistema, siempre en hora de Perú.
 
-Los servidores (Docker, Supabase) corren en UTC: `date.today()` ahí devuelve la fecha de UTC, que
+Los servidores (Docker, AWS) corren en UTC: `date.today()` ahí devuelve la fecha de UTC, que
 desde las 7 p. m. de Lima ya es "mañana". Toda regla que dependa del día (fecha límite de un
 anuncio, fecha de registro...) debe usar `hoy_en_peru()`.
 """

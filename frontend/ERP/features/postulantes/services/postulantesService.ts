@@ -142,7 +142,7 @@ export function postulanteTieneCuenta(postulante: Postulante): boolean {
   return postulante.tieneCuenta ?? postulante.consentimientos.tratamientoDatos;
 }
 
-// "Solicitar cuenta": el backend le envía al postulante (con Mailjet) un correo para que cree su
+// "Solicitar cuenta": el backend le envía al postulante (con Amazon SES) un correo para que cree su
 // cuenta en ANUNCIOS. Devuelve el correo al que se envió. Solo funciona con backend.
 export async function solicitarCuenta(postulanteId: string): Promise<string> {
   if (!API_URL) throw new Error("El envío de correos necesita el backend (NEXT_PUBLIC_API_URL)");
@@ -355,7 +355,7 @@ export async function addDocumento(
   tipo: DocumentoPostulante["tipo"]
 ): Promise<DocumentoPostulante> {
   if (API_URL) {
-    // ---- MODO API: el archivo viaja al backend, que lo sube a Supabase Storage ----
+    // ---- MODO API: el archivo viaja al backend, que lo guarda en Amazon S3 ----
     const formulario = new FormData();
     formulario.append("tipo", tipo);
     formulario.append("archivo", archivo);

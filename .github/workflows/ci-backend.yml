@@ -1,0 +1,78 @@
+name: CI Backend
+
+# Pruebas automatizadas del backend (verificación de las reglas de negocio, la seguridad entre
+# servicios y el webhook de WhatsApp). Cada servicio se prueba por separado, con sus propias
+# dependencias, igual que se despliega. No usan base de datos ni servicios externos.
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - ".github/workflows/ci-backend.yml"
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - ".github/workflows/ci-backend.yml"
+  workflow_dispatch: {}
+
+jobs:
+  pruebas:
+    name: Pruebas de ${{ matrix.nombre }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - nombre: shared_kernel
+            requisitos: backend/gateway/requirements.txt
+            pruebas: backend/libs/shared/tests
+            raiz: backend/gateway
+          - nombre: gateway
+            requisitos: backend/gateway/requirements.txt
+            pruebas: backend/gateway/tests
+            raiz: backend/gateway
+          - nombre: servicio-postulantes
+            requisitos: backend/servicio-postulantes/requirements.txt
+            pruebas: backend/servicio-postulantes/tests
+            raiz: backend/servicio-postulantes
+          - nombre: servicio-procesos-seleccion
+            requisitos: backend/servicio-procesos-seleccion/requirements.txt
+            pruebas: backend/servicio-procesos-seleccion/tests
+            raiz: backend/servicio-procesos-seleccion
+          - nombre: servicio-comunicaciones
+            requisitos: backend/servicio-comunicaciones/requirements.txt
+            pruebas: backend/servicio-comunicaciones/tests
+            raiz: backend/servicio-comunicaciones
+
+    env:
+      # Valores de prueba: la configuración se lee al importar, pero ninguna prueba se conecta.
+      DATABASE_URL: postgresql+asyncpg://prueba:prueba@localhost:5432/prueba
+      JWT_SECRET: jwt-de-prueba
+      GATEWAY_SHARED_SECRET: hmac-de-prueba
+      URL_SERVICIO_POSTULANTES: http://servicio-postulantes:8001
+      PYTHONPATH: ${{ github.workspace }}/${{ matrix.raiz }}:${{ github.workspace }}/backend/libs/shared
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.12 (la misma versión de las imágenes Docker)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: ${{ matrix.requisitos }}
+
+      - name: Instalar dependencias
+        run: pip install -r ${{ matrix.requisitos }} pytest httpx
+
+      - name: Ejecutar pruebas
+        run: python -m pytest ${{ matrix.pruebas }} -q --junitxml=reporte-${{ matrix.nombre }}.xml
+
+      - name: Guardar el reporte de pruebas (evidencia)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reporte-pruebas-${{ matrix.nombre }}
+          path: reporte-${{ matrix.nombre }}.xml

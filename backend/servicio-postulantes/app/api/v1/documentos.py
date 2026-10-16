@@ -1,6 +1,6 @@
 """Rutas de los documentos de un postulante (CV, DNI, certificados, imágenes...).
 
-Rutas (todas cuelgan de un postulante). Los archivos se guardan en SUPABASE STORAGE (un bucket privado);
+Rutas (todas cuelgan de un postulante). Los archivos se guardan en Amazon S3 (un bucket privado; carpeta local en desarrollo);
 en nuestra base de datos solo queda la ruta del archivo y algunos datos suyos.
     GET     /postulantes/{id}/documentos                          → listar sus documentos      (Admin, RRHH, Supervisor)
     GET     /postulantes/{id}/documentos/{documento_id}/contenido → el archivo en sí, para verlo o descargarlo
@@ -110,7 +110,7 @@ async def obtener_contenido_documento(
 
 
 # ---------------------------------------------------------------------------
-# Subir un archivo nuevo (a Supabase Storage)
+# Subir un archivo nuevo (al almacenamiento: S3 en AWS)
 # ---------------------------------------------------------------------------
 @router.post("/archivo", response_model=DocumentoRespuesta, status_code=status.HTTP_201_CREATED)
 async def subir_documento_archivo(
@@ -132,7 +132,7 @@ async def subir_documento_archivo(
         postulante_id=postulante_id,
         tipo=tipo,
         nombre_archivo=archivo.filename or "archivo",
-        referencia_almacenamiento=f"{settings.supabase_bucket}/{subido.ruta}",
+        referencia_almacenamiento=f"{settings.contenedor_archivos}/{subido.ruta}",
         ruta_archivo=subido.ruta,
         tipo_contenido=subido.tipo_contenido,
         tamano_bytes=subido.bytes,
@@ -162,7 +162,7 @@ async def reemplazar_documento_archivo(
     subido = await subir_archivo(contenido, archivo.content_type, postulante_id)
 
     documento.nombre_archivo = archivo.filename or "archivo"
-    documento.referencia_almacenamiento = f"{settings.supabase_bucket}/{subido.ruta}"
+    documento.referencia_almacenamiento = f"{settings.contenedor_archivos}/{subido.ruta}"
     documento.ruta_archivo = subido.ruta
     documento.tipo_contenido = subido.tipo_contenido
     documento.tamano_bytes = subido.bytes

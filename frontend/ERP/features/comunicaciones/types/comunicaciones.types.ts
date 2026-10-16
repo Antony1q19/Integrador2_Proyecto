@@ -13,6 +13,10 @@ export interface Contacto {
   ultimaActividad?: string;
   noLeidos: number;
   estado: "en_linea" | "ausente" | "desconectado";
+  // false = escribió un número que no es de ningún postulante registrado.
+  registrado?: boolean;
+  // Cuándo escribió el postulante por última vez (la ventana de 24 h de WhatsApp cuenta desde ahí).
+  ultimoEntrante?: string;
 }
 
 export interface Mensaje {
@@ -22,6 +26,7 @@ export interface Mensaje {
   texto: string;
   fecha: string; // ISO datetime
   estado: EstadoMensaje;
+  error?: string | null; // por qué WhatsApp no lo entregó (si estado == "fallido")
   esPlantilla?: boolean;
 }
 
@@ -36,37 +41,5 @@ export interface PlantillaMensaje {
   nombre: string;
   descripcion: string;
   contenido: string;
-  categoria: "entrevista" | "documentos" | "seguimiento" | "contratacion" | "general";
+  categoria: string; // entrevista | documentos | seguimiento | contratacion | general
 }
-
-// Plantillas predefinidas
-export const PLANTILLAS: PlantillaMensaje[] = [
-  {
-    id: "1",
-    nombre: "Confirmación de Entrevista",
-    descripcion: "Confirma fecha y hora de entrevista",
-    categoria: "entrevista",
-    contenido: "Estimado/a {nombre}, confirmamos su entrevista para el día {fecha} a las {hora}. Por favor, confirmar asistencia.",
-  },
-  {
-    id: "2",
-    nombre: "Solicitud de Documentos",
-    descripcion: "Solicita documentos adicionales al postulante",
-    categoria: "documentos",
-    contenido: "Estimado/a {nombre}, para continuar con el proceso, necesitamos que nos envíe los siguientes documentos: {documentos}.",
-  },
-  {
-    id: "3",
-    nombre: "Seguimiento de Proceso",
-    descripcion: "Actualiza el estado del proceso al postulante",
-    categoria: "seguimiento",
-    contenido: "Estimado/a {nombre}, le informamos que su proceso de selección ha avanzado a la etapa de {etapa}.",
-  },
-  {
-    id: "4",
-    nombre: "Oferta de Contratación",
-    descripcion: "Comunica la oferta de contratación",
-    categoria: "contratacion",
-    contenido: "Estimado/a {nombre}, nos complace ofrecerle el puesto de {cargo}. Los detalles de la oferta son: {detalles}.",
-  },
-];

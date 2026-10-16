@@ -4,9 +4,10 @@ Rutas (prefijo /postulantes). El navegador las llama a través del Gateway,
 como /api/v1/postulantes...:
     GET    /postulantes         → listar todos      (Admin, RRHH, Supervisor)
     GET    /postulantes/{id}    → ver uno           (Admin, RRHH, Supervisor)
+    GET    /postulantes/por-telefono/{tel} → quién tiene ese teléfono (servicio-comunicaciones)
     POST   /postulantes         → crear             (ANUNCIOS al registrarse, o RRHH a mano; 409 si el documento o el correo ya existen)
     PATCH  /postulantes/{id}    → editar            (Admin, RRHH, Supervisor)
-    POST   /postulantes/{id}/solicitar-cuenta → enviar por correo (Mailjet) la invitación a crear su cuenta
+    POST   /postulantes/{id}/solicitar-cuenta → enviar por correo (Amazon SES) la invitación a crear su cuenta
                                                 (Admin, RRHH, Supervisor; 409 si ya tiene cuenta)
 
 Estas funciones son "delgadas" a propósito: reciben la petición, aplican la
@@ -35,6 +36,7 @@ from app.schemas.postulante import (
     SolicitudCuentaRespuesta,
 )
 from shared_kernel.exceptions import ConflictoDeEstado, RecursoNoEncontrado
+from shared_kernel.telefonos import normalizar_telefono
 
 router = APIRouter(prefix="/postulantes", tags=["postulantes"])
 
@@ -104,6 +106,31 @@ async def listar_postulantes(
         postulantes_ocultos(usuario),
     )
     return [_a_respuesta(p, tiene_cuenta) for p, tiene_cuenta in resultado.all() if p.id not in ocultos]
+
+
+@router.get("/por-telefono/{telefono}")
+async def buscar_por_telefono(
+    telefono: str,
+    sesion: AsyncSession = Depends(obtener_sesion_lectura),
+    usuario: dict = Depends(requerir_rol("Admin", "RRHH", "Supervisor")),
+) -> list[dict]:
+    """Postulantes con ese teléfono, escrito en cualquier formato ("947757081", "+51 947 757 081"...).
+    La usa servicio-comunicaciones para saber de quién es un WhatsApp que llega."""
+    buscado = normalizar_telefono(telefono)
+    if len(buscado) < 9:
+        return []
+    # Primer filtro en la base (por los últimos 9 dígitos, sin espacios ni símbolos) y la
+    # comparación exacta, ya con el código de país, en Python.
+    solo_digitos = func.regexp_replace(Postulante.telefono, "[^0-9]", "", "g")
+    resultado, ocultos = await asyncio.gather(
+        sesion.execute(select(Postulante).where(solo_digitos.endswith(buscado[-9:]))),
+        postulantes_ocultos(usuario),
+    )
+    return [
+        {"id": p.id, "nombres": p.nombres, "apellidos": p.apellidos, "telefono": buscado}
+        for p in resultado.scalars()
+        if p.id not in ocultos and normalizar_telefono(p.telefono) == buscado
+    ]
 
 
 @router.get("/{postulante_id}", response_model=PostulanteRespuesta, dependencies=[Depends(exigir_postulante_visible)])
@@ -229,7 +256,7 @@ async def solicitar_cuenta(
     sesion: AsyncSession = Depends(obtener_sesion),
     _usuario: dict = Depends(requerir_rol("Admin", "RRHH", "Supervisor")),
 ) -> SolicitudCuentaRespuesta:
-    """Envía (con Mailjet) un correo al postulante invitándolo a crear su cuenta en ANUNCIOS."""
+    """Envía (con Amazon SES) un correo al postulante invitándolo a crear su cuenta en ANUNCIOS."""
     postulante, tiene_cuenta = await _obtener_con_cuenta(sesion, postulante_id)
     if tiene_cuenta:
         raise ConflictoDeEstado("Este postulante ya tiene una cuenta")

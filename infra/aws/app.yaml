@@ -1,0 +1,719 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  TalentERP - stack APP (se crea con prender.sh y se borra con apagar.sh): red, balanceador,
+  base de datos RDS (restaurada desde el último snapshot) y los 7 servicios en ECS Fargate.
+  Al borrarlo, la base guarda un snapshot final: los datos no se pierden.
+
+Parameters:
+  Proyecto:
+    Type: String
+    Default: talenterp
+  ImagenTag:
+    Type: String
+    Default: latest
+  SnapshotId:
+    Type: String
+    Default: ""
+    Description: Snapshot desde el que se restaura la base. Vacío = base nueva (primera vez).
+  CantidadTareas:
+    Type: Number
+    Default: 1
+    AllowedValues: [0, 1]
+    Description: 0 = servicios creados pero detenidos (para la migración inicial de datos).
+  ClaseBaseDatos:
+    Type: String
+    Default: db.t4g.micro
+  VersionPostgres:
+    Type: String
+    Default: "17.6"
+    Description: Versión exacta de PostgreSQL 17 (prender.sh pone la recomendada por AWS en la región).
+  ListaPrefijosCloudFront:
+    Type: String
+    Default: pl-3b927c52
+    Description: Lista de IPs de CloudFront (com.amazonaws.global.cloudfront.origin-facing) de la región.
+
+Conditions:
+  RestaurarDeSnapshot: !Not [!Equals [!Ref SnapshotId, ""]]
+  BaseNueva: !Equals [!Ref SnapshotId, ""]
+
+Resources:
+  # ================================================================ red
+  Vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.20.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags: [{ Key: Name, Value: !Ref Proyecto }]
+  PuertaInternet:
+    Type: AWS::EC2::InternetGateway
+  UnionPuertaInternet:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties: { VpcId: !Ref Vpc, InternetGatewayId: !Ref PuertaInternet }
+
+  # Subredes públicas: balanceador y tareas (con IP pública para salir a internet SIN NAT Gateway,
+  # que costaría ~US$ 1 al día). Las tareas igual solo aceptan tráfico del balanceador y entre ellas.
+  SubredPublicaA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      CidrBlock: 10.20.0.0/24
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      MapPublicIpOnLaunch: true
+      Tags: [{ Key: Name, Value: !Sub "${Proyecto}-publica-a" }]
+  SubredPublicaB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      CidrBlock: 10.20.1.0/24
+      AvailabilityZone: !Select [1, !GetAZs ""]
+      MapPublicIpOnLaunch: true
+      Tags: [{ Key: Name, Value: !Sub "${Proyecto}-publica-b" }]
+  TablaRutasPublica:
+    Type: AWS::EC2::RouteTable
+    Properties: { VpcId: !Ref Vpc }
+  RutaAInternet:
+    Type: AWS::EC2::Route
+    DependsOn: UnionPuertaInternet
+    Properties:
+      RouteTableId: !Ref TablaRutasPublica
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref PuertaInternet
+  AsociacionPublicaA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: { SubnetId: !Ref SubredPublicaA, RouteTableId: !Ref TablaRutasPublica }
+  AsociacionPublicaB:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: { SubnetId: !Ref SubredPublicaB, RouteTableId: !Ref TablaRutasPublica }
+
+  # Subredes privadas (sin salida a internet): solo la base de datos.
+  SubredPrivadaA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      CidrBlock: 10.20.10.0/24
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      Tags: [{ Key: Name, Value: !Sub "${Proyecto}-privada-a" }]
+  SubredPrivadaB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      CidrBlock: 10.20.11.0/24
+      AvailabilityZone: !Select [1, !GetAZs ""]
+      Tags: [{ Key: Name, Value: !Sub "${Proyecto}-privada-b" }]
+
+  # ================================================================ firewalls (security groups)
+  SgBalanceador:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Balanceador - solo acepta trafico que viene de CloudFront
+      VpcId: !Ref Vpc
+      SecurityGroupIngress:
+        - { IpProtocol: tcp, FromPort: 80, ToPort: 80, SourcePrefixListId: !Ref ListaPrefijosCloudFront }
+  SgServicios:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Servicios ECS - solo desde el balanceador y entre ellos
+      VpcId: !Ref Vpc
+      SecurityGroupIngress:
+        - { IpProtocol: tcp, FromPort: 3000, ToPort: 3001, SourceSecurityGroupId: !Ref SgBalanceador }
+        - { IpProtocol: tcp, FromPort: 8000, ToPort: 8000, SourceSecurityGroupId: !Ref SgBalanceador }
+  SgServiciosEntreEllos:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref SgServicios
+      IpProtocol: tcp
+      FromPort: 0
+      ToPort: 65535
+      SourceSecurityGroupId: !Ref SgServicios
+  SgBaseDatos:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: RDS - solo desde los servicios
+      VpcId: !Ref Vpc
+      SecurityGroupIngress:
+        - { IpProtocol: tcp, FromPort: 5432, ToPort: 5432, SourceSecurityGroupId: !Ref SgServicios }
+
+  # ================================================================ base de datos
+  GrupoSubredesBaseDatos:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subredes privadas de la base de datos
+      SubnetIds: [!Ref SubredPrivadaA, !Ref SubredPrivadaB]
+
+  BaseDatos:
+    Type: AWS::RDS::DBInstance
+    # Al borrar el stack (apagar.sh) se guarda un snapshot final con todos los datos.
+    DeletionPolicy: Snapshot
+    UpdateReplacePolicy: Snapshot
+    Properties:
+      DBInstanceIdentifier: !Sub "${Proyecto}-bd"
+      DBInstanceClass: !Ref ClaseBaseDatos
+      Engine: postgres
+      EngineVersion: !If [BaseNueva, !Ref VersionPostgres, !Ref "AWS::NoValue"]
+      DBSnapshotIdentifier: !If [RestaurarDeSnapshot, !Ref SnapshotId, !Ref "AWS::NoValue"]
+      DBName: !If [BaseNueva, talenterp, !Ref "AWS::NoValue"]
+      MasterUsername: !If [BaseNueva, talenterp, !Ref "AWS::NoValue"]
+      MasterUserPassword: !If [BaseNueva, !Sub "{{resolve:ssm-secure:/${Proyecto}/bd/password}}", !Ref "AWS::NoValue"]
+      StorageEncrypted: !If [BaseNueva, true, !Ref "AWS::NoValue"]
+      AllocatedStorage: "20"
+      StorageType: gp3
+      DBSubnetGroupName: !Ref GrupoSubredesBaseDatos
+      VPCSecurityGroups: [!Ref SgBaseDatos]
+      PubliclyAccessible: false
+      MultiAZ: false
+      BackupRetentionPeriod: 0
+      DeletionProtection: false
+      AutoMinorVersionUpgrade: true
+
+  # ================================================================ balanceador
+  Balanceador:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Type: application
+      Scheme: internet-facing
+      Subnets: [!Ref SubredPublicaA, !Ref SubredPublicaB]
+      SecurityGroups: [!Ref SgBalanceador]
+      LoadBalancerAttributes:
+        - { Key: routing.http.drop_invalid_header_fields.enabled, Value: "true" }
+
+  DestinoErp:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      VpcId: !Ref Vpc
+      TargetType: ip
+      Protocol: HTTP
+      Port: 3000
+      HealthCheckPath: /login
+      Matcher: { HttpCode: "200-399" }
+      TargetGroupAttributes: [{ Key: deregistration_delay.timeout_seconds, Value: "10" }]
+  DestinoAnuncios:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      VpcId: !Ref Vpc
+      TargetType: ip
+      Protocol: HTTP
+      Port: 3001
+      HealthCheckPath: /
+      Matcher: { HttpCode: "200-399" }
+      TargetGroupAttributes: [{ Key: deregistration_delay.timeout_seconds, Value: "10" }]
+  DestinoGateway:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      VpcId: !Ref Vpc
+      TargetType: ip
+      Protocol: HTTP
+      Port: 8000
+      HealthCheckPath: /health
+      Matcher: { HttpCode: "200" }
+      TargetGroupAttributes: [{ Key: deregistration_delay.timeout_seconds, Value: "10" }]
+
+  # Sin las cabeceras que agrega CloudFront, todo responde 403 (nadie entra directo al balanceador).
+  Escucha:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref Balanceador
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: fixed-response
+          FixedResponseConfig: { StatusCode: "403", ContentType: text/plain, MessageBody: Acceso no permitido }
+
+  # Del backend, SOLO el webhook de WhatsApp es público (llega por la URL del ERP).
+  ReglaWebhook:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref Escucha
+      Priority: 10
+      Conditions:
+        - Field: path-pattern
+          PathPatternConfig: { Values: [/api/v1/publico/webhook/whatsapp] }
+        - Field: http-header
+          HttpHeaderConfig: { HttpHeaderName: X-TalentERP-Clave, Values: [!ImportValue { "Fn::Sub": "${Proyecto}-clave-origen" }] }
+      Actions: [{ Type: forward, TargetGroupArn: !Ref DestinoGateway }]
+  ReglaErp:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref Escucha
+      Priority: 20
+      Conditions:
+        - Field: http-header
+          HttpHeaderConfig: { HttpHeaderName: X-TalentERP-App, Values: [erp] }
+        - Field: http-header
+          HttpHeaderConfig: { HttpHeaderName: X-TalentERP-Clave, Values: [!ImportValue { "Fn::Sub": "${Proyecto}-clave-origen" }] }
+      Actions: [{ Type: forward, TargetGroupArn: !Ref DestinoErp }]
+  ReglaAnuncios:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref Escucha
+      Priority: 30
+      Conditions:
+        - Field: http-header
+          HttpHeaderConfig: { HttpHeaderName: X-TalentERP-App, Values: [anuncios] }
+        - Field: http-header
+          HttpHeaderConfig: { HttpHeaderName: X-TalentERP-Clave, Values: [!ImportValue { "Fn::Sub": "${Proyecto}-clave-origen" }] }
+      Actions: [{ Type: forward, TargetGroupArn: !Ref DestinoAnuncios }]
+
+  # ================================================================ ECS
+  # Service Connect: cada servicio se encuentra por su nombre (servicio-postulantes:8001...), igual
+  # que en docker-compose. Usa un espacio de nombres HTTP de Cloud Map (sin zona DNS: no cobra).
+  EspacioNombres:
+    Type: AWS::ServiceDiscovery::HttpNamespace
+    Properties:
+      Name: !Sub "${Proyecto}.interno"
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Ref Proyecto
+      CapacityProviders: [FARGATE]
+      ServiceConnectDefaults: { Namespace: !GetAtt EspacioNombres.Arn }
+      ClusterSettings: [{ Name: containerInsights, Value: disabled }]
+
+  # ---------------------------------------------------------------- definiciones de tareas
+  TareaGateway:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub "${Proyecto}-gateway"
+      RequiresCompatibilities: [FARGATE]
+      NetworkMode: awsvpc
+      Cpu: "256"
+      Memory: "512"
+      RuntimePlatform: { OperatingSystemFamily: LINUX, CpuArchitecture: X86_64 }
+      ExecutionRoleArn: !ImportValue { "Fn::Sub": "${Proyecto}-rol-ejecucion" }
+      TaskRoleArn: !ImportValue { "Fn::Sub": "${Proyecto}-rol-sin-permisos" }
+      ContainerDefinitions:
+        - Name: gateway
+          Image: !Sub
+            - "${Registro}/${Proyecto}/gateway:${ImagenTag}"
+            - Registro: !ImportValue { "Fn::Sub": "${Proyecto}-registro" }
+          Essential: true
+          Command: [uvicorn, app.main:app, --host, 0.0.0.0, --port, "8000", --proxy-headers, --forwarded-allow-ips, "*", --timeout-keep-alive, "60"]
+          PortMappings: [{ Name: http, ContainerPort: 8000, AppProtocol: http }]
+          Environment:
+            - { Name: ENTORNO, Value: produccion }
+            - { Name: INICIALIZAR_BD, Value: "true" }
+            - { Name: DB_HOST, Value: !GetAtt BaseDatos.Endpoint.Address }
+            - { Name: DB_SCHEMA, Value: usuario }
+            - { Name: URL_SERVICIO_POSTULANTES, Value: "http://servicio-postulantes:8001" }
+            - { Name: URL_SERVICIO_EMPRESAS_VACANTES, Value: "http://servicio-empresas-vacantes:8002" }
+            - { Name: URL_SERVICIO_PROCESOS_SELECCION, Value: "http://servicio-procesos-seleccion:8003" }
+            - { Name: URL_SERVICIO_COMUNICACIONES, Value: "http://servicio-comunicaciones:8004" }
+            - Name: CORS_ORIGINS
+              Value: !Join [",", [!ImportValue { "Fn::Sub": "${Proyecto}-url-erp" }, !ImportValue { "Fn::Sub": "${Proyecto}-url-anuncios" }]]
+          Secrets:
+            - { Name: DB_PASSWORD, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/bd/password" }
+            - { Name: JWT_SECRET, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/jwt-secret" }
+            - { Name: GATEWAY_SHARED_SECRET, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/gateway-shared-secret" }
+            - { Name: FRONTEND_PROXY_SECRET, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/frontend-proxy-secret" }
+          LogConfiguration:
+            LogDriver: awslogs
+            Options: { awslogs-group: !Sub "/${Proyecto}/gateway", awslogs-region: !Ref "AWS::Region", awslogs-stream-prefix: ecs }
+
+  TareaPostulantes:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub "${Proyecto}-servicio-postulantes"
+      RequiresCompatibilities: [FARGATE]
+      NetworkMode: awsvpc
+      Cpu: "256"
+      Memory: "512"
+      RuntimePlatform: { OperatingSystemFamily: LINUX, CpuArchitecture: X86_64 }
+      ExecutionRoleArn: !ImportValue { "Fn::Sub": "${Proyecto}-rol-ejecucion" }
+      TaskRoleArn: !ImportValue { "Fn::Sub": "${Proyecto}-rol-postulantes" }
+      ContainerDefinitions:
+        - Name: servicio-postulantes
+          Image: !Sub
+            - "${Registro}/${Proyecto}/servicio-postulantes:${ImagenTag}"
+            - Registro: !ImportValue { "Fn::Sub": "${Proyecto}-registro" }
+          Essential: true
+          Command: [uvicorn, app.main:app, --host, 0.0.0.0, --port, "8001", --timeout-keep-alive, "60"]
+          PortMappings: [{ Name: http, ContainerPort: 8001, AppProtocol: http }]
+          Environment:
+            - { Name: ENTORNO, Value: produccion }
+            - { Name: INICIALIZAR_BD, Value: "true" }
+            - { Name: NOMBRE_SERVICIO, Value: servicio-postulantes }
+            - { Name: DB_HOST, Value: !GetAtt BaseDatos.Endpoint.Address }
+            - { Name: DB_SCHEMA, Value: postulantes }
+            - { Name: URL_SERVICIO_PROCESOS_SELECCION, Value: "http://servicio-procesos-seleccion:8003" }
+            - { Name: ALMACENAMIENTO, Value: s3 }
+            - { Name: S3_BUCKET_DOCUMENTOS, Value: !ImportValue { "Fn::Sub": "${Proyecto}-bucket-documentos" } }
+            - { Name: AWS_REGION, Value: !Ref "AWS::Region" }
+            - { Name: CORREO, Value: ses }
+            - { Name: CORREO_REMITENTE_EMAIL, Value: !ImportValue { "Fn::Sub": "${Proyecto}-correo-remitente" } }
+            - { Name: URL_ANUNCIOS, Value: !ImportValue { "Fn::Sub": "${Proyecto}-url-anuncios" } }
+          Secrets:
+            - { Name: DB_PASSWORD, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/bd/password" }
+            - { Name: JWT_SECRET, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/jwt-secret" }
+            - { Name: GATEWAY_SHARED_SECRET, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/gateway-shared-secret" }
+          LogConfiguration:
+            LogDriver: awslogs
+            Options: { awslogs-group: !Sub "/${Proyecto}/servicio-postulantes", awslogs-region: !Ref "AWS::Region", awslogs-stream-prefix: ecs }
+
+  TareaEmpresasVacantes:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub "${Proyecto}-servicio-empresas-vacantes"
+      RequiresCompatibilities: [FARGATE]
+      NetworkMode: awsvpc
+      Cpu: "256"
+      Memory: "512"
+      RuntimePlatform: { OperatingSystemFamily: LINUX, CpuArchitecture: X86_64 }
+      ExecutionRoleArn: !ImportValue { "Fn::Sub": "${Proyecto}-rol-ejecucion" }
+      TaskRoleArn: !ImportValue { "Fn::Sub": "${Proyecto}-rol-sin-permisos" }
+      ContainerDefinitions:
+        - Name: servicio-empresas-vacantes
+          Image: !Sub
+            - "${Registro}/${Proyecto}/servicio-empresas-vacantes:${ImagenTag}"
+            - Registro: !ImportValue { "Fn::Sub": "${Proyecto}-registro" }
+          Essential: true
+          Command: [uvicorn, app.main:app, --host, 0.0.0.0, --port, "8002", --timeout-keep-alive, "60"]
+          PortMappings: [{ Name: http, ContainerPort: 8002, AppProtocol: http }]
+          Environment:
+            - { Name: ENTORNO, Value: produccion }
+            - { Name: INICIALIZAR_BD, Value: "true" }
+            - { Name: NOMBRE_SERVICIO, Value: servicio-empresas-vacantes }
+            - { Name: DB_HOST, Value: !GetAtt BaseDatos.Endpoint.Address }
+            - { Name: DB_SCHEMA, Value: empresas_vacantes }
+          Secrets:
+            - { Name: DB_PASSWORD, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/bd/password" }
+            - { Name: JWT_SECRET, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/jwt-secret" }
+            - { Name: GATEWAY_SHARED_SECRET, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/gateway-shared-secret" }
+          LogConfiguration:
+            LogDriver: awslogs
+            Options: { awslogs-group: !Sub "/${Proyecto}/servicio-empresas-vacantes", awslogs-region: !Ref "AWS::Region", awslogs-stream-prefix: ecs }
+
+  TareaProcesosSeleccion:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub "${Proyecto}-servicio-procesos-seleccion"
+      RequiresCompatibilities: [FARGATE]
+      NetworkMode: awsvpc
+      Cpu: "256"
+      Memory: "512"
+      RuntimePlatform: { OperatingSystemFamily: LINUX, CpuArchitecture: X86_64 }
+      ExecutionRoleArn: !ImportValue { "Fn::Sub": "${Proyecto}-rol-ejecucion" }
+      TaskRoleArn: !ImportValue { "Fn::Sub": "${Proyecto}-rol-sin-permisos" }
+      ContainerDefinitions:
+        - Name: servicio-procesos-seleccion
+          Image: !Sub
+            - "${Registro}/${Proyecto}/servicio-procesos-seleccion:${ImagenTag}"
+            - Registro: !ImportValue { "Fn::Sub": "${Proyecto}-registro" }
+          Essential: true
+          Command: [uvicorn, app.main:app, --host, 0.0.0.0, --port, "8003", --timeout-keep-alive, "60"]
+          PortMappings: [{ Name: http, ContainerPort: 8003, AppProtocol: http }]
+          Environment:
+            - { Name: ENTORNO, Value: produccion }
+            - { Name: INICIALIZAR_BD, Value: "true" }
+            - { Name: NOMBRE_SERVICIO, Value: servicio-procesos-seleccion }
+            - { Name: DB_HOST, Value: !GetAtt BaseDatos.Endpoint.Address }
+            - { Name: DB_SCHEMA, Value: procesos_seleccion }
+            - { Name: URL_SERVICIO_EMPRESAS_VACANTES, Value: "http://servicio-empresas-vacantes:8002" }
+            - { Name: URL_SERVICIO_POSTULANTES, Value: "http://servicio-postulantes:8001" }
+          Secrets:
+            - { Name: DB_PASSWORD, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/bd/password" }
+            - { Name: JWT_SECRET, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/jwt-secret" }
+            - { Name: GATEWAY_SHARED_SECRET, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/gateway-shared-secret" }
+          LogConfiguration:
+            LogDriver: awslogs
+            Options: { awslogs-group: !Sub "/${Proyecto}/servicio-procesos-seleccion", awslogs-region: !Ref "AWS::Region", awslogs-stream-prefix: ecs }
+
+  TareaComunicaciones:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub "${Proyecto}-servicio-comunicaciones"
+      RequiresCompatibilities: [FARGATE]
+      NetworkMode: awsvpc
+      Cpu: "256"
+      Memory: "512"
+      RuntimePlatform: { OperatingSystemFamily: LINUX, CpuArchitecture: X86_64 }
+      ExecutionRoleArn: !ImportValue { "Fn::Sub": "${Proyecto}-rol-ejecucion" }
+      TaskRoleArn: !ImportValue { "Fn::Sub": "${Proyecto}-rol-sin-permisos" }
+      ContainerDefinitions:
+        - Name: servicio-comunicaciones
+          Image: !Sub
+            - "${Registro}/${Proyecto}/servicio-comunicaciones:${ImagenTag}"
+            - Registro: !ImportValue { "Fn::Sub": "${Proyecto}-registro" }
+          Essential: true
+          Command: [uvicorn, app.main:app, --host, 0.0.0.0, --port, "8004", --timeout-keep-alive, "60"]
+          PortMappings: [{ Name: http, ContainerPort: 8004, AppProtocol: http }]
+          Environment:
+            - { Name: ENTORNO, Value: produccion }
+            - { Name: INICIALIZAR_BD, Value: "true" }
+            - { Name: NOMBRE_SERVICIO, Value: servicio-comunicaciones }
+            - { Name: DB_HOST, Value: !GetAtt BaseDatos.Endpoint.Address }
+            - { Name: DB_SCHEMA, Value: comunicaciones }
+            - { Name: URL_SERVICIO_POSTULANTES, Value: "http://servicio-postulantes:8001" }
+            - { Name: URL_SERVICIO_PROCESOS_SELECCION, Value: "http://servicio-procesos-seleccion:8003" }
+            - { Name: META_API_VERSION, Value: v23.0 }
+          Secrets:
+            - { Name: DB_PASSWORD, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/bd/password" }
+            - { Name: JWT_SECRET, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/jwt-secret" }
+            - { Name: GATEWAY_SHARED_SECRET, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/gateway-shared-secret" }
+            - { Name: META_ACCESS_TOKEN, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/meta/access-token" }
+            - { Name: META_VERIFY_TOKEN, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/meta/verify-token" }
+            - { Name: META_APP_SECRET, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/meta/app-secret" }
+            - { Name: META_PHONE_NUMBER_ID, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/meta/phone-number-id" }
+            - { Name: META_WABA_ID, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/meta/waba-id" }
+          LogConfiguration:
+            LogDriver: awslogs
+            Options: { awslogs-group: !Sub "/${Proyecto}/servicio-comunicaciones", awslogs-region: !Ref "AWS::Region", awslogs-stream-prefix: ecs }
+
+  TareaErp:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub "${Proyecto}-erp"
+      RequiresCompatibilities: [FARGATE]
+      NetworkMode: awsvpc
+      Cpu: "256"
+      Memory: "512"
+      RuntimePlatform: { OperatingSystemFamily: LINUX, CpuArchitecture: X86_64 }
+      ExecutionRoleArn: !ImportValue { "Fn::Sub": "${Proyecto}-rol-ejecucion" }
+      TaskRoleArn: !ImportValue { "Fn::Sub": "${Proyecto}-rol-sin-permisos" }
+      ContainerDefinitions:
+        - Name: erp
+          Image: !Sub
+            - "${Registro}/${Proyecto}/erp:${ImagenTag}"
+            - Registro: !ImportValue { "Fn::Sub": "${Proyecto}-registro" }
+          Essential: true
+          PortMappings: [{ Name: http, ContainerPort: 3000, AppProtocol: http }]
+          Environment:
+            - { Name: GATEWAY_INTERNAL_URL, Value: "http://gateway:8000/api/v1" }
+          Secrets:
+            - { Name: FRONTEND_PROXY_SECRET, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/frontend-proxy-secret" }
+          LogConfiguration:
+            LogDriver: awslogs
+            Options: { awslogs-group: !Sub "/${Proyecto}/erp", awslogs-region: !Ref "AWS::Region", awslogs-stream-prefix: ecs }
+
+  TareaAnuncios:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub "${Proyecto}-anuncios"
+      RequiresCompatibilities: [FARGATE]
+      NetworkMode: awsvpc
+      Cpu: "256"
+      Memory: "512"
+      RuntimePlatform: { OperatingSystemFamily: LINUX, CpuArchitecture: X86_64 }
+      ExecutionRoleArn: !ImportValue { "Fn::Sub": "${Proyecto}-rol-ejecucion" }
+      TaskRoleArn: !ImportValue { "Fn::Sub": "${Proyecto}-rol-sin-permisos" }
+      ContainerDefinitions:
+        - Name: anuncios
+          Image: !Sub
+            - "${Registro}/${Proyecto}/anuncios:${ImagenTag}"
+            - Registro: !ImportValue { "Fn::Sub": "${Proyecto}-registro" }
+          Essential: true
+          PortMappings: [{ Name: http, ContainerPort: 3001, AppProtocol: http }]
+          Environment:
+            - { Name: GATEWAY_INTERNAL_URL, Value: "http://gateway:8000/api/v1" }
+          Secrets:
+            - { Name: FRONTEND_PROXY_SECRET, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/frontend-proxy-secret" }
+          LogConfiguration:
+            LogDriver: awslogs
+            Options: { awslogs-group: !Sub "/${Proyecto}/anuncios", awslogs-region: !Ref "AWS::Region", awslogs-stream-prefix: ecs }
+
+  # Migración ÚNICA de los datos de Supabase a RDS (la ejecuta prender.sh la primera vez, antes de
+  # encender los servicios). pg_dump de cada esquema → psql en RDS, todo dentro de la VPC.
+  TareaMigracion:
+    Type: AWS::ECS::TaskDefinition
+    Condition: BaseNueva
+    Properties:
+      Family: !Sub "${Proyecto}-migracion"
+      RequiresCompatibilities: [FARGATE]
+      NetworkMode: awsvpc
+      Cpu: "512"
+      Memory: "1024"
+      RuntimePlatform: { OperatingSystemFamily: LINUX, CpuArchitecture: X86_64 }
+      ExecutionRoleArn: !ImportValue { "Fn::Sub": "${Proyecto}-rol-ejecucion" }
+      TaskRoleArn: !ImportValue { "Fn::Sub": "${Proyecto}-rol-sin-permisos" }
+      ContainerDefinitions:
+        - Name: migracion
+          Image: public.ecr.aws/docker/library/postgres:17-alpine
+          Essential: true
+          EntryPoint: [sh, -c]
+          Command:
+            - |
+              set -eu
+              export PGPASSWORD="$DB_PASSWORD" PGSSLMODE=require
+              DESTINO="host=$DB_HOST port=5432 dbname=talenterp user=talenterp"
+              echo "Copiando esquemas usuario y postulantes..."
+              pg_dump --no-owner --no-privileges -n usuario -n postulantes "$ORIGEN_PERSONAS" | psql -v ON_ERROR_STOP=1 -q "$DESTINO"
+              echo "Copiando esquemas empresas_vacantes, procesos_seleccion y comunicaciones..."
+              pg_dump --no-owner --no-privileges -n empresas_vacantes -n procesos_seleccion -n comunicaciones "$ORIGEN_RECLUTAMIENTO" | psql -v ON_ERROR_STOP=1 -q "$DESTINO"
+              echo "MIGRACION_OK"
+          Environment:
+            - { Name: DB_HOST, Value: !GetAtt BaseDatos.Endpoint.Address }
+          Secrets:
+            - { Name: DB_PASSWORD, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/bd/password" }
+            - { Name: ORIGEN_PERSONAS, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/migracion/supabase-personas" }
+            - { Name: ORIGEN_RECLUTAMIENTO, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/migracion/supabase-reclutamiento" }
+          LogConfiguration:
+            LogDriver: awslogs
+            Options: { awslogs-group: !Sub "/${Proyecto}/migracion", awslogs-region: !Ref "AWS::Region", awslogs-stream-prefix: ecs }
+
+  # ---------------------------------------------------------------- servicios
+  ServicioGateway:
+    Type: AWS::ECS::Service
+    DependsOn: ReglaWebhook
+    Properties:
+      ServiceName: gateway
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref TareaGateway
+      LaunchType: FARGATE
+      DesiredCount: !Ref CantidadTareas
+      HealthCheckGracePeriodSeconds: 120
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 0
+        MaximumPercent: 100
+        DeploymentCircuitBreaker: { Enable: true, Rollback: true }
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets: [!Ref SubredPublicaA, !Ref SubredPublicaB]
+          SecurityGroups: [!Ref SgServicios]
+      LoadBalancers: [{ ContainerName: gateway, ContainerPort: 8000, TargetGroupArn: !Ref DestinoGateway }]
+      ServiceConnectConfiguration:
+        Enabled: true
+        Services: [{ PortName: http, DiscoveryName: gateway, ClientAliases: [{ Port: 8000, DnsName: gateway }] }]
+
+  ServicioPostulantes:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: servicio-postulantes
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref TareaPostulantes
+      LaunchType: FARGATE
+      DesiredCount: !Ref CantidadTareas
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 0
+        MaximumPercent: 100
+        DeploymentCircuitBreaker: { Enable: true, Rollback: true }
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets: [!Ref SubredPublicaA, !Ref SubredPublicaB]
+          SecurityGroups: [!Ref SgServicios]
+      ServiceConnectConfiguration:
+        Enabled: true
+        Services: [{ PortName: http, DiscoveryName: servicio-postulantes, ClientAliases: [{ Port: 8001, DnsName: servicio-postulantes }] }]
+
+  ServicioEmpresasVacantes:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: servicio-empresas-vacantes
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref TareaEmpresasVacantes
+      LaunchType: FARGATE
+      DesiredCount: !Ref CantidadTareas
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 0
+        MaximumPercent: 100
+        DeploymentCircuitBreaker: { Enable: true, Rollback: true }
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets: [!Ref SubredPublicaA, !Ref SubredPublicaB]
+          SecurityGroups: [!Ref SgServicios]
+      ServiceConnectConfiguration:
+        Enabled: true
+        Services: [{ PortName: http, DiscoveryName: servicio-empresas-vacantes, ClientAliases: [{ Port: 8002, DnsName: servicio-empresas-vacantes }] }]
+
+  ServicioProcesosSeleccion:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: servicio-procesos-seleccion
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref TareaProcesosSeleccion
+      LaunchType: FARGATE
+      DesiredCount: !Ref CantidadTareas
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 0
+        MaximumPercent: 100
+        DeploymentCircuitBreaker: { Enable: true, Rollback: true }
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets: [!Ref SubredPublicaA, !Ref SubredPublicaB]
+          SecurityGroups: [!Ref SgServicios]
+      ServiceConnectConfiguration:
+        Enabled: true
+        Services: [{ PortName: http, DiscoveryName: servicio-procesos-seleccion, ClientAliases: [{ Port: 8003, DnsName: servicio-procesos-seleccion }] }]
+
+  ServicioComunicaciones:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: servicio-comunicaciones
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref TareaComunicaciones
+      LaunchType: FARGATE
+      DesiredCount: !Ref CantidadTareas
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 0
+        MaximumPercent: 100
+        DeploymentCircuitBreaker: { Enable: true, Rollback: true }
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets: [!Ref SubredPublicaA, !Ref SubredPublicaB]
+          SecurityGroups: [!Ref SgServicios]
+      ServiceConnectConfiguration:
+        Enabled: true
+        Services: [{ PortName: http, DiscoveryName: servicio-comunicaciones, ClientAliases: [{ Port: 8004, DnsName: servicio-comunicaciones }] }]
+
+  ServicioErp:
+    Type: AWS::ECS::Service
+    DependsOn: ReglaErp
+    Properties:
+      ServiceName: erp
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref TareaErp
+      LaunchType: FARGATE
+      DesiredCount: !Ref CantidadTareas
+      HealthCheckGracePeriodSeconds: 120
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 0
+        MaximumPercent: 100
+        DeploymentCircuitBreaker: { Enable: true, Rollback: true }
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets: [!Ref SubredPublicaA, !Ref SubredPublicaB]
+          SecurityGroups: [!Ref SgServicios]
+      LoadBalancers: [{ ContainerName: erp, ContainerPort: 3000, TargetGroupArn: !Ref DestinoErp }]
+      # Solo "cliente" de Service Connect: llama al gateway por su nombre.
+      ServiceConnectConfiguration: { Enabled: true }
+
+  ServicioAnuncios:
+    Type: AWS::ECS::Service
+    DependsOn: ReglaAnuncios
+    Properties:
+      ServiceName: anuncios
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref TareaAnuncios
+      LaunchType: FARGATE
+      DesiredCount: !Ref CantidadTareas
+      HealthCheckGracePeriodSeconds: 120
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 0
+        MaximumPercent: 100
+        DeploymentCircuitBreaker: { Enable: true, Rollback: true }
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets: [!Ref SubredPublicaA, !Ref SubredPublicaB]
+          SecurityGroups: [!Ref SgServicios]
+      LoadBalancers: [{ ContainerName: anuncios, ContainerPort: 3001, TargetGroupArn: !Ref DestinoAnuncios }]
+      ServiceConnectConfiguration: { Enabled: true }
+
+Outputs:
+  BalanceadorDns:
+    Value: !GetAtt Balanceador.DNSName
+  Cluster:
+    Value: !Ref Cluster
+  SubredesTareas:
+    Value: !Join [",", [!Ref SubredPublicaA, !Ref SubredPublicaB]]
+  GrupoSeguridadServicios:
+    Value: !Ref SgServicios
+  TareaMigracion:
+    Condition: BaseNueva
+    Value: !Ref TareaMigracion
+  BaseDatosEndpoint:
+    Value: !GetAtt BaseDatos.Endpoint.Address

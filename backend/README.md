@@ -1,12 +1,12 @@
 # Backend — guía para entenderlo
 
-Este backend está hecho con **Python + FastAPI** y guarda los datos en **PostgreSQL**. Todo corre en contenedores de **Docker**.
+Este backend está hecho con **Python + FastAPI** y guarda los datos en **PostgreSQL**. Todo corre en contenedores de **Docker**: en tu PC con `docker compose` y en producción en **AWS** (ECS Fargate + RDS + S3 + SES; ver [infra/aws/README.md](../infra/aws/README.md)).
 
 ## ¿Cómo está organizado? (la idea en una imagen)
 
 ```
    Navegador (ERP :3000 / ANUNCIOS :3001)
-          │
+          │  el navegador habla con Next.js; Next.js (en el servidor) llama al Gateway
           ▼
    ┌───────────────┐   Es la "recepción del edificio": revisa quién eres
    │   GATEWAY     │   (login/token) y te manda a la oficina correcta.
@@ -14,82 +14,84 @@ Este backend está hecho con **Python + FastAPI** y guarda los datos en **Postgr
    └───────┬───────┘
            │  (cada llamada lleva una firma secreta: "vengo del Gateway")
            ▼
-   ┌──────────────────────────────────────────────────────────────┐
-   │ SERVICIO-POSTULANTES         :8001   (con rutas, ya funciona) │
-   │ SERVICIO-EMPRESAS-VACANTES   :8002   (lee anuncios)           │
-   │ SERVICIO-PROCESOS-SELECCION  :8003   (postulaciones y eval.)  │
-   └──────────────────────────────────────────────────────────────┘
-           │  los archivos (CV, imágenes) NO van a la base de datos:
-           ▼  servicio-postulantes los sube a SUPABASE STORAGE (bucket privado)
-           │  cada servicio guarda SOLO lo suyo, en su propia base de datos
-           ▼
-   PostgreSQL (Supabase: 2 proyectos, 4 esquemas; ver tabla de abajo)
+   ┌───────────────────────────────────────────────────────────────────┐
+   │ SERVICIO-POSTULANTES         :8001   postulantes, documentos      │
+   │ SERVICIO-EMPRESAS-VACANTES   :8002   empresas y anuncios          │
+   │ SERVICIO-PROCESOS-SELECCION  :8003   pipeline, evaluaciones...    │
+   │ SERVICIO-COMUNICACIONES      :8004   WhatsApp (Meta Cloud API)    │
+   └───────────────────────────────────────────────────────────────────┘
+           │  los archivos (CV, DNI) NO van a la base de datos: van a Amazon S3 (en la PC, a una carpeta)
+           ▼  cada servicio guarda SOLO lo suyo, en su propio esquema
+   PostgreSQL: una base, un esquema por servicio (RDS en AWS; contenedor "postgres" en la PC)
 ```
 
-**¿Por qué así?** Cada servicio es dueño de su parte y de su propia base de datos. Como las bases están separadas, un servicio no puede "enlazarse" con las tablas de otro: se refieren entre sí solo por el **id** (ej. una postulación guarda el `postulante_id` y el `anuncio_id`).
+**¿Por qué así?** Cada servicio es dueño de su parte y de su propio esquema. Un servicio no se
+"enlaza" con las tablas de otro: se refieren entre sí solo por el **id** (ej. una postulación guarda
+el `postulante_id` y el `anuncio_id`).
 
-## Las bases de datos y sus tablas
+## La base de datos y sus tablas
 
-| Base de datos | Servicio dueño | Tablas |
+Una sola base PostgreSQL (`talenterp`) con un **esquema** (carpeta) por servicio:
+
+| Esquema (`DB_SCHEMA`) | Servicio dueño | Tablas |
 |---|---|---|
-| `usuario_db` | Gateway | `usuarios` — trabajadores del ERP (Admin, RRHH, Supervisor) y sus contraseñas |
-| `postulantes_db` | servicio-postulantes | `postulantes`, `documentos`, `usuarios` (cuentas de acceso de los postulantes a la app ANUNCIOS) |
-| `empresas_vacantes_db` | servicio-empresas-vacantes | `empresas`, `anuncios` |
-| `procesos_seleccion_db` | servicio-procesos-seleccion | `procesos_postulacion`, `historial_estados`, `evaluaciones` |
+| `usuario` | Gateway | `usuarios` — trabajadores del ERP (Admin, RRHH, Supervisor) y sus contraseñas |
+| `postulantes` | servicio-postulantes | `postulantes`, `documentos`, `usuarios` (cuentas del portal ANUNCIOS), `tokens_recuperacion`, `invitaciones_cuenta` |
+| `empresas_vacantes` | servicio-empresas-vacantes | `empresas`, `anuncios` |
+| `procesos_seleccion` | servicio-procesos-seleccion | `procesos_postulacion`, `historial_estados`, `evaluaciones`, `entrevistas`, `contrataciones`, `seguimientos_postingreso` |
+| `comunicaciones` | servicio-comunicaciones | `conversaciones`, `mensajes`, `plantillas_rapidas` |
 
-> Las dos tablas `usuarios` son **independientes**: una es del personal del ERP y otra de los postulantes. Están en bases distintas a propósito, para que no se mezclen.
+> Las dos tablas `usuarios` son **independientes**: una es del personal del ERP y otra de los postulantes.
 
-## Base de datos en Supabase (2 proyectos)
+**Dónde corre:**
+- **En tu PC** (`docker compose up -d`): un contenedor `postgres` (PostgreSQL 17). Con
+  `ENTORNO=desarrollo`, cada servicio crea su esquema, las tablas que falten y los **datos de prueba**.
+- **En AWS** (`infra/aws/`): Amazon RDS PostgreSQL 17 en subredes privadas. Con `INICIALIZAR_BD=true`
+  crea las tablas que falten, **sin** datos de prueba. La URL se arma con `DB_HOST` y `DB_PASSWORD`
+  (secreto de SSM). Ver [infra/aws/README.md](../infra/aws/README.md).
 
-Supabase es PostgreSQL alojado en la nube. Como el plan gratuito permite 2 proyectos y cada proyecto trae UNA base, las bases de antes pasan a ser **esquemas** (carpetas dentro de la base):
-
-| Proyecto de Supabase | Esquema (`DB_SCHEMA`) | Servicio |
-|---|---|---|
-| `talenterp-personas` | `usuario` | Gateway |
-| `talenterp-personas` | `postulantes` | servicio-postulantes |
-| `talenterp-reclutamiento` | `empresas_vacantes` | servicio-empresas-vacantes |
-| `talenterp-reclutamiento` | `procesos_seleccion` | servicio-procesos-seleccion |
-
-**Cómo se crean las tablas y los datos:** no hace falta ningún script SQL. Al arrancar cada servicio con `ENTORNO=desarrollo`, crea su esquema (`CREATE SCHEMA IF NOT EXISTS`), las tablas que falten (a partir de `infrastructure/models.py`) y los datos de prueba (`infrastructure/seed.py`). Solo crea lo que falta: si cambias una columna de una tabla que ya existe, hay que hacerlo a mano en Supabase (`ALTER TABLE`, desde el SQL Editor).
-
-**Pasos:**
-1. En cada proyecto de Supabase: botón **Connect** → **Session pooler** → copia la cadena de conexión.
-2. En el `.env` de cada servicio pon `DATABASE_URL=postgresql+asyncpg://postgres.<id>:<contraseña>@<host-del-pooler>:5432/postgres?ssl=require` y `DB_SCHEMA=<esquema de la tabla de arriba>`. (Si la contraseña tiene `@`, `#`, `/`... escríbelos codificados: `@` = `%40`.)
-3. `docker compose up -d --build` (hay que reconstruir porque `shared_kernel` se copia dentro de la imagen).
-4. En Supabase → Table Editor → elige el esquema en el desplegable y verás las tablas.
-
-**Seguridad:** Supabase publica una API REST de los esquemas "expuestos" (por defecto solo `public`). Tus tablas están en esquemas propios, así que NO agregues `usuario`, `postulantes`... en Settings → API → *Exposed schemas* (la tabla `usuario.usuarios` tiene hashes de contraseñas). El backend se conecta directo a la base, no por esa API.
-
-**Si algo falla:** "password authentication failed" → el usuario debe ser `postgres.<id-del-proyecto>` (con el punto); "Tenant or user not found" → el host del pooler es de otra región; el "Direct connection" suele ser solo IPv6 y Docker en Windows puede no llegar: usa el Session pooler; si usas el puerto 6543 (Transaction pooler) el código ya desactiva las sentencias preparadas.
+Las columnas nuevas en tablas que ya existen se agregan solas al arrancar (`aplicar_migraciones` de
+cada servicio, con `ADD COLUMN IF NOT EXISTS`).
 
 ## Estado de cada servicio
 
 | Servicio | Tablas | Datos de prueba (seed) | Rutas y lógica |
 |---|---|---|---|
-| Gateway | ✅ | ✅ | ✅ login, usuarios, reenvío |
-| servicio-postulantes | ✅ | ✅ | ✅ postulantes y documentos con Supabase Storage (falta usar la tabla `usuarios`) |
-| servicio-empresas-vacantes | ✅ | ✅ | 🟡 solo lectura de empresas (`GET /empresas`) y anuncios (`GET /anuncios`); falta crear/editar |
-| servicio-procesos-seleccion | ✅ | ✅ | ✅ postulaciones (`/procesos`), evaluaciones (`/evaluaciones`), entrevistas (`/entrevistas`), contrataciones (`/contrataciones`), seguimientos post-ingreso (`/seguimientos`) e indicadores del Dashboard (`/dashboard`) |
+| Gateway | ✅ | ✅ | ✅ login, usuarios, reenvío, webhook público de WhatsApp |
+| servicio-postulantes | ✅ | ✅ | ✅ postulantes, documentos (S3), cuentas del portal, correos (SES) |
+| servicio-empresas-vacantes | ✅ | ✅ | ✅ empresas y anuncios |
+| servicio-procesos-seleccion | ✅ | ✅ | ✅ postulaciones (`/procesos`), evaluaciones, entrevistas, contrataciones, seguimientos post-ingreso e indicadores del Dashboard |
+| servicio-comunicaciones | ✅ | — | ✅ chats de WhatsApp (Meta Cloud API), plantillas, webhook |
 
-## Archivos en Supabase Storage
+## Archivos (CV, DNI, certificados)
 
-Los archivos que suben los usuarios (CV, DNI, imágenes) se guardan en **Supabase Storage** (proyecto `talenterp-personas`), no en nuestra base de datos; ahí solo queda la ruta del archivo (`documentos.ruta_archivo`), su tipo y su tamaño.
+Los archivos que suben los usuarios **no** se guardan en la base: ahí solo queda su ruta
+(`documentos.ruta_archivo`), su tipo y su tamaño. Dónde se guardan lo decide `ALMACENAMIENTO`:
 
-- **Quién sube**: `servicio-postulantes` (`app/infrastructure/storage.py`). El navegador manda el archivo al backend y el backend lo guarda en un **bucket privado**: los archivos no tienen enlace público, solo el backend (con su clave secreta) los lee.
-- **Configuración** (en `servicio-postulantes/.env`, que git ignora): `SUPABASE_URL` (la "Project URL" de `talenterp-personas`), `SUPABASE_SERVICE_KEY` (la clave **secreta** `service_role`/`secret` de Project Settings → API; da control total del proyecto, no la compartas) y `SUPABASE_BUCKET` (por defecto `postulantes-documentos`). El bucket se crea solo al encender el servicio (privado, máximo 5 MB, solo PDF/JPG/PNG). Si falta la URL o la clave, subir un archivo responde 503 con un mensaje que dice cuál falta.
-- **Reglas**: solo PDF, JPG o PNG, máximo 5 MB.
-- **Rutas**: subir `POST /postulantes/{id}/documentos/archivo`, reemplazar `PUT /postulantes/{id}/documentos/{documento_id}/archivo`, eliminar `DELETE /postulantes/{id}/documentos/{documento_id}` (también borra el archivo del Storage).
-- **Ver / descargar**: `GET /postulantes/{id}/documentos/{documento_id}/contenido`. El backend lee el archivo del bucket y lo devuelve al ERP, que lo muestra en una ventana (modal). Solo lo ve quien tiene sesión y rol.
+- **`s3` (AWS):** un bucket **privado y cifrado** de Amazon S3. Solo `servicio-postulantes` puede
+  leerlo, con el rol de IAM de su tarea (no hay claves en el código ni en los `.env`).
+- **`local` (tu PC):** una carpeta del contenedor (volumen `archivos-postulantes`).
 
-## Rapidez con la base de datos en la nube
+- **Reglas**: solo PDF, JPG o PNG (se verifica el contenido real, no solo la extensión), máximo 5 MB.
+- **Rutas**: subir `POST /postulantes/{id}/documentos/archivo`, reemplazar `PUT .../{documento_id}/archivo`,
+  eliminar `DELETE .../{documento_id}` (también borra el archivo), ver `GET .../{documento_id}/contenido`
+  (el backend lo lee y lo entrega solo a quien tiene sesión y rol).
 
-Supabase está lejos (unos 200 ms de ida y vuelta) y cada "viaje" a la base se paga completo, así que el código está pensado para hacer **menos viajes por petición** (`libs/shared/shared_kernel/database.py`):
+## Correos
+
+`servicio-postulantes` envía la invitación a crear cuenta y la recuperación de contraseña.
+`CORREO=ses` usa **Amazon SES** (el remitente debe estar verificado en SES); `CORREO=consola` (tu PC)
+no envía nada: escribe el correo y su enlace en el log, para poder probar el flujo.
+
+## Rapidez con la base de datos
+
+Cada "viaje" a la base se paga completo, así que el código hace **menos viajes por petición**
+(`libs/shared/shared_kernel/database.py`):
 - Las rutas que solo **leen** (GET) usan `obtener_sesion_lectura`: modo autocommit, sin abrir ni cerrar transacción (ahorra 2 viajes). Las que **guardan** usan `obtener_sesion` (con transacción).
-- No se comprueba la conexión en cada uso, solo si estuvo inactiva más de 20 s; se reutiliza siempre la conexión más reciente (ya tiene las consultas "aprendidas") y se abren 3 conexiones al encender el servicio (abrir una nueva tarda 1-4 s).
-- Pocas conexiones por servicio (3 + 2 extra): el "Session pooler" da a cada una una conexión real de la base y el plan gratuito tiene pocas.
-- Consultas combinadas (ej. postulante + "¿tiene cuenta?" en una sola; postulaciones + historial con `joinedload`) y sin `refresh` innecesarios tras guardar.
-- El Gateway recuerda 15 s las empresas de cada RRHH/Supervisor (`gateway/app/core/cache_empresas.py`); cuando un Admin las cambia, se olvida al instante.
-- Resultado medido: una lectura simple pasó de ~1000 ms a ~215 ms (1 viaje) y el Dashboard de ~2400 ms a ~850 ms.
+- No se comprueba la conexión en cada uso, solo si estuvo inactiva más de 20 s; se abren 3 conexiones al encender el servicio.
+- Pocas conexiones por servicio (3 + 2 extra): los 5 servicios comparten una instancia pequeña de RDS.
+- Consultas combinadas (ej. postulante + "¿tiene cuenta?" en una sola; conversaciones + último mensaje) e índices donde se busca seguido (ej. teléfono de las conversaciones).
+- El Gateway recuerda 15 s el estado de cada cuenta (`gateway/app/core/cache_cuentas.py`); cuando un Admin la cambia, se olvida al instante.
 
 ## Qué empresas ve cada persona
 
@@ -190,7 +192,7 @@ docker logs gateway-service --tail 50
 #   http://localhost:8001/docs   Postulantes (solo para depurar)
 ```
 
-**Empezar de cero** (borra TODOS los datos de prueba): en Supabase, en el SQL Editor de cada proyecto, ejecuta `drop schema usuario cascade;` (y lo mismo con `postulantes`, `empresas_vacantes` y `procesos_seleccion`, cada uno en su proyecto) y luego `docker compose up -d --force-recreate`: los servicios vuelven a crear esquemas, tablas y datos.
+**Empezar de cero** (borra TODOS los datos locales): `docker compose down -v` (borra la base y los archivos locales) y `docker compose up -d`: los servicios vuelven a crear esquemas, tablas y datos de prueba.
 
 ## Vocabulario rápido
 

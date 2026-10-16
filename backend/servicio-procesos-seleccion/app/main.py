@@ -35,6 +35,9 @@ configurar_logging("servicio-procesos-seleccion", settings.log_level)
 async def lifespan(app: FastAPI):
     # AL ENCENDER: en modo "desarrollo" crea las tablas que falten (leyendo las
     # clases de infrastructure/models.py) y siembra los datos de prueba.
+    # Producción (AWS) con base nueva: crea las tablas que falten, SIN datos de prueba.
+    if settings.inicializar_bd and settings.entorno != "desarrollo":
+        await crear_tablas(engine)
     if settings.entorno == "desarrollo":
         await crear_tablas(engine)
         await sembrar_datos_de_prueba()

@@ -10,9 +10,9 @@
 // clave coincide, así nadie puede inventarse una IP llamando directo al puerto del Gateway.
 // Ver backend/gateway/app/core/limite_peticiones.py.
 //
-// Nota: la IP se toma de X-Forwarded-For, que Next.js completa con la IP de la conexión. En
-// producción, el proxy de entrada (nginx, el balanceador...) debe sobrescribir esa cabecera para
-// que un cliente no pueda falsificarla.
+// ¿De dónde sale la IP? En AWS, CloudFront agrega "CloudFront-Viewer-Address" (ip:puerto) con la IP
+// REAL de quien se conecta: el usuario no puede inventarla. Si no está (desarrollo local), se usa
+// X-Forwarded-For, que en la PC completa el propio Next.js.
 import type { NextRequest } from 'next/server';
 
 const SECRETO_PROXY = process.env.FRONTEND_PROXY_SECRET;
@@ -20,9 +20,17 @@ const SECRETO_PROXY = process.env.FRONTEND_PROXY_SECRET;
 export function cabecerasIpCliente(request: NextRequest): Record<string, string> {
   if (!SECRETO_PROXY) return {};
   const ip =
+    ipDeCloudFront(request.headers.get('cloudfront-viewer-address')) ||
     request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
     request.headers.get('x-real-ip')?.trim() ||
     '';
   if (!ip) return {};
   return { 'X-Cliente-IP': ip, 'X-Proxy-Secret': SECRETO_PROXY };
+}
+
+// '203.0.113.5:44321' o '2001:db8::1:44321' → la IP sin el puerto (lo que va después del último ':').
+function ipDeCloudFront(valor: string | null): string {
+  if (!valor) return '';
+  const corte = valor.lastIndexOf(':');
+  return (corte > 0 ? valor.slice(0, corte) : valor).trim();
 }

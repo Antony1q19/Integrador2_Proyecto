@@ -1,0 +1,309 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  TalentERP - stack BASE (permanente, casi gratis cuando la app está apagada): imágenes (ECR),
+  documentos de postulantes (S3), URLs públicas fijas (CloudFront), correo (SES), logs, permisos
+  y alerta de presupuesto. Lo que se prende y apaga está en app.yaml.
+
+Parameters:
+  Proyecto:
+    Type: String
+    Default: talenterp
+    AllowedPattern: "[a-z][a-z0-9-]{2,20}"
+  CorreoRemitente:
+    Type: String
+    Description: Correo desde el que se envían los mensajes (SES le manda un enlace para verificarlo).
+  CorreoAlertas:
+    Type: String
+    Description: Correo que recibe la alerta de presupuesto.
+  PresupuestoMensualUSD:
+    Type: Number
+    Default: 5
+  AlbDns:
+    Type: String
+    Default: apagado.invalid
+    Description: >-
+      DNS del balanceador del stack app (lo pone prender.sh). Mientras la app está apagada,
+      CloudFront apunta a un nombre que no existe y responde error (no cobra nada).
+
+Resources:
+  # ---------------------------------------------------------------- imágenes Docker
+  RepoErp:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub "${Proyecto}/erp"
+      EmptyOnDelete: true
+      ImageScanningConfiguration: { ScanOnPush: true }
+      LifecyclePolicy:
+        LifecyclePolicyText: '{"rules":[{"rulePriority":1,"description":"Guardar solo las 3 ultimas imagenes","selection":{"tagStatus":"any","countType":"imageCountMoreThan","countNumber":3},"action":{"type":"expire"}}]}'
+  RepoAnuncios:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub "${Proyecto}/anuncios"
+      EmptyOnDelete: true
+      ImageScanningConfiguration: { ScanOnPush: true }
+      LifecyclePolicy:
+        LifecyclePolicyText: '{"rules":[{"rulePriority":1,"description":"Guardar solo las 3 ultimas imagenes","selection":{"tagStatus":"any","countType":"imageCountMoreThan","countNumber":3},"action":{"type":"expire"}}]}'
+  RepoGateway:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub "${Proyecto}/gateway"
+      EmptyOnDelete: true
+      ImageScanningConfiguration: { ScanOnPush: true }
+      LifecyclePolicy:
+        LifecyclePolicyText: '{"rules":[{"rulePriority":1,"description":"Guardar solo las 3 ultimas imagenes","selection":{"tagStatus":"any","countType":"imageCountMoreThan","countNumber":3},"action":{"type":"expire"}}]}'
+  RepoPostulantes:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub "${Proyecto}/servicio-postulantes"
+      EmptyOnDelete: true
+      ImageScanningConfiguration: { ScanOnPush: true }
+      LifecyclePolicy:
+        LifecyclePolicyText: '{"rules":[{"rulePriority":1,"description":"Guardar solo las 3 ultimas imagenes","selection":{"tagStatus":"any","countType":"imageCountMoreThan","countNumber":3},"action":{"type":"expire"}}]}'
+  RepoEmpresasVacantes:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub "${Proyecto}/servicio-empresas-vacantes"
+      EmptyOnDelete: true
+      ImageScanningConfiguration: { ScanOnPush: true }
+      LifecyclePolicy:
+        LifecyclePolicyText: '{"rules":[{"rulePriority":1,"description":"Guardar solo las 3 ultimas imagenes","selection":{"tagStatus":"any","countType":"imageCountMoreThan","countNumber":3},"action":{"type":"expire"}}]}'
+  RepoProcesosSeleccion:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub "${Proyecto}/servicio-procesos-seleccion"
+      EmptyOnDelete: true
+      ImageScanningConfiguration: { ScanOnPush: true }
+      LifecyclePolicy:
+        LifecyclePolicyText: '{"rules":[{"rulePriority":1,"description":"Guardar solo las 3 ultimas imagenes","selection":{"tagStatus":"any","countType":"imageCountMoreThan","countNumber":3},"action":{"type":"expire"}}]}'
+  RepoComunicaciones:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub "${Proyecto}/servicio-comunicaciones"
+      EmptyOnDelete: true
+      ImageScanningConfiguration: { ScanOnPush: true }
+      LifecyclePolicy:
+        LifecyclePolicyText: '{"rules":[{"rulePriority":1,"description":"Guardar solo las 3 ultimas imagenes","selection":{"tagStatus":"any","countType":"imageCountMoreThan","countNumber":3},"action":{"type":"expire"}}]}'
+
+  # ---------------------------------------------------------------- documentos (CV, DNI...)
+  BucketDocumentos:
+    Type: AWS::S3::Bucket
+    # Los documentos NO se borran al borrar el stack por error: solo finalizar.sh los elimina.
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault: { SSEAlgorithm: AES256 }
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      OwnershipControls:
+        Rules: [{ ObjectOwnership: BucketOwnerEnforced }]
+
+  PoliticaBucketDocumentos:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref BucketDocumentos
+      PolicyDocument:
+        Statement:
+          - Sid: SoloHttps
+            Effect: Deny
+            Principal: "*"
+            Action: "s3:*"
+            Resource: [!GetAtt BucketDocumentos.Arn, !Sub "${BucketDocumentos.Arn}/*"]
+            Condition: { Bool: { "aws:SecureTransport": "false" } }
+
+  # ---------------------------------------------------------------- correo
+  IdentidadCorreo:
+    Type: AWS::SES::EmailIdentity
+    Properties:
+      EmailIdentity: !Ref CorreoRemitente
+
+  # ---------------------------------------------------------------- logs (7 días)
+  LogsErp: { Type: AWS::Logs::LogGroup, Properties: { LogGroupName: !Sub "/${Proyecto}/erp", RetentionInDays: 7 } }
+  LogsAnuncios: { Type: AWS::Logs::LogGroup, Properties: { LogGroupName: !Sub "/${Proyecto}/anuncios", RetentionInDays: 7 } }
+  LogsGateway: { Type: AWS::Logs::LogGroup, Properties: { LogGroupName: !Sub "/${Proyecto}/gateway", RetentionInDays: 7 } }
+  LogsPostulantes: { Type: AWS::Logs::LogGroup, Properties: { LogGroupName: !Sub "/${Proyecto}/servicio-postulantes", RetentionInDays: 7 } }
+  LogsEmpresasVacantes: { Type: AWS::Logs::LogGroup, Properties: { LogGroupName: !Sub "/${Proyecto}/servicio-empresas-vacantes", RetentionInDays: 7 } }
+  LogsProcesosSeleccion: { Type: AWS::Logs::LogGroup, Properties: { LogGroupName: !Sub "/${Proyecto}/servicio-procesos-seleccion", RetentionInDays: 7 } }
+  LogsComunicaciones: { Type: AWS::Logs::LogGroup, Properties: { LogGroupName: !Sub "/${Proyecto}/servicio-comunicaciones", RetentionInDays: 7 } }
+  LogsMigracion: { Type: AWS::Logs::LogGroup, Properties: { LogGroupName: !Sub "/${Proyecto}/migracion", RetentionInDays: 7 } }
+
+  # ---------------------------------------------------------------- permisos (IAM)
+  # Lo usa ECS para ARRANCAR las tareas: bajar la imagen de ECR, escribir logs y leer los secretos.
+  RolEjecucionTareas:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal: { Service: ecs-tasks.amazonaws.com }
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      Policies:
+        - PolicyName: leer-secretos-del-proyecto
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action: ssm:GetParameters
+                Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/*"
+              - Effect: Allow
+                Action: kms:Decrypt
+                Resource: "*"
+                Condition:
+                  StringEquals: { "kms:ViaService": !Sub "ssm.${AWS::Region}.amazonaws.com" }
+
+  # Permisos del servicio de postulantes MIENTRAS corre: solo SU bucket y enviar correos.
+  RolTareaPostulantes:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal: { Service: ecs-tasks.amazonaws.com }
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: documentos-y-correo
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action: [s3:GetObject, s3:PutObject, s3:DeleteObject]
+                Resource: !Sub "${BucketDocumentos.Arn}/*"
+              - Effect: Allow
+                Action: s3:ListBucket
+                Resource: !GetAtt BucketDocumentos.Arn
+              - Effect: Allow
+                Action: ses:SendEmail
+                Resource: "*"
+                Condition:
+                  StringEquals: { "ses:FromAddress": !Ref CorreoRemitente }
+
+  # Los demás servicios no necesitan ningún permiso de AWS mientras corren.
+  RolTareaSinPermisos:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal: { Service: ecs-tasks.amazonaws.com }
+            Action: sts:AssumeRole
+
+  # ---------------------------------------------------------------- URLs públicas (HTTPS)
+  # Una distribución por aplicación. La URL (dxxxx.cloudfront.net) NO cambia al prender/apagar:
+  # por eso el webhook de Meta no hay que volver a configurarlo. CloudFront agrega dos cabeceras
+  # que el balanceador exige (qué app es y una clave): nadie puede saltarse CloudFront.
+  CloudFrontErp:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Comment: !Sub "${Proyecto} - ERP (y webhook de WhatsApp)"
+        Enabled: true
+        HttpVersion: http2and3
+        IPV6Enabled: true
+        PriceClass: PriceClass_100
+        Origins:
+          - Id: alb
+            DomainName: !Ref AlbDns
+            CustomOriginConfig: { OriginProtocolPolicy: http-only, HTTPPort: 80 }
+            OriginCustomHeaders:
+              - { HeaderName: X-TalentERP-App, HeaderValue: erp }
+              - { HeaderName: X-TalentERP-Clave, HeaderValue: !Select [2, !Split ["/", !Ref "AWS::StackId"]] }
+        DefaultCacheBehavior:
+          TargetOriginId: alb
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
+          Compress: true
+          CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # Managed-CachingDisabled
+          # Managed-AllViewerAndCloudFrontHeaders: pasa Host, cookies y query (y CloudFront-Viewer-Address = IP real)
+          OriginRequestPolicyId: 33f36d7e-f396-46d9-90e0-52428a34d9dc
+        CacheBehaviors:
+          - PathPattern: /_next/static/*
+            TargetOriginId: alb
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods: [GET, HEAD]
+            Compress: true
+            CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 # Managed-CachingOptimized
+
+  CloudFrontAnuncios:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Comment: !Sub "${Proyecto} - portal de empleos (ANUNCIOS)"
+        Enabled: true
+        HttpVersion: http2and3
+        IPV6Enabled: true
+        PriceClass: PriceClass_100
+        Origins:
+          - Id: alb
+            DomainName: !Ref AlbDns
+            CustomOriginConfig: { OriginProtocolPolicy: http-only, HTTPPort: 80 }
+            OriginCustomHeaders:
+              - { HeaderName: X-TalentERP-App, HeaderValue: anuncios }
+              - { HeaderName: X-TalentERP-Clave, HeaderValue: !Select [2, !Split ["/", !Ref "AWS::StackId"]] }
+        DefaultCacheBehavior:
+          TargetOriginId: alb
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: [GET, HEAD, OPTIONS, PUT, PATCH, POST, DELETE]
+          Compress: true
+          CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # Managed-CachingDisabled
+          # Managed-AllViewerAndCloudFrontHeaders: pasa Host, cookies y query (y CloudFront-Viewer-Address = IP real)
+          OriginRequestPolicyId: 33f36d7e-f396-46d9-90e0-52428a34d9dc
+        CacheBehaviors:
+          - PathPattern: /_next/static/*
+            TargetOriginId: alb
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods: [GET, HEAD]
+            Compress: true
+            CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 # Managed-CachingOptimized
+
+  # ---------------------------------------------------------------- alerta de gasto
+  Presupuesto:
+    Type: AWS::Budgets::Budget
+    Properties:
+      Budget:
+        BudgetName: !Sub "${Proyecto}-mensual"
+        BudgetType: COST
+        TimeUnit: MONTHLY
+        BudgetLimit: { Amount: !Ref PresupuestoMensualUSD, Unit: USD }
+      NotificationsWithSubscribers:
+        - Notification: { NotificationType: ACTUAL, ComparisonOperator: GREATER_THAN, Threshold: 50 }
+          Subscribers: [{ SubscriptionType: EMAIL, Address: !Ref CorreoAlertas }]
+        - Notification: { NotificationType: ACTUAL, ComparisonOperator: GREATER_THAN, Threshold: 100 }
+          Subscribers: [{ SubscriptionType: EMAIL, Address: !Ref CorreoAlertas }]
+        - Notification: { NotificationType: FORECASTED, ComparisonOperator: GREATER_THAN, Threshold: 100 }
+          Subscribers: [{ SubscriptionType: EMAIL, Address: !Ref CorreoAlertas }]
+
+Outputs:
+  UrlErp:
+    Value: !Sub "https://${CloudFrontErp.DomainName}"
+    Export: { Name: !Sub "${Proyecto}-url-erp" }
+  UrlAnuncios:
+    Value: !Sub "https://${CloudFrontAnuncios.DomainName}"
+    Export: { Name: !Sub "${Proyecto}-url-anuncios" }
+  UrlWebhookWhatsApp:
+    Description: Pegar en Meta > WhatsApp > Configuración > Webhook
+    Value: !Sub "https://${CloudFrontErp.DomainName}/api/v1/publico/webhook/whatsapp"
+  ClaveOrigen:
+    Value: !Select [2, !Split ["/", !Ref "AWS::StackId"]]
+    Export: { Name: !Sub "${Proyecto}-clave-origen" }
+  BucketDocumentos:
+    Value: !Ref BucketDocumentos
+    Export: { Name: !Sub "${Proyecto}-bucket-documentos" }
+  RolEjecucionTareas:
+    Value: !GetAtt RolEjecucionTareas.Arn
+    Export: { Name: !Sub "${Proyecto}-rol-ejecucion" }
+  RolTareaPostulantes:
+    Value: !GetAtt RolTareaPostulantes.Arn
+    Export: { Name: !Sub "${Proyecto}-rol-postulantes" }
+  RolTareaSinPermisos:
+    Value: !GetAtt RolTareaSinPermisos.Arn
+    Export: { Name: !Sub "${Proyecto}-rol-sin-permisos" }
+  RegistroImagenes:
+    Value: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com"
+    Export: { Name: !Sub "${Proyecto}-registro" }
+  CorreoRemitente:
+    Value: !Ref CorreoRemitente
+    Export: { Name: !Sub "${Proyecto}-correo-remitente" }

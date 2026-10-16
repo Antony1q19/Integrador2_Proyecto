@@ -34,7 +34,7 @@ configurar_logging("servicio-postulantes", settings.log_level)
 
 
 async def _asegurar_columnas_nuevas() -> None:
-    """Añade columnas a tablas existentes si la base de datos ya existía en Supabase."""
+    """Añade columnas a tablas que ya existían (bases creadas antes de esas columnas)."""
     esquema = settings.db_schema
     prefijo = f'"{esquema}".' if esquema else ""
     consultas = [
@@ -68,6 +68,10 @@ async def lifespan(app: FastAPI):
     # AL ENCENDER: en modo "desarrollo" crea las tablas que falten (leyendo las
     # clases de infrastructure/models.py) y siembra los datos de prueba
     # (infrastructure/seed.py).
+    # Producción (AWS) con base nueva: crea las tablas que falten, SIN datos de prueba.
+    if settings.inicializar_bd and settings.entorno != "desarrollo":
+        await crear_tablas(engine)
+        await _asegurar_columnas_nuevas()
     if settings.entorno == "desarrollo":
         await crear_tablas(engine)
         await _asegurar_columnas_nuevas()
@@ -76,7 +80,7 @@ async def lifespan(app: FastAPI):
     await _asegurar_tablas_nuevas()
     # Abre las conexiones a la base ahora (en segundo plano) y no cuando llegue la primera petición.
     tarea_calentamiento = asyncio.create_task(calentar_conexiones(engine))
-    # Crea el bucket privado de Supabase Storage si todavía no existe.
+    # Comprueba que el almacenamiento de archivos (S3 o carpeta local) esté disponible.
     tarea_bucket = asyncio.create_task(asegurar_bucket(TAMANO_MAXIMO_BYTES, TIPOS_DE_ARCHIVO_PERMITIDOS))
     yield  # <- aquí el servidor queda funcionando
     await asyncio.gather(tarea_calentamiento, tarea_bucket)

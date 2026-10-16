@@ -1,91 +1,77 @@
-"""Envío de correos con MAILJET (https://www.mailjet.com), por su API REST v3.1.
+"""Envío de correos: Amazon SES en AWS, o el log en desarrollo.
 
-Se usa la API directamente con httpx (que el servicio ya tiene) en vez del SDK de Mailjet:
-es una sola llamada y así no se agrega otra dependencia.
-    POST https://api.mailjet.com/v3.1/send
-    Autenticación "Basic": usuario = MAILJET_API_KEY, contraseña = MAILJET_SECRET_KEY
-
-Las dos claves y el remitente van solo en el archivo .env (que git ignora). El remitente
-(CORREO_REMITENTE_EMAIL) tiene que estar VALIDADO en Mailjet (Account settings > Sender
-addresses & domains); si no, Mailjet no entrega el correo.
+CORREO (.env):
+  - "ses"     → Amazon SES (API v2, SendEmail). El permiso lo da el rol de IAM de la tarea (sin claves).
+                El remitente (CORREO_REMITENTE_EMAIL) debe estar VERIFICADO en SES. Mientras la cuenta
+                esté en el "sandbox" de SES, solo se puede enviar a direcciones también verificadas.
+  - "consola" → no se envía nada: el correo (con su enlace) se escribe en el log, para probar en la PC.
 """
+import asyncio
 import html
 import logging
+import uuid
 from urllib.parse import urlencode
-
-import httpx
 
 from app.core.config import settings
 from shared_kernel.exceptions import ServicioNoDisponible
 
 logger = logging.getLogger(__name__)
 
-_URL_MAILJET = "https://api.mailjet.com/v3.1/send"
-_TIEMPO_MAXIMO_SEGUNDOS = 15
+_cliente_ses = None
+
+
+def _ses():
+    global _cliente_ses
+    if _cliente_ses is None:
+        import boto3  # solo hace falta en modo "ses"
+
+        _cliente_ses = boto3.client("sesv2", region_name=settings.aws_region)
+    return _cliente_ses
 
 
 async def enviar_correo(destinatario: str, nombre_destinatario: str, asunto: str, html_cuerpo: str, texto: str) -> str:
-    """Envía un correo y devuelve el id que le asigna Mailjet. Si algo falla, responde 503."""
-    if not (settings.mailjet_api_key and settings.mailjet_secret_key and settings.correo_remitente_email):
-        raise ServicioNoDisponible(
-            "El envío de correos no está configurado: faltan MAILJET_API_KEY, MAILJET_SECRET_KEY "
-            "o CORREO_REMITENTE_EMAIL en el .env del servicio de postulantes"
-        )
+    """Envía un correo y devuelve el id del mensaje. Si algo falla, responde 503 con el motivo."""
+    if settings.correo != "ses":
+        logger.info("Correo (modo consola) para %s | %s | %s", destinatario, asunto, texto)
+        return f"consola-{uuid.uuid4().hex}"
 
-    mensaje = {
-        "From": {"Email": settings.correo_remitente_email, "Name": settings.correo_remitente_nombre},
-        "To": [{"Email": destinatario, "Name": nombre_destinatario}],
-        "Subject": asunto,
-        "HTMLPart": html_cuerpo,
-        "TextPart": texto,  # versión sin formato: la leen algunos clientes y ayuda a no caer en spam
-    }
+    if not settings.correo_remitente_email:
+        raise ServicioNoDisponible("El envío de correos no está configurado: falta CORREO_REMITENTE_EMAIL")
+
+    remitente = f"{settings.correo_remitente_nombre} <{settings.correo_remitente_email}>"
     try:
-        async with httpx.AsyncClient(timeout=_TIEMPO_MAXIMO_SEGUNDOS) as cliente:
-            respuesta = await cliente.post(
-                _URL_MAILJET,
-                auth=(settings.mailjet_api_key, settings.mailjet_secret_key),
-                json={"Messages": [mensaje]},
-            )
-    except httpx.HTTPError as exc:
-        logger.warning("No se pudo conectar con Mailjet: %s", exc)
-        raise ServicioNoDisponible("No se pudo enviar el correo. Intenta nuevamente en unos minutos.") from exc
-
-    if respuesta.status_code >= 400:
-        # El detalle técnico completo queda en el log; al usuario, el motivo en español.
-        logger.warning("Mailjet rechazó el correo (%s): %s", respuesta.status_code, respuesta.text)
-        raise ServicioNoDisponible(_motivo_del_rechazo(respuesta))
-
-    resultado = respuesta.json()["Messages"][0]
-    if resultado.get("Status") != "success":
-        logger.warning("Mailjet no envió el correo: %s", resultado)
-        raise ServicioNoDisponible(_motivo_del_rechazo(respuesta))
-    return str(resultado["To"][0].get("MessageUUID", ""))
-
-
-def _motivo_del_rechazo(respuesta: httpx.Response) -> str:
-    """Traduce los rechazos más comunes de Mailjet a un mensaje claro para quien usa el ERP."""
-    if respuesta.status_code == 401:
-        return (
-            "Mailjet no aceptó las claves (MAILJET_API_KEY / MAILJET_SECRET_KEY). "
-            "Revisa el .env del servicio de postulantes."
+        respuesta = await asyncio.to_thread(
+            _ses().send_email,
+            FromEmailAddress=remitente,
+            Destination={"ToAddresses": [destinatario]},
+            Content={
+                "Simple": {
+                    "Subject": {"Data": asunto, "Charset": "UTF-8"},
+                    "Body": {
+                        "Html": {"Data": html_cuerpo, "Charset": "UTF-8"},
+                        # versión sin formato: la leen algunos clientes y ayuda a no caer en spam
+                        "Text": {"Data": texto, "Charset": "UTF-8"},
+                    },
+                }
+            },
         )
-    if respuesta.status_code == 429:
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("SES no envió el correo: %s", exc)
+        raise ServicioNoDisponible(_motivo_del_rechazo(exc)) from exc
+    return str(respuesta.get("MessageId", ""))
+
+
+def _motivo_del_rechazo(error: Exception) -> str:
+    """Traduce los rechazos más comunes de SES a un mensaje claro para quien usa el ERP."""
+    detalle = str(error)
+    if "not verified" in detalle.lower():
+        return (
+            "SES no permite enviar a esa dirección todavía: la cuenta está en el sandbox de SES y solo "
+            "envía a correos verificados. Verifica el destinatario o pide el acceso de producción en SES."
+        )
+    if "Throttling" in detalle or "MaxSendRate" in detalle:
         return "Se enviaron demasiados correos seguidos. Espera un momento e intenta de nuevo."
-
-    # Mailjet explica el error dentro de cada mensaje: {"Messages": [{"Errors": [{"ErrorMessage": ...}]}]}
-    try:
-        errores = respuesta.json()["Messages"][0].get("Errors", [])
-        detalle = "; ".join(e.get("ErrorMessage", "") for e in errores if e.get("ErrorMessage"))
-    except (ValueError, KeyError, IndexError, TypeError):
-        detalle = ""
-    if "sender" in detalle.lower():
-        return (
-            f"El remitente ({settings.correo_remitente_email}) no está validado en Mailjet. "
-            "Valídalo en Mailjet > Account settings > Sender addresses & domains."
-        )
-    if detalle:
-        return f"Mailjet rechazó el envío: {detalle}"
-    return "El servicio de correo rechazó el envío. Revisa la configuración de Mailjet."
+    return "No se pudo enviar el correo. Intenta nuevamente en unos minutos."
 
 
 def correo_solicitud_cuenta(nombres: str, email: str, token_invitacion: str) -> tuple[str, str, str]:
@@ -181,21 +167,19 @@ def correo_recuperar_password(nombres: str, enlace: str) -> tuple[str, str, str]
 async def enviar_correo_recuperacion(destinatario: str, nombres: str, raw_token: str) -> None:
     """Envía el correo de recuperación en segundo plano sin bloquear ni propagar excepciones.
 
-    Si Mailjet falla o no está configurado y ENTORNO es desarrollo, imprime el enlace en los logs.
+    En desarrollo (o si el envío falla) el enlace queda en el log para poder probar el flujo.
     """
     enlace = f"{settings.url_anuncios.rstrip('/')}/restablecer-password?token={raw_token}"
     asunto, html_cuerpo, texto = correo_recuperar_password(nombres, enlace)
 
-    correo_configurado = bool(settings.mailjet_api_key and settings.mailjet_secret_key and settings.correo_remitente_email)
-
-    if correo_configurado:
+    if settings.correo == "ses":
         try:
             await enviar_correo(destinatario, nombres, asunto, html_cuerpo, texto)
             logger.info("Correo de recuperación enviado con éxito a la dirección solicitada.")
             return
         except Exception as exc:  # noqa: BLE001
             # Se registra el error SIN revelar el token
-            logger.warning("No se pudo entregar el correo de recuperación vía Mailjet: %s", exc)
+            logger.warning("No se pudo entregar el correo de recuperación vía SES: %s", exc)
 
     # Si no está configurado o falló, y estamos en desarrollo, se muestra en el log para pruebas
     if settings.entorno == "desarrollo":

@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     const data = await respuestaGateway.json();
     return NextResponse.json(data);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'No se pudo conectar con el servidor' },
       { status: 503 }

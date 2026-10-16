@@ -1,6 +1,6 @@
 // app/api/postulantes/[id]/solicitar-cuenta/route.ts
 //
-// POST → pide al backend que envíe (con Mailjet) el correo que invita al postulante a crear su
+// POST → pide al backend que envíe (con Amazon SES) el correo que invita al postulante a crear su
 // cuenta en ANUNCIOS. Solo reenvía al Gateway con el JWT de la cookie httpOnly (ver lib/proxyJson.ts).
 import { NextRequest } from "next/server";
 import { reenviarPeticion } from "@/lib/proxyJson";

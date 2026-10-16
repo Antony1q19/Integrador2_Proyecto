@@ -1,0 +1,7 @@
+# No copiar a la imagen: se instalan / construyen dentro de Docker, y los .env nunca van en una imagen.
+node_modules
+.next
+.env
+.env*.local
+npm-debug.log*
+.git

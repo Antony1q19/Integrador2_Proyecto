@@ -5,25 +5,23 @@ from shared_kernel.config import BaseServiceSettings
 
 
 class Settings(BaseServiceSettings):
-    # --- Cliente de WhatsApp (emulador en dev, Meta en prod) ---
-    # URL base de la API. En desarrollo: http://localhost:4300 (kapso-emulator).
-    # En producción: https://graph.facebook.com/v23.0
-    whatsapp_api_url: str = Field(
-        default="http://localhost:4300",
-        alias="WHATSAPP_API_URL",
-    )
-    # API Key o Access Token de Meta.
-    # En dev, puede ser cualquier valor (el emulador no verifica).
-    whatsapp_api_key: str = Field(default="cualquier-clave", alias="WHATSAPP_API_KEY")
-    # Phone Number ID (el número de prueba de Meta, ej. "555111222333").
-    whatsapp_phone_number_id: str = Field(
-        default="555111222333",
-        alias="WHATSAPP_PHONE_NUMBER_ID",
-    )
-    # Secreto para verificar la firma de los webhooks entrantes.
-    whatsapp_webhook_secret: str = Field(
-        default="mi-secreto-de-prueba",
-        alias="WHATSAPP_WEBHOOK_SECRET",
+    # --- Meta WhatsApp Cloud API ---
+    # developers.facebook.com > tu app > WhatsApp > API Setup.
+    meta_access_token: str | None = Field(default=None, alias="META_ACCESS_TOKEN")
+    meta_phone_number_id: str | None = Field(default=None, alias="META_PHONE_NUMBER_ID")
+    meta_api_version: str = Field(default="v23.0", alias="META_API_VERSION")
+    # Identificador de la cuenta de WhatsApp Business (API Setup): las plantillas viven en ella.
+    meta_waba_id: str | None = Field(default=None, alias="META_WABA_ID")
+    # Palabra secreta que se escribe en Meta al registrar el webhook (WhatsApp > Configuration >
+    # "Token de verificación"); Meta la manda de vuelta para comprobar que el webhook es nuestro.
+    meta_verify_token: str | None = Field(default=None, alias="META_VERIFY_TOKEN")
+    # Opcional: "Clave secreta de la app" (App settings > Basic). Si está, se verifica la firma
+    # X-Hub-Signature-256 de cada webhook y se rechaza lo que no venga de Meta.
+    meta_app_secret: str | None = Field(default=None, alias="META_APP_SECRET")
+
+    # Dirección del servicio-procesos-seleccion: dice qué postulantes oculta la regla de empresas.
+    url_servicio_procesos_seleccion: str | None = Field(
+        default=None, alias="URL_SERVICIO_PROCESOS_SELECCION"
     )
 
     # Dirección del servicio-postulantes (para consultar datos del postulante).

@@ -41,12 +41,28 @@ services:
       - gateway
 
   # --- Backend (ADR-002: microservicios detrás de un API Gateway) ---
-  # Gateway + 3 microservicios de dominio (postulantes, empresas-vacantes y
-  # procesos-seleccion). La base de datos NO corre en Docker: es Supabase (2 proyectos),
-  # cada servicio con su propio esquema; se configura con DATABASE_URL y DB_SCHEMA en su ".env".
-  # Cada servicio trae su config en su propio ".env" (copiado de su
-  # ".env.example"); acá solo se referencia con "env_file", nada de
-  # secretos ni URLs sueltas en este archivo.
+  # Gateway + 4 microservicios de dominio. Este docker-compose es para DESARROLLO en la PC:
+  # la base de datos es un PostgreSQL local (una base, un esquema por servicio, como RDS en AWS),
+  # los archivos se guardan en un volumen local y los correos se escriben en el log.
+  # En AWS (producción) todo corre en ECS Fargate + RDS + S3 + SES: ver infra/aws/.
+  # Cada servicio trae su config en su propio ".env" (copiado de su ".env.example").
+
+  postgres:
+    container_name: postgres-local
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: talenterp
+      POSTGRES_USER: talenterp
+      POSTGRES_PASSWORD: talenterp
+    ports:
+      - "5432:5432"
+    volumes:
+      - datos-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U talenterp -d talenterp"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
 
   gateway:
     container_name: gateway-service
@@ -61,6 +77,8 @@ services:
     env_file:
       - ./backend/gateway/.env
     depends_on:
+      postgres:
+        condition: service_healthy
       servicio-postulantes:
         condition: service_started
 
@@ -77,8 +95,12 @@ services:
     volumes:
       - ./backend/servicio-postulantes/app:/app/app
       - ./backend/libs/shared/shared_kernel:/app/libs/shared_kernel
+      - archivos-postulantes:/app/archivos   # CV, DNI... (en AWS van a S3)
     env_file:
       - ./backend/servicio-postulantes/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   servicio-empresas-vacantes:
     container_name: empresas-vacantes-service
@@ -95,6 +117,9 @@ services:
       - ./backend/libs/shared/shared_kernel:/app/libs/shared_kernel
     env_file:
       - ./backend/servicio-empresas-vacantes/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   servicio-procesos-seleccion:
     container_name: procesos-seleccion-service
@@ -111,6 +136,9 @@ services:
       - ./backend/libs/shared/shared_kernel:/app/libs/shared_kernel
     env_file:
       - ./backend/servicio-procesos-seleccion/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   servicio-comunicaciones:
     container_name: comunicaciones-service
@@ -124,7 +152,10 @@ services:
       - ./backend/libs/shared/shared_kernel:/app/libs/shared_kernel
     env_file:
       - ./backend/servicio-comunicaciones/.env
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     depends_on:
-      - gateway
+      postgres:
+        condition: service_healthy
+
+volumes:
+  datos-postgres:
+  archivos-postulantes:

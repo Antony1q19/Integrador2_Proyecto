@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 
 import { menuItems, Role } from "@/features/portada/types/menu";
+import { useTotalNoLeidos } from "@/features/comunicaciones/avisosWhatsApp";
 import { cerrarSesionApi } from "@/features/login/sesion/authService";
 
 interface SidebarProps {
@@ -32,6 +33,7 @@ export default function Sidebar({
     const estaEn = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
     const router = useRouter();
     const [submenusManuales, setSubmenusManuales] = useState<Record<string, boolean>>({});
+    const noLeidos = useTotalNoLeidos();
 
     const handleLogout = async () => {
         // Borramos las cookies de sesión al salir: rol y nombre acá mismo;
@@ -145,6 +147,13 @@ export default function Sidebar({
 
                                                 {/* Texto */}
                                                 <span>{item.name}</span>
+
+                                                {/* Mensajes de WhatsApp sin leer */}
+                                                {item.href === "/comunicaciones" && noLeidos > 0 && (
+                                                    <span className="ml-auto rounded-full bg-emerald-500 px-2 py-0.5 text-[11px] font-semibold text-white">
+                                                        {noLeidos > 99 ? "99+" : noLeidos}
+                                                    </span>
+                                                )}
 
                                                 {/* Indicador */}
                                                 {active && <span className="ml-auto h-2 w-2 rounded-full bg-white shadow-lg" />}

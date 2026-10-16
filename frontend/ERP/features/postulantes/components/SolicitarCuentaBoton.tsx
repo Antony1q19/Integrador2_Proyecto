@@ -1,7 +1,7 @@
 // features/postulantes/components/SolicitarCuentaBoton.tsx
 //
 // Botón "Solicitar" de la columna "Cuenta" en /postulantes: el backend le envía al postulante un
-// correo (Mailjet) invitándolo a crear su cuenta en ANUNCIOS. Muestra el resultado en el mismo botón.
+// correo (Amazon SES) invitándolo a crear su cuenta en ANUNCIOS. Muestra el resultado en el mismo botón.
 "use client";
 
 import { useState } from "react";

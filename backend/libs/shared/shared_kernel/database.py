@@ -7,11 +7,11 @@ Vocabulario básico:
 - "async"    = mientras la base responde, el servidor puede atender otras
                peticiones en vez de quedarse esperando.
 
-Cada servicio tiene su PROPIA base de datos (o, en Supabase, su propio "esquema");
+Cada servicio tiene su PROPIO "esquema" dentro de la base de datos (RDS en AWS);
 este archivo solo evita repetir el mismo código de conexión en cada uno.
 
 ¿Qué es un "esquema"? Una carpeta dentro de la base de datos donde viven las tablas de un
-servicio. Supabase da UNA base por proyecto, así que cada servicio guarda sus tablas en su
+servicio. Hay UNA base de datos para todo el sistema, así que cada servicio guarda sus tablas en su
 propio esquema (ej. "postulantes", "procesos_seleccion") y no se mezclan. Se indica con la
 variable DB_SCHEMA del .env de cada servicio; si no se define, se usa el esquema normal
 ("public"), que es lo que pasa con el Postgres local de Docker.
@@ -35,13 +35,13 @@ from sqlalchemy.orm import DeclarativeBase
 logger = logging.getLogger(__name__)
 
 # --- Rapidez con una base de datos en la nube --------------------------------------------
-# Supabase está lejos (~200 ms de ida y vuelta) y cada "viaje" a la base se paga completo, así que
+# Cada "viaje" a la base se paga completo (más aún si la base está en otra región), así que
 # lo que más acelera es HACER MENOS VIAJES por petición:
 #   1. No comprobar la conexión ("ping") en cada uso: solo si estuvo inactiva un rato.
 #   2. Las lecturas (GET) usan modo "autocommit": no abren ni cierran transacción (ahorra 2 viajes).
 #   3. Se abren conexiones al encender el servicio, porque abrir una nueva tarda 1-4 segundos.
-# Y pocas conexiones por servicio: el "Session pooler" de Supabase da a cada servicio una conexión
-# real de la base, y el plan gratuito tiene pocas (los 4 servicios comparten 2 proyectos).
+# Y pocas conexiones por servicio: la instancia pequeña de RDS (db.t4g.micro) admite pocas conexiones
+# y los 5 servicios comparten la misma base.
 CONEXIONES_BASE = 3  # conexiones que el servicio mantiene abiertas
 CONEXIONES_EXTRA = 2  # y las que puede abrir de más en un pico
 SEGUNDOS_INACTIVA_ANTES_DE_COMPROBAR = 20
@@ -74,7 +74,7 @@ def crear_engine_y_sessionmaker(
     # un rato (ver `_comprobar_solo_si_estuvo_inactiva`): hacerlo siempre costaría 1 viaje por petición.
     argumentos_de_conexion: dict = {}
     if ":6543/" in database_url:
-        # Puerto 6543 = "Transaction pooler" de Supabase: no admite sentencias preparadas,
+        # Puerto 6543 = un "transaction pooler" (ej. PgBouncer): no admite sentencias preparadas,
         # que asyncpg usa por defecto. Se desactivan. (Con el "Session pooler", puerto 5432,
         # no hace falta.)
         argumentos_de_conexion = {"statement_cache_size": 0, "prepared_statement_cache_size": 0}

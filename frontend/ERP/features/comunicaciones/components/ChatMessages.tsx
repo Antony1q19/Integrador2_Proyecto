@@ -2,7 +2,7 @@
 // Burbujas de mensajes (tipo WhatsApp)
 "use client";
 
-import { RefObject } from "react";
+import { RefObject, useEffect } from "react";
 import { Mensaje } from "../types/comunicaciones.types";
 import { Check, CheckCheck, Clock, XCircle } from "lucide-react";
 
@@ -52,6 +52,12 @@ const formatearFecha = (fecha: string) => {
 };
 
 export function ChatMessages({ mensajes, messagesEndRef }: ChatMessagesProps) {
+  // Bajar al último mensaje al abrir el chat y cuando llega o se envía uno nuevo
+  // (el refresco automático no cambia la cantidad, así que no mueve la vista si estás leyendo arriba).
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ block: "end" });
+  }, [mensajes.length, messagesEndRef]);
+
   // Agrupar mensajes por fecha
   const mensajesAgrupados = mensajes.reduce<Record<string, Mensaje[]>>(
     (acc, mensaje) => {
@@ -104,6 +110,11 @@ export function ChatMessages({ mensajes, messagesEndRef }: ChatMessagesProps) {
                     </span>
                     {esMio && getEstadoIcon(mensaje.estado)}
                   </div>
+                  {esMio && mensaje.estado === "fallido" && (
+                    <p className="mt-1 border-t border-red-200 pt-1 text-[11px] text-red-600">
+                      No entregado{mensaje.error ? `: ${mensaje.error}` : ""}
+                    </p>
+                  )}
                 </div>
               </div>
             );

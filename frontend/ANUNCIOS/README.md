@@ -8,7 +8,7 @@ Aplicación pública construida con **Next.js (App Router)** para que las person
 - **Sesión segura por Cookie httpOnly**: El token JWT de sesión (`authToken`, vigencia de 1 hora) se almacena en una cookie `httpOnly` (`SameSite=Lax`, `Secure` en producción). El navegador nunca expone el token al JavaScript del cliente.
 - **Protección de rutas**: `middleware.ts` protege las rutas privadas (`/perfil` e `/his_postulaciones`), redirigiendo a `/login?siguiente=...` si no existe sesión.
 - **Registro con trazabilidad**: Exige aceptar la Política de Privacidad y Términos y Condiciones conforme a la Ley N.º 29733 (versión `2026-01`).
-- **Recuperación de contraseña**: Flujo con enlace único firmado por correo electrónico (Mailjet) y formulario seguro de restablecimiento (`/restablecer-password`).
+- **Recuperación de contraseña**: Flujo con enlace único firmado por correo electrónico (Amazon SES) y formulario seguro de restablecimiento (`/restablecer-password`).
 - **Separación estricta ERP / ANUNCIOS**: Los tokens de postulante portan `aud: "anuncios"` y `rol: "Postulante"`, impidiendo cualquier acceso a las rutas administrativas del ERP.
 - **Cero mocks**: Toda la autenticación e historial operan contra datos y estados reales del backend.
 
