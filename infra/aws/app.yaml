@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: >-
-  TalentERP - stack APP (se crea con prender.sh y se borra con apagar.sh): red, balanceador,
+  TalentERP - stack APP (se crea con prender.ps1 y se borra con apagar.ps1): red, balanceador,
   base de datos RDS (restaurada desde el último snapshot) y los 7 servicios en ECS Fargate.
   Al borrarlo, la base guarda un snapshot final: los datos no se pierden.
 
@@ -26,7 +26,7 @@ Parameters:
   VersionPostgres:
     Type: String
     Default: "17.6"
-    Description: Versión exacta de PostgreSQL 17 (prender.sh pone la recomendada por AWS en la región).
+    Description: Versión exacta de PostgreSQL 17 (prender.ps1 pone la recomendada por AWS en la región).
   ListaPrefijosCloudFront:
     Type: String
     Default: pl-3b927c52
@@ -143,7 +143,7 @@ Resources:
 
   BaseDatos:
     Type: AWS::RDS::DBInstance
-    # Al borrar el stack (apagar.sh) se guarda un snapshot final con todos los datos.
+    # Al borrar el stack (apagar.ps1) se guarda un snapshot final con todos los datos.
     DeletionPolicy: Snapshot
     UpdateReplacePolicy: Snapshot
     Properties:
@@ -255,8 +255,8 @@ Resources:
       Actions: [{ Type: forward, TargetGroupArn: !Ref DestinoAnuncios }]
 
   # ================================================================ ECS
-  # Service Connect: cada servicio se encuentra por su nombre (servicio-postulantes:8001...), igual
-  # que en docker-compose. Usa un espacio de nombres HTTP de Cloud Map (sin zona DNS: no cobra).
+  # Service Connect: cada servicio se encuentra por su nombre (servicio-postulantes:8001...).
+  # Usa un espacio de nombres HTTP de Cloud Map (sin zona DNS: no cobra).
   EspacioNombres:
     Type: AWS::ServiceDiscovery::HttpNamespace
     Properties:
@@ -290,7 +290,6 @@ Resources:
           Command: [uvicorn, app.main:app, --host, 0.0.0.0, --port, "8000", --proxy-headers, --forwarded-allow-ips, "*", --timeout-keep-alive, "60"]
           PortMappings: [{ Name: http, ContainerPort: 8000, AppProtocol: http }]
           Environment:
-            - { Name: ENTORNO, Value: produccion }
             - { Name: INICIALIZAR_BD, Value: "true" }
             - { Name: DB_HOST, Value: !GetAtt BaseDatos.Endpoint.Address }
             - { Name: DB_SCHEMA, Value: usuario }
@@ -329,16 +328,13 @@ Resources:
           Command: [uvicorn, app.main:app, --host, 0.0.0.0, --port, "8001", --timeout-keep-alive, "60"]
           PortMappings: [{ Name: http, ContainerPort: 8001, AppProtocol: http }]
           Environment:
-            - { Name: ENTORNO, Value: produccion }
             - { Name: INICIALIZAR_BD, Value: "true" }
             - { Name: NOMBRE_SERVICIO, Value: servicio-postulantes }
             - { Name: DB_HOST, Value: !GetAtt BaseDatos.Endpoint.Address }
             - { Name: DB_SCHEMA, Value: postulantes }
             - { Name: URL_SERVICIO_PROCESOS_SELECCION, Value: "http://servicio-procesos-seleccion:8003" }
-            - { Name: ALMACENAMIENTO, Value: s3 }
             - { Name: S3_BUCKET_DOCUMENTOS, Value: !ImportValue { "Fn::Sub": "${Proyecto}-bucket-documentos" } }
             - { Name: AWS_REGION, Value: !Ref "AWS::Region" }
-            - { Name: CORREO, Value: ses }
             - { Name: CORREO_REMITENTE_EMAIL, Value: !ImportValue { "Fn::Sub": "${Proyecto}-correo-remitente" } }
             - { Name: URL_ANUNCIOS, Value: !ImportValue { "Fn::Sub": "${Proyecto}-url-anuncios" } }
           Secrets:
@@ -369,7 +365,6 @@ Resources:
           Command: [uvicorn, app.main:app, --host, 0.0.0.0, --port, "8002", --timeout-keep-alive, "60"]
           PortMappings: [{ Name: http, ContainerPort: 8002, AppProtocol: http }]
           Environment:
-            - { Name: ENTORNO, Value: produccion }
             - { Name: INICIALIZAR_BD, Value: "true" }
             - { Name: NOMBRE_SERVICIO, Value: servicio-empresas-vacantes }
             - { Name: DB_HOST, Value: !GetAtt BaseDatos.Endpoint.Address }
@@ -402,7 +397,6 @@ Resources:
           Command: [uvicorn, app.main:app, --host, 0.0.0.0, --port, "8003", --timeout-keep-alive, "60"]
           PortMappings: [{ Name: http, ContainerPort: 8003, AppProtocol: http }]
           Environment:
-            - { Name: ENTORNO, Value: produccion }
             - { Name: INICIALIZAR_BD, Value: "true" }
             - { Name: NOMBRE_SERVICIO, Value: servicio-procesos-seleccion }
             - { Name: DB_HOST, Value: !GetAtt BaseDatos.Endpoint.Address }
@@ -437,7 +431,6 @@ Resources:
           Command: [uvicorn, app.main:app, --host, 0.0.0.0, --port, "8004", --timeout-keep-alive, "60"]
           PortMappings: [{ Name: http, ContainerPort: 8004, AppProtocol: http }]
           Environment:
-            - { Name: ENTORNO, Value: produccion }
             - { Name: INICIALIZAR_BD, Value: "true" }
             - { Name: NOMBRE_SERVICIO, Value: servicio-comunicaciones }
             - { Name: DB_HOST, Value: !GetAtt BaseDatos.Endpoint.Address }
@@ -509,45 +502,6 @@ Resources:
           LogConfiguration:
             LogDriver: awslogs
             Options: { awslogs-group: !Sub "/${Proyecto}/anuncios", awslogs-region: !Ref "AWS::Region", awslogs-stream-prefix: ecs }
-
-  # Migración ÚNICA de los datos de Supabase a RDS (la ejecuta prender.sh la primera vez, antes de
-  # encender los servicios). pg_dump de cada esquema → psql en RDS, todo dentro de la VPC.
-  TareaMigracion:
-    Type: AWS::ECS::TaskDefinition
-    Condition: BaseNueva
-    Properties:
-      Family: !Sub "${Proyecto}-migracion"
-      RequiresCompatibilities: [FARGATE]
-      NetworkMode: awsvpc
-      Cpu: "512"
-      Memory: "1024"
-      RuntimePlatform: { OperatingSystemFamily: LINUX, CpuArchitecture: X86_64 }
-      ExecutionRoleArn: !ImportValue { "Fn::Sub": "${Proyecto}-rol-ejecucion" }
-      TaskRoleArn: !ImportValue { "Fn::Sub": "${Proyecto}-rol-sin-permisos" }
-      ContainerDefinitions:
-        - Name: migracion
-          Image: public.ecr.aws/docker/library/postgres:17-alpine
-          Essential: true
-          EntryPoint: [sh, -c]
-          Command:
-            - |
-              set -eu
-              export PGPASSWORD="$DB_PASSWORD" PGSSLMODE=require
-              DESTINO="host=$DB_HOST port=5432 dbname=talenterp user=talenterp"
-              echo "Copiando esquemas usuario y postulantes..."
-              pg_dump --no-owner --no-privileges -n usuario -n postulantes "$ORIGEN_PERSONAS" | psql -v ON_ERROR_STOP=1 -q "$DESTINO"
-              echo "Copiando esquemas empresas_vacantes, procesos_seleccion y comunicaciones..."
-              pg_dump --no-owner --no-privileges -n empresas_vacantes -n procesos_seleccion -n comunicaciones "$ORIGEN_RECLUTAMIENTO" | psql -v ON_ERROR_STOP=1 -q "$DESTINO"
-              echo "MIGRACION_OK"
-          Environment:
-            - { Name: DB_HOST, Value: !GetAtt BaseDatos.Endpoint.Address }
-          Secrets:
-            - { Name: DB_PASSWORD, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/bd/password" }
-            - { Name: ORIGEN_PERSONAS, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/migracion/supabase-personas" }
-            - { Name: ORIGEN_RECLUTAMIENTO, ValueFrom: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${Proyecto}/migracion/supabase-reclutamiento" }
-          LogConfiguration:
-            LogDriver: awslogs
-            Options: { awslogs-group: !Sub "/${Proyecto}/migracion", awslogs-region: !Ref "AWS::Region", awslogs-stream-prefix: ecs }
 
   # ---------------------------------------------------------------- servicios
   ServicioGateway:
@@ -712,8 +666,5 @@ Outputs:
     Value: !Join [",", [!Ref SubredPublicaA, !Ref SubredPublicaB]]
   GrupoSeguridadServicios:
     Value: !Ref SgServicios
-  TareaMigracion:
-    Condition: BaseNueva
-    Value: !Ref TareaMigracion
   BaseDatosEndpoint:
     Value: !GetAtt BaseDatos.Endpoint.Address

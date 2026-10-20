@@ -7,9 +7,6 @@ import { actualizarCache, useCargaConCache } from "@/lib/cacheCliente";
 import { EstadoProceso, HistorialEstado, Postulante } from "../types/postulante.types";
 import { fetchPostulantes, fetchAnuncios, actualizarEstadoPostulacion } from "../services/postulantesService";
 
-// Nombre para el historial en modo mock; con backend lo pone el servidor (la cuenta con sesión).
-const USUARIO_ACTUAL = "Usuario RRHH";
-
 interface UsePostulantesPipelineResult {
   postulantes: Postulante[];
   anuncios: Anuncio[];
@@ -67,7 +64,7 @@ export function usePostulantesPipeline(): UsePostulantesPipelineResult {
     const clave = `${postulanteId}:${anuncioId}`;
     setEnVuelo((previo) => ({ ...previo, [clave]: estado })); // 1) se mueve ya
     try {
-      const registro = await actualizarEstadoPostulacion(postulanteId, anuncioId, estado, USUARIO_ACTUAL);
+      const registro = await actualizarEstadoPostulacion(postulanteId, anuncioId, estado);
       // 2) confirmado: el cambio pasa a la lista guardada (la misma que usa /postulantes)
       actualizarCache<Postulante[]>("postulantes:lista", (actual) => conEstado(actual, postulanteId, anuncioId, estado, registro));
     } finally {

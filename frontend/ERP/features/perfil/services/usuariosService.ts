@@ -1,8 +1,7 @@
 // features/perfil/services/usuariosService.ts
 //
 // Llama a las rutas propias del ERP (app/api/usuarios/**), nunca al
-// Gateway directo -mismo patrón que postulantesService.ts-. Sin modo
-// mock: esta pantalla siempre habla con el backend real.
+// Gateway directo -mismo patrón que postulantesService.ts-.
 import { RolInterno, Usuario, UsuarioCreado, UsuarioFormData } from "../types/usuario";
 
 async function leerJsonOFallar<T>(res: Response, mensajeError: string): Promise<T> {

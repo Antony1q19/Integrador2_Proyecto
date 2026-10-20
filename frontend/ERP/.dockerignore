@@ -1,4 +1,4 @@
-# No copiar a la imagen: se instalan / construyen dentro de Docker, y los .env nunca van en una imagen.
+# No copiar a la imagen: se instalan / construyen al construirla, y los .env nunca van en una imagen.
 node_modules
 .next
 .env

@@ -45,7 +45,7 @@ export function middleware(request: NextRequest) {
 
   // 2.b. La raíz "/" no tiene página propia: si hay sesión, mandarlo a su
   // perfil (evita el 404 de "Página no encontrada" al entrar solo con
-  // "localhost:3000", sin ruta).
+  // el dominio, sin ruta).
   if (role && pathname === '/') {
     return NextResponse.redirect(new URL('/perfil', request.url));
   }

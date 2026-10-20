@@ -76,9 +76,9 @@ async def recibir_webhook(
         if not _firma_valida(raw_body, request.headers.get("x-hub-signature-256", "")):
             logger.warning("Webhook con firma inválida: rechazado")
             raise HTTPException(status_code=401, detail="Firma inválida")
-    elif settings.entorno != "desarrollo":
-        # Fuera de desarrollo, sin la clave no hay forma de saber si la llamada viene de Meta:
-        # se rechaza todo antes que aceptar mensajes falsos.
+    else:
+        # Sin la clave no hay forma de saber si la llamada viene de Meta: se rechaza todo antes
+        # que aceptar mensajes falsos.
         logger.error("META_APP_SECRET no está configurado: webhook rechazado")
         raise HTTPException(status_code=503, detail="Webhook no configurado")
 

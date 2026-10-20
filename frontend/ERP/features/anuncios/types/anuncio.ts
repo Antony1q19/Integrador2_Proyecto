@@ -13,7 +13,4 @@ export interface Anuncio {
   empresaId: number;
   empresaRazonSocial: string; // desnormalizado para no tener que buscar la empresa cada vez que listamos
   fechaCreacion: string;
-  // IDs de Postulante asociados (solo en modo mock). Con el backend real no viene: esa relación
-  // vive en las postulaciones (servicio-procesos-seleccion → `procesosPostulacion` del postulante).
-  postulantesAsociadosIds?: string[];
 }

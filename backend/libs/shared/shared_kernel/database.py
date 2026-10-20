@@ -13,8 +13,8 @@ este archivo solo evita repetir el mismo código de conexión en cada uno.
 ¿Qué es un "esquema"? Una carpeta dentro de la base de datos donde viven las tablas de un
 servicio. Hay UNA base de datos para todo el sistema, así que cada servicio guarda sus tablas en su
 propio esquema (ej. "postulantes", "procesos_seleccion") y no se mezclan. Se indica con la
-variable DB_SCHEMA del .env de cada servicio; si no se define, se usa el esquema normal
-("public"), que es lo que pasa con el Postgres local de Docker.
+variable DB_SCHEMA de cada servicio; si no se define, se usa el esquema normal
+("public").
 """
 import asyncio
 import logging
@@ -47,7 +47,7 @@ CONEXIONES_EXTRA = 2  # y las que puede abrir de más en un pico
 SEGUNDOS_INACTIVA_ANTES_DE_COMPROBAR = 20
 SEGUNDOS_MAXIMOS_DE_VIDA_DE_CONEXION = 1800  # se renuevan cada 30 min (una conexión vieja ya tiene sus consultas "aprendidas": es más rápida)
 
-# El esquema se lee de la variable de entorno (Docker Compose carga el .env del servicio).
+# El esquema se lee de la variable de entorno DB_SCHEMA (la pone la tarea de ECS).
 # Tiene que conocerse ANTES de definir las tablas, por eso se lee aquí, al importar.
 ESQUEMA_BD: str | None = os.environ.get("DB_SCHEMA") or None
 if ESQUEMA_BD is not None and not re.fullmatch(r"[a-z_][a-z0-9_]*", ESQUEMA_BD):

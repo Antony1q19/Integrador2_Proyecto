@@ -20,12 +20,10 @@ configurar_logging("servicio-comunicaciones", settings.log_level)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Producción (AWS) con base nueva: crea las tablas que falten, SIN datos de prueba.
-    if settings.inicializar_bd and settings.entorno != "desarrollo":
+    # Con INICIALIZAR_BD (base nueva en RDS): crea las tablas que falten.
+    if settings.inicializar_bd:
         await crear_tablas(engine)
-    if settings.entorno == "desarrollo":
-        await crear_tablas(engine)
-    # En cualquier entorno: índices nuevos y plantillas rápidas iniciales (si faltan).
+    # Siempre: índices nuevos y plantillas rápidas iniciales (si faltan).
     await aplicar_migraciones(engine)
     tarea_calentamiento = asyncio.create_task(calentar_conexiones(engine))
     yield
@@ -37,9 +35,10 @@ app = FastAPI(
     description="Chats de WhatsApp con los postulantes.",
     version="1.0.0",
     lifespan=lifespan,
-    docs_url="/docs" if settings.entorno == "desarrollo" else None,
-    redoc_url="/redoc" if settings.entorno == "desarrollo" else None,
-    openapi_url="/openapi.json" if settings.entorno == "desarrollo" else None,
+    # La documentación interactiva (/docs) describe TODAS las rutas: no se publica.
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
 )
 
 registrar_manejadores_excepciones(app)

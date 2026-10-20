@@ -22,7 +22,7 @@ Parameters:
     Type: String
     Default: apagado.invalid
     Description: >-
-      DNS del balanceador del stack app (lo pone prender.sh). Mientras la app está apagada,
+      DNS del balanceador del stack app (lo pone prender.ps1). Mientras la app está apagada,
       CloudFront apunta a un nombre que no existe y responde error (no cobra nada).
 
 Resources:
@@ -87,7 +87,7 @@ Resources:
   # ---------------------------------------------------------------- documentos (CV, DNI...)
   BucketDocumentos:
     Type: AWS::S3::Bucket
-    # Los documentos NO se borran al borrar el stack por error: solo finalizar.sh los elimina.
+    # Los documentos NO se borran al borrar el stack por error: solo finalizar.ps1 los elimina.
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
@@ -129,7 +129,6 @@ Resources:
   LogsEmpresasVacantes: { Type: AWS::Logs::LogGroup, Properties: { LogGroupName: !Sub "/${Proyecto}/servicio-empresas-vacantes", RetentionInDays: 7 } }
   LogsProcesosSeleccion: { Type: AWS::Logs::LogGroup, Properties: { LogGroupName: !Sub "/${Proyecto}/servicio-procesos-seleccion", RetentionInDays: 7 } }
   LogsComunicaciones: { Type: AWS::Logs::LogGroup, Properties: { LogGroupName: !Sub "/${Proyecto}/servicio-comunicaciones", RetentionInDays: 7 } }
-  LogsMigracion: { Type: AWS::Logs::LogGroup, Properties: { LogGroupName: !Sub "/${Proyecto}/migracion", RetentionInDays: 7 } }
 
   # ---------------------------------------------------------------- permisos (IAM)
   # Lo usa ECS para ARRANCAR las tareas: bajar la imagen de ECR, escribir logs y leer los secretos.

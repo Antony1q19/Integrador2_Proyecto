@@ -3,7 +3,7 @@
 `crear_tablas` solo crea las tablas que faltan: si una tabla ya existe en la base, no le agrega
 columnas nuevas. Por eso cada columna nueva se agrega aquí con `ADD COLUMN IF NOT EXISTS`, que se
 puede ejecutar todas las veces que el Gateway arranque sin cambiar nada si la columna ya está.
-(Esquema "usuario" de la base de datos: RDS en AWS, PostgreSQL local en desarrollo.)
+(Esquema "usuario" de la base de datos en Amazon RDS.)
 """
 import logging
 

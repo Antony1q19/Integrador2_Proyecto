@@ -32,51 +32,67 @@ los datos nunca se pierden. Los documentos viven en S3 (stack base) y tampoco se
 
 ## Requisitos
 
-- [AWS CLI v2](https://aws.amazon.com/cli/) con sesión iniciada: `aws login --region us-east-1`
-  (o `aws configure` con una access key de un usuario IAM con permisos de administrador).
-- Docker Desktop encendido (para construir las imágenes).
-- Git Bash (Windows) o cualquier terminal bash.
-- Los `.env` locales de `backend/` completos (de ahí salen los secretos).
+- Windows PowerShell 5.1 (viene con Windows) o PowerShell 7.
+- [AWS CLI v2](https://aws.amazon.com/cli/) con sesión iniciada con el perfil de `config.env`:
+  `aws login --profile integrador --region us-east-1` (o `aws configure --profile integrador` con una
+  access key de un usuario IAM con permisos de administrador).
+- Docker Desktop encendido, solo para `publicar.ps1`: ECS Fargate ejecuta imágenes de contenedor y se
+  construyen con los `Dockerfile` de `backend/` y `frontend/`.
+- Los datos de WhatsApp de Meta a mano (token, clave secreta de la app, IDs): `configurar.ps1` los
+  pide por consola la primera vez. No hay archivos `.env`: los secretos viven solo en SSM.
 
 ## Uso diario
 
-```bash
-bash infra/aws/prender.sh     # 15-20 min. Muestra las URLs al terminar.
-bash infra/aws/apagar.sh      # 10-15 min. Guarda los datos y deja de cobrar por hora.
-bash infra/aws/publicar.sh    # Después de cambiar código: construye y sube las imágenes.
-bash infra/aws/configurar.sh  # Después de cambiar un secreto en un .env (ej. token de Meta).
+Desde la carpeta raíz del proyecto, en PowerShell:
+
+```powershell
+.\infra\aws\prender.ps1     # 15-20 min. Muestra las URLs al terminar.
+.\infra\aws\apagar.ps1      # 10-15 min. Guarda los datos y deja de cobrar por hora.
+.\infra\aws\publicar.ps1    # Después de cambiar código: construye y sube las imágenes.
+.\infra\aws\configurar.ps1 -Meta  # Cambiar los datos de WhatsApp (ej. token nuevo de Meta).
 ```
+
+Si Windows no deja ejecutar scripts ("la ejecución de scripts está deshabilitada"), habilítalos una
+vez para tu usuario: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`, o ejecuta cada uno con
+`powershell -ExecutionPolicy Bypass -File .\infra\aws\prender.ps1`.
 
 ## Fin del curso
 
-```bash
-bash infra/aws/finalizar.sh   # Borra TODO (pide escribir "BORRAR TODO"). Irreversible.
+```powershell
+.\infra\aws\finalizar.ps1   # Borra TODO (pide escribir "BORRAR TODO"). Irreversible.
 ```
 
 Borra los dos stacks, todos los snapshots, el bucket de documentos, los secretos y los logs, y al
 final comprueba que no quede ningún recurso con la etiqueta `Proyecto=talenterp`.
 
-## La primera vez
+## Sin snapshot
 
-`prender.sh` detecta que no hay snapshot y:
-1. Crea la base vacía (PostgreSQL 17) con los servicios **apagados**.
-2. Copia los datos de Supabase a RDS con una tarea de ECS (`pg_dump` → `psql`, dentro de la VPC).
-3. Copia los documentos de Supabase Storage a S3 (misma ruta).
-4. Borra de AWS las credenciales de Supabase (la migración no se repite) y enciende los servicios.
-
-Los datos de origen salen de `infra/aws/.migracion.env` (git lo ignora; `finalizar.sh` lo borra).
+Si no hay ningún snapshot (por ejemplo, después de `finalizar.ps1`), `prender.ps1` crea la base vacía
+(PostgreSQL 17) y cada servicio crea sus tablas al arrancar (`INICIALIZAR_BD=true`).
 
 ## Después del primer encendido
 
 1. **Correo:** Amazon SES envía un enlace de verificación a `CORREO_REMITENTE` (`config.env`): hay que
    hacer clic. Mientras la cuenta esté en el *sandbox* de SES, solo se puede enviar a correos
    verificados; para enviar a cualquiera: SES > *Account dashboard* > *Request production access*.
-2. **WhatsApp:** en Meta > WhatsApp > Configuración > Webhook, poner la URL que muestra `prender.sh`
+2. **WhatsApp:** en Meta > WhatsApp > Configuración > Webhook, poner la URL que muestra `prender.ps1`
    (`https://dxxxx.cloudfront.net/api/v1/publico/webhook/whatsapp`) y el mismo *token de
    verificación* de siempre. La URL es fija: no cambia al prender/apagar.
-3. **Clave secreta de la app de Meta:** ponerla en `META_APP_SECRET` de
-   `backend/servicio-comunicaciones/.env` y ejecutar `configurar.sh` + `publicar.sh` (en producción,
-   sin esa clave el webhook rechaza todos los mensajes, por seguridad).
+3. **Clave secreta de la app de Meta:** si quedó pendiente, ejecutar `configurar.ps1 -Meta` (sin esa
+   clave el webhook rechaza todos los mensajes, por seguridad).
+
+## Secretos (SSM Parameter Store)
+
+Todos viven cifrados en SSM bajo `/talenterp/...` y ECS se los entrega a cada contenedor al arrancar.
+No hay copias en archivos: para ver uno, `aws ssm get-parameter --name /talenterp/<nombre> --with-decryption`.
+
+| Parámetro | Quién lo crea |
+|---|---|
+| `bd/password` | `configurar.ps1`, aleatoria, una sola vez (nunca cambia: los snapshots la necesitan) |
+| `jwt-secret`, `gateway-shared-secret`, `frontend-proxy-secret` | `configurar.ps1`, aleatorias; `-RotarClaves` genera nuevas (cierra todas las sesiones) |
+| `meta/access-token`, `meta/app-secret`, `meta/verify-token`, `meta/phone-number-id`, `meta/waba-id` | Tú, por consola con `configurar.ps1` (o `-Meta` para cambiarlos) |
+
+Si la app está prendida, `configurar.ps1` reinicia los servicios cuando cambia algo.
 
 ## Seguridad
 

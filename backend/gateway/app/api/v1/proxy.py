@@ -28,7 +28,7 @@ router = APIRouter()
 # Tabla de direcciones: primera palabra de la ruta → dirección interna del
 # microservicio que la atiende. Para agregar un servicio nuevo, se añade una
 # línea aquí y su URL en core/config.py. (Si la URL no está configurada en el
-# .env, vale None y esa ruta responde 404 "Servicio no encontrado".)
+# configuración, vale None y esa ruta responde 404 "Servicio no encontrado".)
 _URL_POR_SERVICIO = {
     "postulantes": settings.url_servicio_postulantes,                   # servicio-postulantes
     "empresas": settings.url_servicio_empresas_vacantes,                # servicio-empresas-vacantes

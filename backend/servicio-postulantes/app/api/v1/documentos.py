@@ -1,6 +1,6 @@
 """Rutas de los documentos de un postulante (CV, DNI, certificados, imágenes...).
 
-Rutas (todas cuelgan de un postulante). Los archivos se guardan en Amazon S3 (un bucket privado; carpeta local en desarrollo);
+Rutas (todas cuelgan de un postulante). Los archivos se guardan en Amazon S3 (un bucket privado);
 en nuestra base de datos solo queda la ruta del archivo y algunos datos suyos.
     GET     /postulantes/{id}/documentos                          → listar sus documentos      (Admin, RRHH, Supervisor)
     GET     /postulantes/{id}/documentos/{documento_id}/contenido → el archivo en sí, para verlo o descargarlo

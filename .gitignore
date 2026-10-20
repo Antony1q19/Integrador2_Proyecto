@@ -74,11 +74,3 @@ next-env.d.ts
 Thumbs.db
 ehthumbs.db
 
-# --- Docker ---
-# (Ignora datos de volúmenes locales persistidos si los llegas a mapear a disco)
-.docker/
-
-
-# Migración única de Supabase a AWS (contiene credenciales)
-infra/aws/.migracion.env
-infra/aws/.salidas/

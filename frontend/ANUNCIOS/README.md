@@ -10,7 +10,7 @@ Aplicación pública construida con **Next.js (App Router)** para que las person
 - **Registro con trazabilidad**: Exige aceptar la Política de Privacidad y Términos y Condiciones conforme a la Ley N.º 29733 (versión `2026-01`).
 - **Recuperación de contraseña**: Flujo con enlace único firmado por correo electrónico (Amazon SES) y formulario seguro de restablecimiento (`/restablecer-password`).
 - **Separación estricta ERP / ANUNCIOS**: Los tokens de postulante portan `aud: "anuncios"` y `rol: "Postulante"`, impidiendo cualquier acceso a las rutas administrativas del ERP.
-- **Cero mocks**: Toda la autenticación e historial operan contra datos y estados reales del backend.
+- **Datos reales**: Toda la autenticación e historial operan contra el backend en AWS.
 
 ## Estructura de Páginas
 
@@ -26,19 +26,8 @@ Aplicación pública construida con **Next.js (App Router)** para que las person
 | `/his_postulaciones` | Historial de ofertas a las que ha postulado | Protegido (Postulante) |
 | `/legal/privacidad` | Términos y Condiciones y Política de Privacidad (versión 2026-01) | Público |
 
-## Variables de Entorno (`.env`)
+## Despliegue
 
-```env
-# Dirección interna del API Gateway (solo accesible desde el servidor de Next.js)
-GATEWAY_INTERNAL_URL=http://gateway:8000/api/v1
-```
-
-## Desarrollo Local
-
-```bash
-# Instalar dependencias
-npm install
-
-# Iniciar servidor de desarrollo (puerto 3001)
-npm run dev -- -p 3001
-```
+Corre en AWS ECS Fargate (puerto 3001) detrás de CloudFront. La imagen se construye con el
+`Dockerfile` de esta carpeta y la publica `infra/aws/publicar.ps1`. Las variables
+(`GATEWAY_INTERNAL_URL`, `FRONTEND_PROXY_SECRET`) las pone la tarea de ECS (`infra/aws/app.yaml`).

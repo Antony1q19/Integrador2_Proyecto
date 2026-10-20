@@ -1,15 +1,12 @@
-"""Envío de correos: Amazon SES en AWS, o el log en desarrollo.
+"""Envío de correos con Amazon SES (API v2, SendEmail).
 
-CORREO (.env):
-  - "ses"     → Amazon SES (API v2, SendEmail). El permiso lo da el rol de IAM de la tarea (sin claves).
-                El remitente (CORREO_REMITENTE_EMAIL) debe estar VERIFICADO en SES. Mientras la cuenta
-                esté en el "sandbox" de SES, solo se puede enviar a direcciones también verificadas.
-  - "consola" → no se envía nada: el correo (con su enlace) se escribe en el log, para probar en la PC.
+El permiso lo da el rol de IAM de la tarea (sin claves). El remitente (CORREO_REMITENTE_EMAIL) debe
+estar VERIFICADO en SES. Mientras la cuenta esté en el "sandbox" de SES, solo se puede enviar a
+direcciones también verificadas.
 """
 import asyncio
 import html
 import logging
-import uuid
 from urllib.parse import urlencode
 
 from app.core.config import settings
@@ -23,7 +20,7 @@ _cliente_ses = None
 def _ses():
     global _cliente_ses
     if _cliente_ses is None:
-        import boto3  # solo hace falta en modo "ses"
+        import boto3
 
         _cliente_ses = boto3.client("sesv2", region_name=settings.aws_region)
     return _cliente_ses
@@ -31,10 +28,6 @@ def _ses():
 
 async def enviar_correo(destinatario: str, nombre_destinatario: str, asunto: str, html_cuerpo: str, texto: str) -> str:
     """Envía un correo y devuelve el id del mensaje. Si algo falla, responde 503 con el motivo."""
-    if settings.correo != "ses":
-        logger.info("Correo (modo consola) para %s | %s | %s", destinatario, asunto, texto)
-        return f"consola-{uuid.uuid4().hex}"
-
     if not settings.correo_remitente_email:
         raise ServicioNoDisponible("El envío de correos no está configurado: falta CORREO_REMITENTE_EMAIL")
 
@@ -74,6 +67,12 @@ def _motivo_del_rechazo(error: Exception) -> str:
     return "No se pudo enviar el correo. Intenta nuevamente en unos minutos."
 
 
+def _url_anuncios() -> str:
+    if not settings.url_anuncios:
+        raise ServicioNoDisponible("El envío de correos no está configurado: falta URL_ANUNCIOS")
+    return settings.url_anuncios.rstrip("/")
+
+
 def correo_solicitud_cuenta(nombres: str, email: str, token_invitacion: str) -> tuple[str, str, str]:
     """Arma el correo que invita a un postulante a crear su cuenta en la bolsa de trabajo.
 
@@ -81,7 +80,7 @@ def correo_solicitud_cuenta(nombres: str, email: str, token_invitacion: str) -> 
     de invitación (de un solo uso, 7 días): sin él no se puede crear la cuenta de ese perfil.
     """
     parametros = urlencode({"invitacion": token_invitacion, "email": email})
-    enlace = f"{settings.url_anuncios.rstrip('/')}/registro?{parametros}"
+    enlace = f"{_url_anuncios()}/registro?{parametros}"
     asunto = "Crea tu cuenta para seguir tu postulación"
 
     # html.escape: el nombre lo escribió una persona; así no puede "romper" ni inyectar nada en el HTML.
@@ -165,26 +164,12 @@ def correo_recuperar_password(nombres: str, enlace: str) -> tuple[str, str, str]
 
 
 async def enviar_correo_recuperacion(destinatario: str, nombres: str, raw_token: str) -> None:
-    """Envía el correo de recuperación en segundo plano sin bloquear ni propagar excepciones.
-
-    En desarrollo (o si el envío falla) el enlace queda en el log para poder probar el flujo.
-    """
-    enlace = f"{settings.url_anuncios.rstrip('/')}/restablecer-password?token={raw_token}"
-    asunto, html_cuerpo, texto = correo_recuperar_password(nombres, enlace)
-
-    if settings.correo == "ses":
-        try:
-            await enviar_correo(destinatario, nombres, asunto, html_cuerpo, texto)
-            logger.info("Correo de recuperación enviado con éxito a la dirección solicitada.")
-            return
-        except Exception as exc:  # noqa: BLE001
-            # Se registra el error SIN revelar el token
-            logger.warning("No se pudo entregar el correo de recuperación vía SES: %s", exc)
-
-    # Si no está configurado o falló, y estamos en desarrollo, se muestra en el log para pruebas
-    if settings.entorno == "desarrollo":
-        logger.info(
-            "[DESARROLLO] Enlace de recuperación generado para %s: %s",
-            destinatario,
-            enlace,
-        )
+    """Envía el correo de recuperación en segundo plano sin bloquear ni propagar excepciones."""
+    try:
+        enlace = f"{_url_anuncios()}/restablecer-password?token={raw_token}"
+        asunto, html_cuerpo, texto = correo_recuperar_password(nombres, enlace)
+        await enviar_correo(destinatario, nombres, asunto, html_cuerpo, texto)
+        logger.info("Correo de recuperación enviado con éxito a la dirección solicitada.")
+    except Exception as exc:  # noqa: BLE001
+        # Se registra el error SIN revelar el token
+        logger.warning("No se pudo entregar el correo de recuperación vía SES: %s", exc)

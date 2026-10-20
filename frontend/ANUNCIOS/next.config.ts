@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(__dirname),
   },
-  // Imagen de producción mínima (Dockerfile.prod): Next.js copia solo lo necesario para correr.
+  // Imagen de producción mínima (Dockerfile): Next.js copia solo lo necesario para correr.
   output: "standalone",
   // No anunciar "X-Powered-By: Next.js" (no regalar información del stack).
   poweredByHeader: false,

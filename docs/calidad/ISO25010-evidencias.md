@@ -72,11 +72,7 @@ Leyenda: ✅ cumple con evidencia · 🟡 cumple parcialmente · ❌ pendiente
   como artefacto (evidencia descargable desde GitHub Actions).
 - `ci.yml`: lint + build de producción del ERP y de ANUNCIOS (0 errores, 0 advertencias en v2).
 
-**Cómo correrlas localmente** (desde la raíz, con Docker encendido):
-```bash
-docker compose run --rm --no-deps -v "$PWD/backend/servicio-comunicaciones/tests:/app/tests" servicio-comunicaciones sh -c "pip install -q pytest && python -m pytest /app/tests -q"
-```
-(cambiar el servicio y la carpeta para las demás suites; la librería común se corre con la imagen del gateway).
+Las suites se ejecutan en GitHub Actions (`ci-backend.yml`) en cada push / PR.
 
 ### 2.2 Validación con usuarios (UAT) — pendiente de ejecutar
 
@@ -96,7 +92,7 @@ Plantilla para registrar la validación de cada funcionalidad con el usuario (co
 
 | Mecanismo | Evidencia |
 |---|---|
-| API REST + JSON documentada con **OpenAPI** | `/docs` de cada servicio FastAPI (solo en desarrollo) |
+| API REST + JSON documentada con **OpenAPI** | esquema OpenAPI de FastAPI (no se publica en producción) |
 | **Meta WhatsApp Cloud API** (envío, plantillas, estados, vistos, webhook) | `servicio-comunicaciones/app/infrastructure/whatsapp_client.py`, `app/api/v1/webhook.py` |
 | **Amazon SES** (correos de invitación y recuperación) | `servicio-postulantes/app/infrastructure/correo.py` |
 | **Amazon RDS** PostgreSQL (esquema por servicio) y **Amazon S3** (bucket privado y cifrado) | `infra/aws/app.yaml`, `infra/aws/base.yaml` |
@@ -107,8 +103,8 @@ Plantilla para registrar la validación de cada funcionalidad con el usuario (co
 
 ### 3.2 Co-existencia — ✅
 
-- 7 contenedores independientes (`docker-compose.yml`); los microservicios **no se publican** fuera de
-  la red de Docker (solo el Gateway :8000 y los frontends :3000/:3001).
+- 7 servicios independientes en ECS Fargate (`infra/aws/app.yaml`); los microservicios **no se publican**:
+  se encuentran entre sí por Service Connect y solo el ERP y el portal reciben tráfico (vía CloudFront).
 - Cada servicio es dueño de **su esquema** de base de datos; se relacionan solo por id.
 - Dos frontends (ERP y portal) conviven con sesiones y tokens separados (audiencia `anuncios`).
 - En AWS, el balanceador solo acepta tráfico de CloudFront y del backend solo es público el webhook de
@@ -161,7 +157,7 @@ Plantilla para registrar la validación de cada funcionalidad con el usuario (co
 
 | Hallazgo | Corrección | Evidencia |
 |---|---|---|
-| El webhook aceptaba llamadas que no venían de Meta | Firma `X-Hub-Signature-256` verificada; fuera de desarrollo, sin clave se rechaza todo | `webhook.py`, 3 pruebas |
+| El webhook aceptaba llamadas que no venían de Meta | Firma `X-Hub-Signature-256` verificada; sin clave se rechaza todo | `webhook.py`, 3 pruebas |
 | El túnel exponía todo el Gateway (`/docs`, login…) | En AWS: solo el webhook es público (regla del balanceador) y `/docs` se oculta en producción | `infra/aws/app.yaml` |
 | Chats visibles para cualquier RRHH/Supervisor | Regla de empresas aplicada | `servicio-comunicaciones/app/api/visibilidad.py` |
 | Supervisor podía enviar mensajes | Solo lectura (backend y pantalla) | `conversaciones.py`, `lib/permisos.ts` |

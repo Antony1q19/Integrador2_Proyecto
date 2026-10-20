@@ -91,7 +91,7 @@ class Documento(Base):
     tipo: Mapped[str] = mapped_column(String(50), nullable=False)  # CV, DNI, certificado, etc.
     nombre_archivo: Mapped[str] = mapped_column(String(255), nullable=False)
     # Dónde está guardado el archivo (el archivo en sí NO se guarda en la base de datos):
-    # "<bucket o carpeta>/<ruta>" dentro del almacenamiento (S3 en AWS, carpeta local en desarrollo).
+    # "<bucket>/<ruta>" del archivo en Amazon S3.
     referencia_almacenamiento: Mapped[str] = mapped_column(String(500), nullable=False)
 
     # Datos del archivo en el almacenamiento (vacíos en los documentos que no se subieron ahí, como el

@@ -126,7 +126,6 @@ def cliente(monkeypatch):
     app.dependency_overrides[obtener_sesion] = lambda: sesion
     monkeypatch.setattr(settings, "meta_verify_token", "token-verificacion")
     monkeypatch.setattr(settings, "meta_app_secret", "clave-secreta-app")
-    monkeypatch.setattr(settings, "entorno", "produccion")
     yield TestClient(app), sesion
     app.dependency_overrides.clear()
 
@@ -182,7 +181,7 @@ def test_webhook_con_firma_valida_es_aceptado(cliente):
     assert sesion.commits == 1
 
 
-def test_fuera_de_desarrollo_sin_clave_de_la_app_se_rechaza_todo(cliente, monkeypatch):
+def test_sin_clave_de_la_app_se_rechaza_todo(cliente, monkeypatch):
     http, _ = cliente
     monkeypatch.setattr(settings, "meta_app_secret", None)
     respuesta = http.post(WEBHOOK, content=ESTADO_LEIDO, headers={"Content-Type": "application/json"})

@@ -6,13 +6,13 @@
 // todos los usuarios a la vez.
 //
 // Estas cabeceras le pasan al Gateway la IP real del usuario. Van junto con una clave compartida
-// (FRONTEND_PROXY_SECRET, la misma que en backend/gateway/.env): el Gateway solo cree la IP si la
+// (FRONTEND_PROXY_SECRET, la misma que usa el Gateway; vive en SSM): el Gateway solo cree la IP si la
 // clave coincide, así nadie puede inventarse una IP llamando directo al puerto del Gateway.
 // Ver backend/gateway/app/core/limite_peticiones.py.
 //
 // ¿De dónde sale la IP? En AWS, CloudFront agrega "CloudFront-Viewer-Address" (ip:puerto) con la IP
-// REAL de quien se conecta: el usuario no puede inventarla. Si no está (desarrollo local), se usa
-// X-Forwarded-For, que en la PC completa el propio Next.js.
+// REAL de quien se conecta: el usuario no puede inventarla. Si no está (la petición no pasó por
+// CloudFront), se usa X-Forwarded-For como respaldo.
 import type { NextRequest } from "next/server";
 
 const SECRETO_PROXY = process.env.FRONTEND_PROXY_SECRET;

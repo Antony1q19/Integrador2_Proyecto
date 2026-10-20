@@ -1,14 +1,7 @@
 // features/perfil/services/perfilService.ts
 //
-// Capa de servicio. Este es el ÚNICO lugar que debe cambiar cuando se
-// conecte el backend real. Hoy lee/muta `mockPerfil.ts` (una pequeña "base
-// de datos" en memoria con 3 cuentas) simulando latencia de red; mañana hace
-// fetch() al endpoint real usando el id de la sesión autenticada en vez de
-// `perfilActivoId`.
-//
-// Para integrar: comentar/eliminar el bloque "MODO MOCK" y descomentar el
-// bloque "MODO API" de cada función. Los hooks y componentes que consumen
-// este servicio NO se tocan.
+// Capa de servicio del perfil del postulante con sesión iniciada: habla con las
+// rutas /api/auth/... del servidor de Next.js, que llaman al Gateway.
 
 import {
   PerfilPostulante,
