@@ -9,7 +9,7 @@ Verificar-Credenciales
 Write-Host ''
 Write-Host "  Esto borra PARA SIEMPRE todo TalentERP en la cuenta $($Cuenta.Substring(0, 4))******** ($Region):" -ForegroundColor Yellow
 Write-Host '     base de datos y snapshots, documentos (S3), imágenes (ECR), URLs (CloudFront),' -ForegroundColor Yellow
-Write-Host '     secretos (SSM), correo (SES), logs y presupuesto.' -ForegroundColor Yellow
+Write-Host '     secretos (SSM), correo (SES), CodeBuild, logs y presupuesto.' -ForegroundColor Yellow
 Write-Host ''
 $Confirmacion = Read-Host '  Escribe BORRAR TODO para continuar'
 if ($Confirmacion -cne 'BORRAR TODO') { Fallar 'Cancelado: no se borró nada.' }
@@ -46,6 +46,13 @@ if ((Estado-Stack $StackBase) -ne 'NO_EXISTE') {
         Aws s3api delete-bucket --bucket $Bucket | Out-Null
     }
     Ok 'Bucket borrado'
+
+    # El bucket del código (CodeBuild) se borra con el stack, pero CloudFormation exige que esté vacío.
+    $BucketCodigo = AwsIntentar cloudformation describe-stacks --stack-name $StackBase --query "Stacks[0].Outputs[?OutputKey=='BucketCodigo'].OutputValue" --output text
+    if ($BucketCodigo -and $BucketCodigo -ne 'None') {
+        AwsVer s3 rm "s3://$BucketCodigo" --recursive --only-show-errors
+        Ok "Bucket de código vaciado ($BucketCodigo)"
+    }
 
     Paso 'Borrando el stack base (CloudFront tarda ~15 min en borrarse)'
     Aws cloudformation delete-stack --stack-name $StackBase | Out-Null

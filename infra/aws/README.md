@@ -2,7 +2,7 @@
 
 Todo TalentERP corre en AWS: **ECS Fargate** (7 servicios), **RDS PostgreSQL** (base de datos),
 **S3** (documentos), **SES** (correos), **CloudFront** (HTTPS y URLs fijas, también para el webhook
-de WhatsApp), **ECR** (imágenes), **SSM Parameter Store** (secretos), **CloudWatch** (logs) y
+de WhatsApp), **ECR** (imágenes), **CodeBuild** (construye las imágenes), **SSM Parameter Store** (secretos), **CloudWatch** (logs) y
 **AWS Budgets** (alerta de gasto). Región: `us-east-1`.
 
 ```
@@ -24,7 +24,7 @@ de WhatsApp), **ECR** (imágenes), **SSM Parameter Store** (secretos), **CloudWa
 
 | Stack | Plantilla | Contenido | Costo |
 |---|---|---|---|
-| `talenterp-base` | `base.yaml` | ECR, S3 de documentos, CloudFront (x2), SES, roles IAM, logs, presupuesto | < US$ 1/mes |
+| `talenterp-base` | `base.yaml` | ECR, CodeBuild, S3 de documentos, CloudFront (x2), SES, roles IAM, logs, presupuesto | < US$ 1/mes (+ ~US$ 0.10 por publicación) |
 | `talenterp-app` | `app.yaml` | VPC, balanceador, ECS (7 servicios), RDS | ~US$ 0.20/hora **solo mientras está prendido** |
 
 Al **apagar**, la base de datos guarda un **snapshot final** y el próximo encendido la restaura:
@@ -34,10 +34,10 @@ los datos nunca se pierden. Los documentos viven en S3 (stack base) y tampoco se
 
 - Windows PowerShell 5.1 (viene con Windows) o PowerShell 7.
 - [AWS CLI v2](https://aws.amazon.com/cli/) con sesión iniciada con el perfil de `config.env`:
-  `aws login --profile integrador --region us-east-1` (o `aws configure --profile integrador` con una
+  `aws login --profile desarrollo --region us-east-1` (o `aws configure --profile desarrollo` con una
   access key de un usuario IAM con permisos de administrador).
-- Docker Desktop encendido, solo para `publicar.ps1`: ECS Fargate ejecuta imágenes de contenedor y se
-  construyen con los `Dockerfile` de `backend/` y `frontend/`.
+- git (para saber qué archivos subir). **No hace falta Docker**: las imágenes se construyen en AWS
+  CodeBuild con los `Dockerfile` de `backend/` y `frontend/`.
 - Los datos de WhatsApp de Meta a mano (token, clave secreta de la app, IDs): `configurar.ps1` los
   pide por consola la primera vez. No hay archivos `.env`: los secretos viven solo en SSM.
 
@@ -48,7 +48,7 @@ Desde la carpeta raíz del proyecto, en PowerShell:
 ```powershell
 .\infra\aws\prender.ps1     # 15-20 min. Muestra las URLs al terminar.
 .\infra\aws\apagar.ps1      # 10-15 min. Guarda los datos y deja de cobrar por hora.
-.\infra\aws\publicar.ps1    # Después de cambiar código: construye y sube las imágenes.
+.\infra\aws\publicar.ps1    # Después de cambiar código: CodeBuild construye y sube las imágenes (8-12 min).
 .\infra\aws\configurar.ps1 -Meta  # Cambiar los datos de WhatsApp (ej. token nuevo de Meta).
 ```
 

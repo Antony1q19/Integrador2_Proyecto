@@ -1,6 +1,6 @@
 ﻿# PRENDER TalentERP en AWS (15-20 min).      .\infra\aws\prender.ps1
 #
-#  1. Crea/actualiza el stack base (ECR, S3, CloudFront, SES, permisos, presupuesto).
+#  1. Crea/actualiza el stack base (ECR, CodeBuild, S3, CloudFront, SES, permisos, presupuesto).
 #  2. Sube los secretos a SSM y las imágenes a ECR si todavía no están.
 #  3. Crea el stack app restaurando la base de datos desde el ÚLTIMO snapshot (tus datos).
 #     Si no hay ningún snapshot, crea la base vacía (los servicios crean sus tablas al arrancar).
@@ -12,7 +12,7 @@ $Inicio = Get-Date
 
 # ---------------------------------------------------------------------------------------------
 Paso "1/5 Stack base ($StackBase)"
-Desplegar-Base
+Desplegar-Base (Alb-Actual)
 Ok 'Stack base listo'
 
 $EstadoCorreo = AwsIntentar sesv2 get-email-identity --email-identity $CorreoRemitente --query VerificationStatus --output text
@@ -64,7 +64,7 @@ if ($EstadoApp -ne 'NO_EXISTE') {
     Ok "Ya estaba prendido ($EstadoApp)"
 } else {
     $Prefijos = Aws ec2 describe-managed-prefix-lists `
-        --filters Name=prefix-list-name,Values=com.amazonaws.global.cloudfront.origin-facing `
+        --filters 'Name=prefix-list-name,Values=com.amazonaws.global.cloudfront.origin-facing' `
         --query 'PrefixLists[0].PrefixListId' --output text
     $VersionPg = Lista (Aws rds describe-db-engine-versions --engine postgres `
             --query "DBEngineVersions[?starts_with(EngineVersion, '17.')].EngineVersion" --output text) |

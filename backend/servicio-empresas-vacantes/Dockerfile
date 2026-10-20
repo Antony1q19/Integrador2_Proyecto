@@ -2,7 +2,7 @@
 # Imagen de PRODUCCIÓN (AWS ECS Fargate). Se construye desde la carpeta backend/ (ver infra/aws/publicar.ps1).
 
 # Punto de partida: una imagen ligera con Python 3.12 ya instalado.
-FROM python:3.12-slim
+FROM public.ecr.aws/docker/library/python:3.12-slim
 
 WORKDIR /app
 

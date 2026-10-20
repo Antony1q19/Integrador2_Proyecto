@@ -19,7 +19,7 @@ Parameters:
     Type: Number
     Default: 1
     AllowedValues: [0, 1]
-    Description: 0 = servicios creados pero detenidos (para la migración inicial de datos).
+    Description: 0 = servicios creados pero detenidos; 1 = una tarea por servicio.
   ClaseBaseDatos:
     Type: String
     Default: db.t4g.micro

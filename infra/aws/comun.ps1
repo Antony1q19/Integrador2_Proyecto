@@ -26,6 +26,8 @@ if ($Config.PERFIL_AWS) { $env:AWS_PROFILE = $Config.PERFIL_AWS }
 
 # aws.exe por su ruta: las funciones de abajo se llaman Aws/AwsVer y PowerShell no distingue mayúsculas.
 $AwsExe = Get-Command aws -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Source
+# Si el instalador no lo agregó al PATH, se busca en su carpeta por defecto.
+if (-not $AwsExe -and (Test-Path "$env:ProgramFiles\Amazon\AWSCLIV2\aws.exe")) { $AwsExe = "$env:ProgramFiles\Amazon\AWSCLIV2\aws.exe" }
 
 $StackBase = "$Proyecto-base"
 $StackApp = "$Proyecto-app"
@@ -99,6 +101,14 @@ function Snapshots-BaseDatos {
     $texto = AwsIntentar rds describe-db-snapshots --db-instance-identifier $IdBaseDatos --snapshot-type manual `
         --query 'reverse(sort_by(DBSnapshots[?Status==`available`], &SnapshotCreateTime))[].DBSnapshotIdentifier' --output text
     return Lista $texto
+}
+
+# DNS del balanceador si la app está prendida (vacío si no). Desplegar-Base lo necesita para no
+# dejar a CloudFront apuntando a "apagado" mientras la app corre.
+function Alb-Actual {
+    if ((Estado-Stack $StackApp) -eq 'NO_EXISTE') { return '' }
+    $alb = AwsIntentar cloudformation describe-stacks --stack-name $StackApp --query "Stacks[0].Outputs[?OutputKey=='BalanceadorDns'].OutputValue" --output text
+    if ($alb -and $alb -ne 'None') { return $alb } else { return '' }
 }
 
 # Despliega base.yaml (con el DNS del balanceador, si se pasa).

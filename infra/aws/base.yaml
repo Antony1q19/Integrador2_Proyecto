@@ -84,6 +84,103 @@ Resources:
       LifecyclePolicy:
         LifecyclePolicyText: '{"rules":[{"rulePriority":1,"description":"Guardar solo las 3 ultimas imagenes","selection":{"tagStatus":"any","countType":"imageCountMoreThan","countNumber":3},"action":{"type":"expire"}}]}'
 
+  # ---------------------------------------------------------------- construcción de imágenes (CodeBuild)
+  # publicar.ps1 sube el código comprimido a este bucket y CodeBuild construye las 7 imágenes y las
+  # sube a ECR: no hace falta Docker en ninguna PC. El zip se borra solo al día siguiente.
+  BucketCodigo:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault: { SSEAlgorithm: AES256 }
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      OwnershipControls:
+        Rules: [{ ObjectOwnership: BucketOwnerEnforced }]
+      LifecycleConfiguration:
+        Rules: [{ Id: borrar-codigo-viejo, Status: Enabled, ExpirationInDays: 1 }]
+
+  LogsBuild: { Type: AWS::Logs::LogGroup, Properties: { LogGroupName: !Sub "/${Proyecto}/build", RetentionInDays: 7 } }
+
+  # Permisos de CodeBuild: leer el zip, escribir su log y subir imágenes SOLO a los repos del proyecto.
+  RolCodeBuild:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal: { Service: codebuild.amazonaws.com }
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: construir-imagenes
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action: [logs:CreateLogStream, logs:PutLogEvents]
+                Resource: !Sub "${LogsBuild.Arn}"
+              - Effect: Allow
+                Action: [s3:GetObject, s3:GetObjectVersion]
+                Resource: !Sub "${BucketCodigo.Arn}/*"
+              - Effect: Allow
+                Action: ecr:GetAuthorizationToken
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:BatchGetImage
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:InitiateLayerUpload
+                  - ecr:UploadLayerPart
+                  - ecr:CompleteLayerUpload
+                  - ecr:PutImage
+                Resource: !Sub "arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${Proyecto}/*"
+
+  ProyectoBuild:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Sub "${Proyecto}-imagenes"
+      Description: Construye las 7 imágenes de TalentERP y las sube a ECR (lo lanza publicar.ps1).
+      ServiceRole: !GetAtt RolCodeBuild.Arn
+      Source:
+        Type: S3
+        Location: !Sub "${BucketCodigo}/codigo.zip"
+        BuildSpec: |
+          version: 0.2
+          phases:
+            pre_build:
+              commands:
+                - aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$REGISTRO"
+            build:
+              commands:
+                - |
+                  set -e
+                  construir() {
+                    imagen="$REGISTRO/$PROYECTO/$1:latest"
+                    echo "==> Imagen $1"
+                    docker build --platform linux/amd64 -f "$2" -t "$imagen" "$3"
+                    docker push -q "$imagen"
+                  }
+                  for servicio in gateway servicio-postulantes servicio-empresas-vacantes servicio-procesos-seleccion servicio-comunicaciones; do
+                    construir "$servicio" "backend/$servicio/Dockerfile" backend
+                  done
+                  construir erp frontend/ERP/Dockerfile frontend/ERP
+                  construir anuncios frontend/ANUNCIOS/Dockerfile frontend/ANUNCIOS
+      Artifacts: { Type: NO_ARTIFACTS }
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_MEDIUM # 4 vCPU / 7 GB: next build de los dos frontends
+        Image: aws/codebuild/amazonlinux-x86_64-standard:5.0
+        PrivilegedMode: true # necesario para usar Docker dentro del build
+        EnvironmentVariables:
+          - { Name: PROYECTO, Value: !Ref Proyecto }
+          - { Name: REGISTRO, Value: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com" }
+      LogsConfig:
+        CloudWatchLogs: { Status: ENABLED, GroupName: !Ref LogsBuild }
+      TimeoutInMinutes: 30
+
   # ---------------------------------------------------------------- documentos (CV, DNI...)
   BucketDocumentos:
     Type: AWS::S3::Bucket
@@ -306,3 +403,7 @@ Outputs:
   CorreoRemitente:
     Value: !Ref CorreoRemitente
     Export: { Name: !Sub "${Proyecto}-correo-remitente" }
+  BucketCodigo:
+    Value: !Ref BucketCodigo
+  ProyectoBuild:
+    Value: !Ref ProyectoBuild

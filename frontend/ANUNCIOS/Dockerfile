@@ -2,19 +2,19 @@
 # Tres etapas: instalar dependencias → compilar (next build) → imagen final mínima con el
 # servidor "standalone" de Next.js (sin código fuente ni dependencias de desarrollo).
 
-FROM node:20-alpine AS dependencias
+FROM public.ecr.aws/docker/library/node:20-alpine AS dependencias
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
-FROM node:20-alpine AS build
+FROM public.ecr.aws/docker/library/node:20-alpine AS build
 WORKDIR /app
 COPY --from=dependencias /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
-FROM node:20-alpine
+FROM public.ecr.aws/docker/library/node:20-alpine
 WORKDIR /app
 ENV NODE_ENV=production     NEXT_TELEMETRY_DISABLED=1     PORT=3001     HOSTNAME=0.0.0.0
 # Sin privilegios de administrador dentro del contenedor.
