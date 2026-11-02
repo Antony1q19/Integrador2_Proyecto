@@ -1,0 +1,1365 @@
+{
+  "components": {
+    "schemas": {
+      "ConversacionCrear": {
+        "description": "Datos para crear una conversación nueva.",
+        "properties": {
+          "nombre": {
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Nombre",
+            "type": "string"
+          },
+          "postulante_id": {
+            "minLength": 1,
+            "title": "Postulante Id",
+            "type": "string"
+          },
+          "telefono": {
+            "maxLength": 30,
+            "minLength": 5,
+            "title": "Telefono",
+            "type": "string"
+          }
+        },
+        "required": [
+          "postulante_id",
+          "nombre",
+          "telefono"
+        ],
+        "title": "ConversacionCrear",
+        "type": "object"
+      },
+      "ConversacionRespuesta": {
+        "description": "Una conversación con el último mensaje y datos del postulante.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "no_leidos": {
+            "title": "No Leidos",
+            "type": "integer"
+          },
+          "nombre": {
+            "title": "Nombre",
+            "type": "string"
+          },
+          "postulante_id": {
+            "title": "Postulante Id",
+            "type": "string"
+          },
+          "registrado": {
+            "default": true,
+            "title": "Registrado",
+            "type": "boolean"
+          },
+          "telefono": {
+            "title": "Telefono",
+            "type": "string"
+          },
+          "ultima_actividad": {
+            "format": "date-time",
+            "title": "Ultima Actividad",
+            "type": "string"
+          },
+          "ultimo_entrante": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ultimo Entrante"
+          },
+          "ultimo_mensaje": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ultimo Mensaje"
+          }
+        },
+        "required": [
+          "id",
+          "postulante_id",
+          "nombre",
+          "telefono",
+          "ultima_actividad",
+          "no_leidos"
+        ],
+        "title": "ConversacionRespuesta",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "MensajeCrear": {
+        "description": "Datos para enviar un mensaje nuevo.\n\nNO hace falta postulante_id: la conversación (por su id en la URL) ya sabe\ncon quién se está hablando.",
+        "properties": {
+          "texto": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Texto",
+            "type": "string"
+          }
+        },
+        "required": [
+          "texto"
+        ],
+        "title": "MensajeCrear",
+        "type": "object"
+      },
+      "MensajeRespuesta": {
+        "description": "Un mensaje que se devuelve al frontend.",
+        "properties": {
+          "conversacion_id": {
+            "title": "Conversacion Id",
+            "type": "string"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "estado": {
+            "title": "Estado",
+            "type": "string"
+          },
+          "fecha": {
+            "format": "date-time",
+            "title": "Fecha",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "remitente": {
+            "title": "Remitente",
+            "type": "string"
+          },
+          "texto": {
+            "title": "Texto",
+            "type": "string"
+          },
+          "wamid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wamid"
+          }
+        },
+        "required": [
+          "id",
+          "conversacion_id",
+          "remitente",
+          "texto",
+          "fecha",
+          "estado"
+        ],
+        "title": "MensajeRespuesta",
+        "type": "object"
+      },
+      "PlantillaCrear": {
+        "description": "Datos para mandar una plantilla nueva a revisión de Meta.",
+        "properties": {
+          "categoria": {
+            "pattern": "^(MARKETING|UTILITY)$",
+            "title": "Categoria",
+            "type": "string"
+          },
+          "cuerpo": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "Cuerpo",
+            "type": "string"
+          },
+          "ejemplos": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Ejemplos",
+            "type": "array"
+          },
+          "idioma": {
+            "default": "es",
+            "maxLength": 10,
+            "minLength": 2,
+            "title": "Idioma",
+            "type": "string"
+          },
+          "nombre": {
+            "maxLength": 512,
+            "minLength": 1,
+            "pattern": "^[a-z0-9_]+$",
+            "title": "Nombre",
+            "type": "string"
+          }
+        },
+        "required": [
+          "nombre",
+          "categoria",
+          "cuerpo"
+        ],
+        "title": "PlantillaCrear",
+        "type": "object"
+      },
+      "PlantillaEnviar": {
+        "description": "Enviar una plantilla APROBADA a una conversación.",
+        "properties": {
+          "idioma": {
+            "minLength": 2,
+            "title": "Idioma",
+            "type": "string"
+          },
+          "nombre": {
+            "minLength": 1,
+            "title": "Nombre",
+            "type": "string"
+          },
+          "variables": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Variables",
+            "type": "array"
+          }
+        },
+        "required": [
+          "nombre",
+          "idioma"
+        ],
+        "title": "PlantillaEnviar",
+        "type": "object"
+      },
+      "PlantillaRapidaActualizar": {
+        "properties": {
+          "contenido": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Contenido",
+            "type": "string"
+          },
+          "descripcion": {
+            "default": "",
+            "maxLength": 200,
+            "title": "Descripcion",
+            "type": "string"
+          },
+          "titulo": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Titulo",
+            "type": "string"
+          }
+        },
+        "required": [
+          "titulo",
+          "contenido"
+        ],
+        "title": "PlantillaRapidaActualizar",
+        "type": "object"
+      },
+      "PlantillaRapidaRespuesta": {
+        "properties": {
+          "categoria": {
+            "title": "Categoria",
+            "type": "string"
+          },
+          "contenido": {
+            "title": "Contenido",
+            "type": "string"
+          },
+          "descripcion": {
+            "title": "Descripcion",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "titulo": {
+            "title": "Titulo",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "titulo",
+          "descripcion",
+          "categoria",
+          "contenido"
+        ],
+        "title": "PlantillaRapidaRespuesta",
+        "type": "object"
+      },
+      "PlantillaRespuesta": {
+        "description": "Una plantilla de la cuenta de WhatsApp Business, con su estado de revisión en Meta.",
+        "properties": {
+          "categoria": {
+            "title": "Categoria",
+            "type": "string"
+          },
+          "cuerpo": {
+            "title": "Cuerpo",
+            "type": "string"
+          },
+          "estado": {
+            "title": "Estado",
+            "type": "string"
+          },
+          "idioma": {
+            "title": "Idioma",
+            "type": "string"
+          },
+          "motivo_rechazo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motivo Rechazo"
+          },
+          "nombre": {
+            "title": "Nombre",
+            "type": "string"
+          },
+          "variables": {
+            "title": "Variables",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "nombre",
+          "categoria",
+          "idioma",
+          "estado",
+          "cuerpo",
+          "variables"
+        ],
+        "title": "PlantillaRespuesta",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Chats de WhatsApp con los postulantes.",
+    "title": "Servicio de Comunicaciones",
+    "version": "1.0.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/comunicaciones/conversaciones": {
+      "get": {
+        "description": "Todas las conversaciones, las más recientes primero, con el último mensaje de cada una\n(en la misma consulta: un solo viaje a la base).",
+        "operationId": "listar_conversaciones_comunicaciones_conversaciones_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ConversacionRespuesta"
+                  },
+                  "title": "Response Listar Conversaciones Comunicaciones Conversaciones Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Listar Conversaciones",
+        "tags": [
+          "comunicaciones"
+        ]
+      },
+      "post": {
+        "description": "Crea una conversación o devuelve la existente con ese postulante.",
+        "operationId": "crear_conversacion_comunicaciones_conversaciones_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConversacionCrear"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversacionRespuesta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Crear Conversacion",
+        "tags": [
+          "comunicaciones"
+        ]
+      }
+    },
+    "/comunicaciones/conversaciones/{conversacion_id}/leer": {
+      "post": {
+        "description": "Pone en 0 los no leídos y avisa a WhatsApp, para que el postulante vea los ✓✓ azules.",
+        "operationId": "marcar_leida_comunicaciones_conversaciones__conversacion_id__leer_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "conversacion_id",
+            "required": true,
+            "schema": {
+              "title": "Conversacion Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Marcar Leida",
+        "tags": [
+          "comunicaciones"
+        ]
+      }
+    },
+    "/comunicaciones/conversaciones/{conversacion_id}/mensajes": {
+      "get": {
+        "operationId": "listar_mensajes_comunicaciones_conversaciones__conversacion_id__mensajes_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "conversacion_id",
+            "required": true,
+            "schema": {
+              "title": "Conversacion Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MensajeRespuesta"
+                  },
+                  "title": "Response Listar Mensajes Comunicaciones Conversaciones  Conversacion Id  Mensajes Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Listar Mensajes",
+        "tags": [
+          "comunicaciones"
+        ]
+      },
+      "post": {
+        "operationId": "enviar_mensaje_comunicaciones_conversaciones__conversacion_id__mensajes_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "conversacion_id",
+            "required": true,
+            "schema": {
+              "title": "Conversacion Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MensajeCrear"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MensajeRespuesta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Enviar Mensaje",
+        "tags": [
+          "comunicaciones"
+        ]
+      }
+    },
+    "/comunicaciones/conversaciones/{conversacion_id}/plantilla": {
+      "post": {
+        "operationId": "enviar_plantilla_comunicaciones_conversaciones__conversacion_id__plantilla_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "conversacion_id",
+            "required": true,
+            "schema": {
+              "title": "Conversacion Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlantillaEnviar"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MensajeRespuesta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Enviar Plantilla",
+        "tags": [
+          "plantillas"
+        ]
+      }
+    },
+    "/comunicaciones/plantillas": {
+      "get": {
+        "operationId": "listar_plantillas_comunicaciones_plantillas_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PlantillaRespuesta"
+                  },
+                  "title": "Response Listar Plantillas Comunicaciones Plantillas Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Listar Plantillas",
+        "tags": [
+          "plantillas"
+        ]
+      },
+      "post": {
+        "operationId": "crear_plantilla_comunicaciones_plantillas_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlantillaCrear"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlantillaRespuesta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Crear Plantilla",
+        "tags": [
+          "plantillas"
+        ]
+      }
+    },
+    "/comunicaciones/plantillas-rapidas": {
+      "get": {
+        "operationId": "listar_plantillas_rapidas_comunicaciones_plantillas_rapidas_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PlantillaRapidaRespuesta"
+                  },
+                  "title": "Response Listar Plantillas Rapidas Comunicaciones Plantillas Rapidas Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Listar Plantillas Rapidas",
+        "tags": [
+          "plantillas"
+        ]
+      }
+    },
+    "/comunicaciones/plantillas-rapidas/{plantilla_id}": {
+      "put": {
+        "operationId": "editar_plantilla_rapida_comunicaciones_plantillas_rapidas__plantilla_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "plantilla_id",
+            "required": true,
+            "schema": {
+              "title": "Plantilla Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlantillaRapidaActualizar"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlantillaRapidaRespuesta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Editar Plantilla Rapida",
+        "tags": [
+          "plantillas"
+        ]
+      }
+    },
+    "/comunicaciones/plantillas/{nombre}": {
+      "delete": {
+        "operationId": "eliminar_plantilla_comunicaciones_plantillas__nombre__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "nombre",
+            "required": true,
+            "schema": {
+              "title": "Nombre",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Eliminar Plantilla",
+        "tags": [
+          "plantillas"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Health Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/webhook/whatsapp": {
+      "get": {
+        "description": "Meta llama aquí al registrar el webhook: si el verify token coincide, se le devuelve el\n\"challenge\" tal cual y Meta da el webhook por válido.",
+        "operationId": "verificar_webhook_webhook_whatsapp_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "hub.mode",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "Hub.Mode",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "hub.verify_token",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "Hub.Verify Token",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "hub.challenge",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "Hub.Challenge",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Verificar Webhook",
+        "tags": [
+          "webhook"
+        ]
+      },
+      "post": {
+        "description": "Guarda los mensajes entrantes y actualiza el estado de los enviados.",
+        "operationId": "recibir_webhook_webhook_whatsapp_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Recibir Webhook Webhook Whatsapp Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Recibir Webhook",
+        "tags": [
+          "webhook"
+        ]
+      }
+    }
+  }
+}

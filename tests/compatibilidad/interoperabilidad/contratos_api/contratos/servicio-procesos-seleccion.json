@@ -1,0 +1,3162 @@
+{
+  "components": {
+    "schemas": {
+      "CambiarEstadoProceso": {
+        "description": "Datos para mover una postulación a otra etapa.",
+        "properties": {
+          "comentario": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comentario"
+          },
+          "estado": {
+            "title": "Estado",
+            "type": "string"
+          }
+        },
+        "required": [
+          "estado"
+        ],
+        "title": "CambiarEstadoProceso",
+        "type": "object"
+      },
+      "Competencias": {
+        "description": "Las 6 competencias, cada una calificada de 1 a 5.\n\n`ge=1, le=5` = \"mayor o igual a 1 y menor o igual a 5\": si llega otro número,\nFastAPI responde error 422 solo.",
+        "properties": {
+          "adaptabilidadFlexibilidad": {
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Adaptabilidadflexibilidad",
+            "type": "integer"
+          },
+          "comunicacionEfectiva": {
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Comunicacionefectiva",
+            "type": "integer"
+          },
+          "dinamismoEnergia": {
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Dinamismoenergia",
+            "type": "integer"
+          },
+          "orientacionCliente": {
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Orientacioncliente",
+            "type": "integer"
+          },
+          "responsabilidad": {
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Responsabilidad",
+            "type": "integer"
+          },
+          "toleranciaPresion": {
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Toleranciapresion",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "comunicacionEfectiva",
+          "orientacionCliente",
+          "responsabilidad",
+          "adaptabilidadFlexibilidad",
+          "toleranciaPresion",
+          "dinamismoEnergia"
+        ],
+        "title": "Competencias",
+        "type": "object"
+      },
+      "ContratacionActualizar": {
+        "properties": {
+          "cargo": {
+            "anyOf": [
+              {
+                "maxLength": 150,
+                "minLength": 2,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cargo"
+          },
+          "estado": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estado"
+          },
+          "fechaIngreso": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fechaingreso"
+          },
+          "moneda": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z]{3}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Moneda"
+          },
+          "observaciones": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observaciones"
+          },
+          "salario": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Salario"
+          },
+          "tipoContrato": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tipocontrato"
+          }
+        },
+        "title": "ContratacionActualizar",
+        "type": "object"
+      },
+      "ContratacionCrear": {
+        "description": "Datos para registrar la contratación de una postulación (y marcarla como \"Contratado\").",
+        "properties": {
+          "anuncioId": {
+            "title": "Anuncioid",
+            "type": "integer"
+          },
+          "cargo": {
+            "maxLength": 150,
+            "minLength": 2,
+            "title": "Cargo",
+            "type": "string"
+          },
+          "fechaIngreso": {
+            "format": "date",
+            "title": "Fechaingreso",
+            "type": "string"
+          },
+          "moneda": {
+            "default": "PEN",
+            "pattern": "^[A-Za-z]{3}$",
+            "title": "Moneda",
+            "type": "string"
+          },
+          "observaciones": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observaciones"
+          },
+          "postulanteId": {
+            "maxLength": 36,
+            "title": "Postulanteid",
+            "type": "string"
+          },
+          "salario": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Salario"
+          },
+          "tipoContrato": {
+            "title": "Tipocontrato",
+            "type": "string"
+          }
+        },
+        "required": [
+          "postulanteId",
+          "anuncioId",
+          "fechaIngreso",
+          "cargo",
+          "tipoContrato"
+        ],
+        "title": "ContratacionCrear",
+        "type": "object"
+      },
+      "ContratacionRespuesta": {
+        "properties": {
+          "anuncioId": {
+            "title": "Anuncioid",
+            "type": "integer"
+          },
+          "cargo": {
+            "title": "Cargo",
+            "type": "string"
+          },
+          "creadoPor": {
+            "title": "Creadopor",
+            "type": "string"
+          },
+          "estado": {
+            "title": "Estado",
+            "type": "string"
+          },
+          "fechaCreacion": {
+            "format": "date-time",
+            "title": "Fechacreacion",
+            "type": "string"
+          },
+          "fechaIngreso": {
+            "format": "date",
+            "title": "Fechaingreso",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "moneda": {
+            "title": "Moneda",
+            "type": "string"
+          },
+          "observaciones": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observaciones"
+          },
+          "postulanteId": {
+            "maxLength": 36,
+            "title": "Postulanteid",
+            "type": "string"
+          },
+          "procesoId": {
+            "title": "Procesoid",
+            "type": "string"
+          },
+          "salario": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Salario"
+          },
+          "seguimientos": {
+            "items": {
+              "$ref": "#/components/schemas/SeguimientoRespuesta"
+            },
+            "title": "Seguimientos",
+            "type": "array"
+          },
+          "tipoContrato": {
+            "title": "Tipocontrato",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "procesoId",
+          "postulanteId",
+          "anuncioId",
+          "fechaIngreso",
+          "cargo",
+          "tipoContrato",
+          "salario",
+          "moneda",
+          "estado",
+          "observaciones",
+          "creadoPor",
+          "fechaCreacion",
+          "seguimientos"
+        ],
+        "title": "ContratacionRespuesta",
+        "type": "object"
+      },
+      "EntrevistaActualizar": {
+        "description": "Lo que se puede cambiar de una entrevista (reprogramarla, cerrarla, anotar cómo salió...).",
+        "properties": {
+          "duracionMin": {
+            "anyOf": [
+              {
+                "maximum": 480.0,
+                "minimum": 10.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duracionmin"
+          },
+          "entrevistador": {
+            "anyOf": [
+              {
+                "maxLength": 150,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entrevistador"
+          },
+          "estado": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estado"
+          },
+          "fechaHora": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fechahora"
+          },
+          "lugarOEnlace": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lugaroenlace"
+          },
+          "modalidad": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Modalidad"
+          },
+          "notas": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notas"
+          },
+          "resultado": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resultado"
+          }
+        },
+        "title": "EntrevistaActualizar",
+        "type": "object"
+      },
+      "EntrevistaCrear": {
+        "description": "Datos para programar una entrevista de una postulación.",
+        "properties": {
+          "anuncioId": {
+            "title": "Anuncioid",
+            "type": "integer"
+          },
+          "duracionMin": {
+            "default": 30,
+            "maximum": 480.0,
+            "minimum": 10.0,
+            "title": "Duracionmin",
+            "type": "integer"
+          },
+          "entrevistador": {
+            "anyOf": [
+              {
+                "maxLength": 150,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entrevistador"
+          },
+          "fechaHora": {
+            "format": "date-time",
+            "title": "Fechahora",
+            "type": "string"
+          },
+          "lugarOEnlace": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lugaroenlace"
+          },
+          "modalidad": {
+            "title": "Modalidad",
+            "type": "string"
+          },
+          "notas": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notas"
+          },
+          "postulanteId": {
+            "maxLength": 36,
+            "title": "Postulanteid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "postulanteId",
+          "anuncioId",
+          "fechaHora",
+          "modalidad"
+        ],
+        "title": "EntrevistaCrear",
+        "type": "object"
+      },
+      "EntrevistaRespuesta": {
+        "properties": {
+          "anuncioId": {
+            "title": "Anuncioid",
+            "type": "integer"
+          },
+          "creadoPor": {
+            "title": "Creadopor",
+            "type": "string"
+          },
+          "duracionMin": {
+            "title": "Duracionmin",
+            "type": "integer"
+          },
+          "entrevistador": {
+            "title": "Entrevistador",
+            "type": "string"
+          },
+          "estado": {
+            "title": "Estado",
+            "type": "string"
+          },
+          "fechaCreacion": {
+            "format": "date-time",
+            "title": "Fechacreacion",
+            "type": "string"
+          },
+          "fechaHora": {
+            "format": "date-time",
+            "title": "Fechahora",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "lugarOEnlace": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lugaroenlace"
+          },
+          "modalidad": {
+            "title": "Modalidad",
+            "type": "string"
+          },
+          "notas": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notas"
+          },
+          "postulanteId": {
+            "maxLength": 36,
+            "title": "Postulanteid",
+            "type": "string"
+          },
+          "procesoId": {
+            "title": "Procesoid",
+            "type": "string"
+          },
+          "resultado": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resultado"
+          }
+        },
+        "required": [
+          "id",
+          "procesoId",
+          "postulanteId",
+          "anuncioId",
+          "fechaHora",
+          "duracionMin",
+          "modalidad",
+          "lugarOEnlace",
+          "entrevistador",
+          "estado",
+          "resultado",
+          "notas",
+          "creadoPor",
+          "fechaCreacion"
+        ],
+        "title": "EntrevistaRespuesta",
+        "type": "object"
+      },
+      "EvaluacionCrear": {
+        "description": "Datos para registrar una evaluación. El puntaje y el resultado NO se envían:\nlos calcula el servidor. Tampoco el evaluador: es la persona con sesión iniciada.",
+        "properties": {
+          "comentarios": {
+            "default": "",
+            "maxLength": 2000,
+            "title": "Comentarios",
+            "type": "string"
+          },
+          "competencias": {
+            "$ref": "#/components/schemas/Competencias"
+          },
+          "postulanteId": {
+            "maxLength": 36,
+            "title": "Postulanteid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "postulanteId",
+          "competencias"
+        ],
+        "title": "EvaluacionCrear",
+        "type": "object"
+      },
+      "EvaluacionRespuesta": {
+        "properties": {
+          "comentarios": {
+            "title": "Comentarios",
+            "type": "string"
+          },
+          "competencias": {
+            "$ref": "#/components/schemas/Competencias"
+          },
+          "evaluador": {
+            "title": "Evaluador",
+            "type": "string"
+          },
+          "fecha": {
+            "format": "date",
+            "title": "Fecha",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "postulanteId": {
+            "title": "Postulanteid",
+            "type": "string"
+          },
+          "puntajeTotal": {
+            "title": "Puntajetotal",
+            "type": "integer"
+          },
+          "resultado": {
+            "title": "Resultado",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "postulanteId",
+          "evaluador",
+          "fecha",
+          "competencias",
+          "puntajeTotal",
+          "resultado",
+          "comentarios"
+        ],
+        "title": "EvaluacionRespuesta",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HistorialPublicoRespuesta": {
+        "description": "Un cambio de etapa tal como lo ve el POSTULANTE en ANUNCIOS: solo cuál y cuándo.\n\nLista blanca a propósito: NO incluye el comentario (son notas internas de RRHH, ej. el motivo\nde un descarte) ni el nombre de quién hizo el cambio.",
+        "properties": {
+          "estado": {
+            "title": "Estado",
+            "type": "string"
+          },
+          "fecha": {
+            "format": "date-time",
+            "title": "Fecha",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "estado",
+          "fecha"
+        ],
+        "title": "HistorialPublicoRespuesta",
+        "type": "object"
+      },
+      "HistorialRespuesta": {
+        "description": "Un cambio de etapa: cuál, cuándo, quién y por qué.",
+        "properties": {
+          "comentario": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comentario"
+          },
+          "estado": {
+            "title": "Estado",
+            "type": "string"
+          },
+          "fecha": {
+            "format": "date-time",
+            "title": "Fecha",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "usuarioResponsable": {
+            "title": "Usuarioresponsable",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "estado",
+          "fecha",
+          "usuarioResponsable"
+        ],
+        "title": "HistorialRespuesta",
+        "type": "object"
+      },
+      "ProcesoCrear": {
+        "description": "Datos para registrar que un postulante se presentó a un anuncio.",
+        "properties": {
+          "anuncioId": {
+            "title": "Anuncioid",
+            "type": "integer"
+          },
+          "postulanteId": {
+            "maxLength": 36,
+            "title": "Postulanteid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "postulanteId",
+          "anuncioId"
+        ],
+        "title": "ProcesoCrear",
+        "type": "object"
+      },
+      "ProcesoPostulanteRespuesta": {
+        "description": "Una postulación tal como la ve el propio postulante (historial sin datos internos).",
+        "properties": {
+          "anuncioId": {
+            "title": "Anuncioid",
+            "type": "integer"
+          },
+          "estadoActual": {
+            "title": "Estadoactual",
+            "type": "string"
+          },
+          "fechaPostulacion": {
+            "format": "date-time",
+            "title": "Fechapostulacion",
+            "type": "string"
+          },
+          "historialEstados": {
+            "items": {
+              "$ref": "#/components/schemas/HistorialPublicoRespuesta"
+            },
+            "title": "Historialestados",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "postulanteId": {
+            "title": "Postulanteid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "postulanteId",
+          "anuncioId",
+          "estadoActual",
+          "fechaPostulacion",
+          "historialEstados"
+        ],
+        "title": "ProcesoPostulanteRespuesta",
+        "type": "object"
+      },
+      "ProcesoRespuesta": {
+        "description": "Una postulación (postulante + anuncio) con su historial de etapas.",
+        "properties": {
+          "anuncioId": {
+            "title": "Anuncioid",
+            "type": "integer"
+          },
+          "estadoActual": {
+            "title": "Estadoactual",
+            "type": "string"
+          },
+          "fechaPostulacion": {
+            "format": "date-time",
+            "title": "Fechapostulacion",
+            "type": "string"
+          },
+          "historialEstados": {
+            "items": {
+              "$ref": "#/components/schemas/HistorialRespuesta"
+            },
+            "title": "Historialestados",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "postulanteId": {
+            "title": "Postulanteid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "postulanteId",
+          "anuncioId",
+          "estadoActual",
+          "fechaPostulacion",
+          "historialEstados"
+        ],
+        "title": "ProcesoRespuesta",
+        "type": "object"
+      },
+      "SeguimientoActualizar": {
+        "description": "Reprogramar un control o registrar cómo salió.",
+        "properties": {
+          "estado": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estado"
+          },
+          "fechaProgramada": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fechaprogramada"
+          },
+          "fechaRealizada": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fecharealizada"
+          },
+          "observaciones": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observaciones"
+          },
+          "valoracion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valoracion"
+          }
+        },
+        "title": "SeguimientoActualizar",
+        "type": "object"
+      },
+      "SeguimientoCrear": {
+        "description": "Un control adicional (además de los de 30, 60 y 90 días que se programan solos).",
+        "properties": {
+          "contratacionId": {
+            "title": "Contratacionid",
+            "type": "string"
+          },
+          "fechaProgramada": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fechaprogramada"
+          },
+          "hitoDias": {
+            "maximum": 730.0,
+            "minimum": 1.0,
+            "title": "Hitodias",
+            "type": "integer"
+          },
+          "observaciones": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observaciones"
+          }
+        },
+        "required": [
+          "contratacionId",
+          "hitoDias"
+        ],
+        "title": "SeguimientoCrear",
+        "type": "object"
+      },
+      "SeguimientoRespuesta": {
+        "properties": {
+          "anuncioId": {
+            "title": "Anuncioid",
+            "type": "integer"
+          },
+          "contratacionId": {
+            "title": "Contratacionid",
+            "type": "string"
+          },
+          "estado": {
+            "title": "Estado",
+            "type": "string"
+          },
+          "fechaProgramada": {
+            "format": "date",
+            "title": "Fechaprogramada",
+            "type": "string"
+          },
+          "fechaRealizada": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fecharealizada"
+          },
+          "hitoDias": {
+            "title": "Hitodias",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "observaciones": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observaciones"
+          },
+          "postulanteId": {
+            "maxLength": 36,
+            "title": "Postulanteid",
+            "type": "string"
+          },
+          "realizadoPor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Realizadopor"
+          },
+          "valoracion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valoracion"
+          },
+          "vencido": {
+            "title": "Vencido",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "contratacionId",
+          "postulanteId",
+          "anuncioId",
+          "hitoDias",
+          "fechaProgramada",
+          "fechaRealizada",
+          "estado",
+          "valoracion",
+          "observaciones",
+          "realizadoPor",
+          "vencido"
+        ],
+        "title": "SeguimientoRespuesta",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Postulaciones (etapa e historial) y evaluaciones por competencias.",
+    "title": "Servicio de Procesos de Selección",
+    "version": "1.0.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/contrataciones": {
+      "get": {
+        "operationId": "listar_contrataciones_contrataciones_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "postulanteId",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Postulanteid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "anuncioId",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Anuncioid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "estado",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Estado"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-nombre",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "X-Usuario-Nombre",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-postulante-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Postulante-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ContratacionRespuesta"
+                  },
+                  "title": "Response Listar Contrataciones Contrataciones Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Listar Contrataciones",
+        "tags": [
+          "contrataciones"
+        ]
+      },
+      "post": {
+        "operationId": "registrar_contratacion_contrataciones_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-nombre",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "X-Usuario-Nombre",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-postulante-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Postulante-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContratacionCrear"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContratacionRespuesta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Registrar Contratacion",
+        "tags": [
+          "contrataciones"
+        ]
+      }
+    },
+    "/contrataciones/{contratacion_id}": {
+      "patch": {
+        "operationId": "actualizar_contratacion_contrataciones__contratacion_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "contratacion_id",
+            "required": true,
+            "schema": {
+              "title": "Contratacion Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-nombre",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "X-Usuario-Nombre",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-postulante-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Postulante-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContratacionActualizar"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContratacionRespuesta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Actualizar Contratacion",
+        "tags": [
+          "contrataciones"
+        ]
+      }
+    },
+    "/dashboard": {
+      "get": {
+        "operationId": "obtener_dashboard_dashboard_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "desde",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Desde"
+            }
+          },
+          {
+            "in": "query",
+            "name": "hasta",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Hasta"
+            }
+          },
+          {
+            "in": "query",
+            "name": "empresaId",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Empresaid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-nombre",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "X-Usuario-Nombre",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-postulante-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Postulante-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Obtener Dashboard Dashboard Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Obtener Dashboard",
+        "tags": [
+          "dashboard"
+        ]
+      }
+    },
+    "/entrevistas": {
+      "get": {
+        "operationId": "listar_entrevistas_entrevistas_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "postulanteId",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Postulanteid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "anuncioId",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Anuncioid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "estado",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Estado"
+            }
+          },
+          {
+            "in": "query",
+            "name": "desde",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Desde"
+            }
+          },
+          {
+            "in": "query",
+            "name": "hasta",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Hasta"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-nombre",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "X-Usuario-Nombre",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-postulante-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Postulante-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EntrevistaRespuesta"
+                  },
+                  "title": "Response Listar Entrevistas Entrevistas Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Listar Entrevistas",
+        "tags": [
+          "entrevistas"
+        ]
+      },
+      "post": {
+        "operationId": "programar_entrevista_entrevistas_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-nombre",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "X-Usuario-Nombre",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-postulante-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Postulante-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntrevistaCrear"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntrevistaRespuesta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Programar Entrevista",
+        "tags": [
+          "entrevistas"
+        ]
+      }
+    },
+    "/entrevistas/{entrevista_id}": {
+      "patch": {
+        "operationId": "actualizar_entrevista_entrevistas__entrevista_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entrevista_id",
+            "required": true,
+            "schema": {
+              "title": "Entrevista Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-nombre",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "X-Usuario-Nombre",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-postulante-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Postulante-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntrevistaActualizar"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntrevistaRespuesta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Actualizar Entrevista",
+        "tags": [
+          "entrevistas"
+        ]
+      }
+    },
+    "/evaluaciones": {
+      "get": {
+        "operationId": "listar_evaluaciones_evaluaciones_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "postulanteId",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Postulanteid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-nombre",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "X-Usuario-Nombre",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-postulante-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Postulante-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EvaluacionRespuesta"
+                  },
+                  "title": "Response Listar Evaluaciones Evaluaciones Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Listar Evaluaciones",
+        "tags": [
+          "evaluaciones"
+        ]
+      },
+      "post": {
+        "operationId": "crear_evaluacion_evaluaciones_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-nombre",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "X-Usuario-Nombre",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-postulante-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Postulante-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvaluacionCrear"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvaluacionRespuesta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Crear Evaluacion",
+        "tags": [
+          "evaluaciones"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "description": "Sirve para comprobar rápido que el servicio está vivo.",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Health Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/procesos": {
+      "get": {
+        "description": "Vista del personal del ERP: historial completo, con comentarios y responsables.",
+        "operationId": "listar_procesos_procesos_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "postulanteId",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Postulanteid"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-nombre",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "X-Usuario-Nombre",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-postulante-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Postulante-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProcesoRespuesta"
+                  },
+                  "title": "Response Listar Procesos Procesos Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Listar Procesos",
+        "tags": [
+          "procesos"
+        ]
+      },
+      "post": {
+        "operationId": "crear_proceso_procesos_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-nombre",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "X-Usuario-Nombre",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-postulante-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Postulante-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcesoCrear"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcesoRespuesta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Crear Proceso",
+        "tags": [
+          "procesos"
+        ]
+      }
+    },
+    "/procesos/mias": {
+      "get": {
+        "description": "Vista del POSTULANTE (app ANUNCIOS): solo SUS postulaciones (el id sale de su token, no de la\nURL) y un historial sin los comentarios internos ni los nombres del personal de RRHH.",
+        "operationId": "listar_mis_procesos_procesos_mias_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-nombre",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "X-Usuario-Nombre",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-postulante-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Postulante-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProcesoPostulanteRespuesta"
+                  },
+                  "title": "Response Listar Mis Procesos Procesos Mias Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Listar Mis Procesos",
+        "tags": [
+          "procesos"
+        ]
+      }
+    },
+    "/procesos/postulante/{postulante_id}/anuncio/{anuncio_id}/estado": {
+      "patch": {
+        "operationId": "cambiar_estado_proceso_procesos_postulante__postulante_id__anuncio__anuncio_id__estado_patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "postulante_id",
+            "required": true,
+            "schema": {
+              "title": "Postulante Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "anuncio_id",
+            "required": true,
+            "schema": {
+              "title": "Anuncio Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-nombre",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "X-Usuario-Nombre",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-postulante-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Postulante-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CambiarEstadoProceso"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistorialRespuesta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Cambiar Estado Proceso",
+        "tags": [
+          "procesos"
+        ]
+      }
+    },
+    "/procesos/postulantes-ocultos": {
+      "get": {
+        "description": "Ids de los postulantes que este usuario no puede ver (lo consulta servicio-postulantes).",
+        "operationId": "listar_postulantes_ocultos_procesos_postulantes_ocultos_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-nombre",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "X-Usuario-Nombre",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-postulante-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Postulante-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Response Listar Postulantes Ocultos Procesos Postulantes Ocultos Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Listar Postulantes Ocultos",
+        "tags": [
+          "procesos"
+        ]
+      }
+    },
+    "/seguimientos": {
+      "get": {
+        "operationId": "listar_seguimientos_seguimientos_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "postulanteId",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Postulanteid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "contratacionId",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Contratacionid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "estado",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Estado"
+            }
+          },
+          {
+            "in": "query",
+            "name": "soloVencidos",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Solovencidos",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-nombre",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "X-Usuario-Nombre",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-postulante-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Postulante-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SeguimientoRespuesta"
+                  },
+                  "title": "Response Listar Seguimientos Seguimientos Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Listar Seguimientos",
+        "tags": [
+          "seguimientos"
+        ]
+      },
+      "post": {
+        "operationId": "agregar_seguimiento_seguimientos_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-nombre",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "X-Usuario-Nombre",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-postulante-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Postulante-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeguimientoCrear"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeguimientoRespuesta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Agregar Seguimiento",
+        "tags": [
+          "seguimientos"
+        ]
+      }
+    },
+    "/seguimientos/{seguimiento_id}": {
+      "patch": {
+        "operationId": "actualizar_seguimiento_seguimientos__seguimiento_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "seguimiento_id",
+            "required": true,
+            "schema": {
+              "title": "Seguimiento Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-nombre",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "X-Usuario-Nombre",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-postulante-id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Postulante-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeguimientoActualizar"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeguimientoRespuesta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Actualizar Seguimiento",
+        "tags": [
+          "seguimientos"
+        ]
+      }
+    }
+  }
+}

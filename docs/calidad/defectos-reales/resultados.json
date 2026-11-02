@@ -1,0 +1,20 @@
+[
+  {
+    "clave": "meta",
+    "hallazgos": "H9 · H10",
+    "titulo": "Errores de Meta mal interpretados por el ERP",
+    "archivo": "backend/servicio-comunicaciones/app/infrastructure/whatsapp_client.py",
+    "commit_antes": "bbc56f8",
+    "falla_antes": true,
+    "pasa_despues": true
+  },
+  {
+    "clave": "openapi",
+    "hallazgos": "H11",
+    "titulo": "Contrato OpenAPI del Gateway inválido",
+    "archivo": "backend/gateway/app/api/v1/proxy.py",
+    "commit_antes": "bbc56f8",
+    "falla_antes": true,
+    "pasa_despues": true
+  }
+]

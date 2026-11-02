@@ -355,6 +355,66 @@ Resources:
             Compress: true
             CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 # Managed-CachingOptimized
 
+  # ---------------------------------------------------------------- alertas de las integraciones (Meta y SES)
+  # Si WhatsApp o el correo empiezan a rechazar peticiones (token vencido, app bloqueada por Meta,
+  # remitente sin verificar, límites), llega un correo a CorreoAlertas. Hay que confirmar la
+  # suscripción con el enlace que manda AWS la primera vez.
+  TemaAlertas:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub "${Proyecto}-alertas"
+      Subscription: [{ Protocol: email, Endpoint: !Ref CorreoAlertas }]
+
+  FiltroErroresMeta:
+    Type: AWS::Logs::MetricFilter
+    Properties:
+      LogGroupName: !Ref LogsComunicaciones
+      FilterPattern: '?"rechazó la petición" ?"No se pudo conectar con Meta"'
+      MetricTransformations:
+        - { MetricNamespace: !Sub "${Proyecto}/Integraciones", MetricName: ErroresMeta, MetricValue: "1", DefaultValue: 0 }
+
+  AlarmaErroresMeta:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${Proyecto}-errores-whatsapp"
+      AlarmDescription: >-
+        WhatsApp (Meta) rechaza las peticiones del sistema: token vencido, app bloqueada, límites o
+        Meta caído. Revisar el log /talenterp/servicio-comunicaciones y el panel de la app en Meta.
+      Namespace: !Sub "${Proyecto}/Integraciones"
+      MetricName: ErroresMeta
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 3
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: [!Ref TemaAlertas]
+
+  FiltroErroresCorreo:
+    Type: AWS::Logs::MetricFilter
+    Properties:
+      LogGroupName: !Ref LogsPostulantes
+      FilterPattern: '?"SES no envió el correo" ?"No se pudo entregar el correo de recuperación"'
+      MetricTransformations:
+        - { MetricNamespace: !Sub "${Proyecto}/Integraciones", MetricName: ErroresCorreo, MetricValue: "1", DefaultValue: 0 }
+
+  AlarmaErroresCorreo:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub "${Proyecto}-errores-correo"
+      AlarmDescription: >-
+        Amazon SES rechaza los correos del sistema (remitente sin verificar, sandbox o límite de
+        envío). Revisar el log /talenterp/servicio-postulantes y la consola de SES.
+      Namespace: !Sub "${Proyecto}/Integraciones"
+      MetricName: ErroresCorreo
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 3
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+      AlarmActions: [!Ref TemaAlertas]
+
   # ---------------------------------------------------------------- alerta de gasto
   Presupuesto:
     Type: AWS::Budgets::Budget

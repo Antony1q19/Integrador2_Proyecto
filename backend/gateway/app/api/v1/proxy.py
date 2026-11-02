@@ -44,13 +44,6 @@ _URL_POR_SERVICIO = {
 }
 
 
-@router.api_route(
-    # Ruta "comodín": atrapa /api/v1/<servicio> y todo lo que venga después.
-    # Se escribe SIN "/" entre las dos partes a propósito, para que también
-    # coincida la ruta pelada  /api/v1/postulantes  (sin nada más detrás).
-    "/{servicio}{ruta:path}",
-    methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
-)
 async def reenviar(
     servicio: str,  # ej. "postulantes"
     ruta: str,      # el resto de la dirección, ej. "/123/documentos" (o "" si no hay más)
@@ -105,6 +98,16 @@ async def reenviar(
         content=respuesta.content,
         status_code=respuesta.status_code,
         headers=_cabeceras_de_respuesta(respuesta.headers),
+    )
+
+
+# Ruta "comodín": atrapa /api/v1/<servicio> y todo lo que venga después. Se escribe SIN "/" entre
+# las dos partes a propósito, para que también coincida la ruta pelada  /api/v1/postulantes.
+# Se registra una vez POR MÉTODO, cada una con su propio operationId: con un solo registro para los
+# cinco métodos, FastAPI repite el operationId y el contrato OpenAPI deja de ser válido.
+for _metodo in ("GET", "POST", "PUT", "PATCH", "DELETE"):
+    router.add_api_route(
+        "/{servicio}{ruta:path}", reenviar, methods=[_metodo], operation_id=f"reenviar_{_metodo.lower()}"
     )
 
 

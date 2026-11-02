@@ -1,0 +1,21 @@
+<!doctype html>
+<meta charset="utf-8">
+<style>
+  body { margin: 0; background: #e9eef0; font-family: 'Segoe UI', Arial, sans-serif; }
+  .ventana { display: inline-block; margin: 24px; width: 1280px; border-radius: 10px; overflow: hidden;
+    box-shadow: 0 6px 24px rgba(0,0,0,.25); background: #fff; }
+  .barra { display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: #dee1e6; }
+  .punto { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+  .direccion { flex: 1; margin-left: 12px; padding: 7px 14px; border-radius: 16px; background: #fff; color: #202124;
+    font-size: 16px; font-family: 'Segoe UI', Arial, sans-serif; }
+  img { display: block; width: 1280px; }
+</style>
+<div class="ventana">
+  <div class="barra">
+    <span class="punto" style="background:#ff5f56"></span>
+    <span class="punto" style="background:#ffbd2e"></span>
+    <span class="punto" style="background:#27c93f"></span>
+    <span class="direccion">{{URL}}</span>
+  </div>
+  <img src="data:image/png;base64,{{IMAGEN}}" alt="Página del portal">
+</div>

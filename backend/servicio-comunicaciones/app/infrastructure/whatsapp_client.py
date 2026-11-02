@@ -16,6 +16,12 @@ logger = logging.getLogger(__name__)
 
 _CAMPOS_PLANTILLA = "name,status,category,language,components,rejected_reason"
 
+# Errores de Meta que NO son culpa de quien usa el ERP: se responden como "servicio no disponible"
+# (503) con un motivo claro, no como "solicitud inválida" (400).
+# https://developers.facebook.com/docs/whatsapp/cloud-api/support/error-codes
+_ERRORES_DE_ACCESO = {10, 200, 368, 131031}  # permisos, app bloqueada, cuenta restringida o bloqueada
+_ERRORES_DE_LIMITE = {4, 80007, 130429, 131056}  # demasiadas peticiones (app, cuenta, número o destinatario)
+
 
 async def enviar_mensaje_texto(telefono_destino: str, texto: str) -> dict:
     """Envía un mensaje de texto. El teléfono va con código de país (ej. 51947757081).
@@ -112,9 +118,22 @@ async def _pedir(metodo: str, ruta: str, **kwargs: Any) -> dict:
     if respuesta.status_code >= 400:
         # Ej. 131030: el número no está en la lista de destinatarios de prueba; 190: el token venció.
         logger.error("Meta rechazó la petición (%s): %s", respuesta.status_code, respuesta.text)
-        error = respuesta.json().get("error", {}) if respuesta.content else {}
+        try:
+            error = respuesta.json().get("error", {}) if respuesta.content else {}
+        except ValueError:  # ej. una página de error HTML de un intermediario (502, 504)
+            error = {}
         motivo = error.get("error_user_msg") or error.get("message") or "WhatsApp rechazó la petición"
-        if error.get("code") == 190:
+        codigo = error.get("code")
+        if codigo == 190:
             raise ServicioNoDisponible("El token de WhatsApp (META_ACCESS_TOKEN) venció: hay que renovarlo")
+        if codigo in _ERRORES_DE_ACCESO:
+            raise ServicioNoDisponible(
+                f"Meta bloqueó el acceso de la app a WhatsApp ({motivo}). "
+                "Revisa los avisos del panel de la app en developers.facebook.com."
+            )
+        if codigo in _ERRORES_DE_LIMITE:
+            raise ServicioNoDisponible("WhatsApp recibió demasiadas peticiones seguidas. Espera un momento e intenta de nuevo.")
+        if respuesta.status_code >= 500:
+            raise ServicioNoDisponible("WhatsApp no está respondiendo en este momento. Intenta nuevamente en unos minutos.")
         raise SolicitudInvalida(motivo)
     return respuesta.json() if respuesta.content else {}
