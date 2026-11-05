@@ -61,12 +61,21 @@ export function EntrevistaModal({ entrevista, postulanteIdFijo, onCerrar, onGuar
 
   const ahoraLocal = aInputDeFechaHora(new Date().toISOString());
   const enElPasado = fechaHora !== "" && fechaHora < ahoraLocal;
+  // Misma regla que el servidor: se programa (o reprograma a) una fecha futura. Si solo se editan otros
+  // datos de una entrevista ya pasada, su fecha no se toca y no se exige.
+  const fechaInicial = entrevista ? aInputDeFechaHora(entrevista.fechaHora) : "";
+  const fechaNoPermitida = enElPasado && (!esEdicion || fechaHora !== fechaInicial);
+  const MENSAJE_FECHA_PASADA = "La entrevista debe programarse en una fecha y hora futura.";
 
   const enviar = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     if (!postulanteId || anuncioElegido === "" || !fechaHora) {
       setError("Elige el postulante, la vacante y la fecha y hora.");
+      return;
+    }
+    if (fechaNoPermitida) {
+      setError(MENSAJE_FECHA_PASADA);
       return;
     }
     setGuardando(true);
@@ -152,9 +161,9 @@ export function EntrevistaModal({ entrevista, postulanteIdFijo, onCerrar, onGuar
             </select>
           </Campo>
         </div>
-        {enElPasado && (
-          <p className="flex items-center gap-1.5 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700">
-            <AlertTriangle size={14} /> La fecha elegida ya pasó. Puedes guardarla igual si estás registrando una entrevista anterior.
+        {fechaNoPermitida && (
+          <p role="alert" className="flex items-center gap-1.5 rounded-lg bg-red-50 px-3 py-2 text-xs font-medium text-red-700">
+            <AlertTriangle size={14} /> {MENSAJE_FECHA_PASADA}
           </p>
         )}
 

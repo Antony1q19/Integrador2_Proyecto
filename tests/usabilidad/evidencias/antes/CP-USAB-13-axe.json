@@ -1,0 +1,23 @@
+{
+  "url": "https://d31inue0zw9dve.cloudfront.net/postulantes/nuevo",
+  "violaciones": [
+    {
+      "regla": "label",
+      "impacto": "critical",
+      "descripcion": "Form elements must have labels",
+      "elementos": 1,
+      "ejemplos": [
+        ".max-w-xs"
+      ]
+    },
+    {
+      "regla": "select-name",
+      "impacto": "critical",
+      "descripcion": "Select element must have an accessible name",
+      "elementos": 1,
+      "ejemplos": [
+        "select"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,975 @@
+{
+  "fecha": "2026-11-05T22:39:28.266Z",
+  "datos": {
+    "sello": "8206353",
+    "empresa": {
+      "id": 17,
+      "razonSocial": "PRUEBA FUNCIONAL 8206353 S.A.C.",
+      "ruc": "20820635399",
+      "contactoNombre": "Ana Prueba",
+      "contactoEmail": "ana.prueba@example.com",
+      "contactoTelefono": "987654321",
+      "sector": "Tecnología",
+      "fechaRegistro": "2026-11-05",
+      "anunciosActivos": 0
+    },
+    "anuncio": {
+      "id": 21,
+      "empresaId": 17,
+      "empresaRazonSocial": "PRUEBA FUNCIONAL 8206353 S.A.C.",
+      "cargo": "QA Funcional 8206353",
+      "descripcion": "Anuncio de PRUEBA para la verificación funcional.",
+      "requisitos": "Ninguno (prueba)",
+      "numeroVacantes": 1,
+      "salarioMin": 3000,
+      "salarioMax": 4000,
+      "fechaLimite": "2026-12-05",
+      "estado": "Abierto",
+      "fechaCreacion": "2026-11-05T22:36:56.729176Z"
+    },
+    "segundosHastaPortada": 14,
+    "procesoPortal": {
+      "id": "519401fa-ab07-4b71-8880-f433ccc6fdf9",
+      "postulanteId": "50d053cb-b62b-4e76-a5ee-8dac9be93ae4",
+      "anuncioId": 21,
+      "estadoActual": "POSTULADO",
+      "fechaPostulacion": "2026-11-05T22:37:21.854471Z",
+      "historialEstados": [
+        {
+          "id": "b96cc746-4ab3-4d92-8c82-f63d2fe556a5",
+          "estado": "POSTULADO",
+          "fecha": "2026-11-05T22:37:21.857206Z",
+          "usuarioResponsable": "Prueba Usabilidad QA",
+          "comentario": null
+        }
+      ]
+    },
+    "postulante": {
+      "id": "64ac4b65-0ea6-4a3d-a31f-cba8369a99ad",
+      "nombres": "Prueba",
+      "apellidos": "Funcional 8206353",
+      "documentoTipo": "DNI",
+      "documentoNumero": "88206353",
+      "email": "success+funcional8206353@simulator.amazonses.com",
+      "telefono": "987654321",
+      "cargoPostulado": null,
+      "empresaCliente": null,
+      "fechaNacimiento": null,
+      "direccion": null,
+      "fuenteReclutamiento": "PRUEBA",
+      "formacionAcademica": [],
+      "idiomas": [],
+      "experiencia": [],
+      "fechaRegistro": "2026-11-05",
+      "consentimientoTratamientoDatos": true,
+      "consentimientoComunicacionesComerciales": false,
+      "tieneCuenta": false
+    },
+    "documento": {
+      "id": "45b94a5b-0aa3-43e2-a31d-66a41eb2ee2b",
+      "tipo": "CV",
+      "nombreArchivo": "cv-prueba-funcional.pdf",
+      "referenciaAlmacenamiento": "talenterp-base-bucketdocumentos-tnfintjw2ie1/64ac4b65-0ea6-4a3d-a31f-cba8369a99ad/18d0b394d9b544939e9bf3c0b4ff8999.pdf",
+      "tamanioBytes": 69,
+      "fechaSubida": "2026-11-05T22:37:31.607985Z",
+      "tieneArchivo": true
+    },
+    "entrevista": {
+      "id": "7a594b4c-9aa5-4dcb-a26f-668a27a0bf1d",
+      "procesoId": "4aaff28d-7640-4548-85f9-feee1ac33aec",
+      "postulanteId": "64ac4b65-0ea6-4a3d-a31f-cba8369a99ad",
+      "anuncioId": 21,
+      "fechaHora": "2026-11-05T17:39:00-05:00",
+      "duracionMin": 30,
+      "modalidad": "Virtual",
+      "lugarOEnlace": null,
+      "entrevistador": "Evaluador Funcional 8206353",
+      "estado": "Programada",
+      "resultado": null,
+      "notas": "PRUEBA",
+      "creadoPor": "Leonardo Morales",
+      "fechaCreacion": "2026-11-05T22:37:41.716493Z"
+    },
+    "contratacion": {
+      "id": "f16f41e7-41a5-44fb-8687-069b7684202e",
+      "procesoId": "4aaff28d-7640-4548-85f9-feee1ac33aec",
+      "postulanteId": "64ac4b65-0ea6-4a3d-a31f-cba8369a99ad",
+      "anuncioId": 21,
+      "fechaIngreso": "2026-11-05",
+      "cargo": "QA Funcional 8206353",
+      "tipoContrato": "Plazo fijo",
+      "salario": 3500,
+      "moneda": "PEN",
+      "estado": "Activo",
+      "observaciones": "PRUEBA funcional",
+      "creadoPor": "Leonardo Morales",
+      "fechaCreacion": "2026-11-05T22:39:07.950745Z",
+      "seguimientos": [
+        {
+          "id": "514dedac-37aa-472e-8dfd-03a83a53cad2",
+          "contratacionId": "f16f41e7-41a5-44fb-8687-069b7684202e",
+          "postulanteId": "64ac4b65-0ea6-4a3d-a31f-cba8369a99ad",
+          "anuncioId": 21,
+          "hitoDias": 30,
+          "fechaProgramada": "2026-12-05",
+          "fechaRealizada": null,
+          "estado": "Pendiente",
+          "valoracion": null,
+          "observaciones": null,
+          "realizadoPor": null,
+          "vencido": false
+        },
+        {
+          "id": "41e790e5-5121-44fe-b2cb-43d9b5f23d27",
+          "contratacionId": "f16f41e7-41a5-44fb-8687-069b7684202e",
+          "postulanteId": "64ac4b65-0ea6-4a3d-a31f-cba8369a99ad",
+          "anuncioId": 21,
+          "hitoDias": 60,
+          "fechaProgramada": "2027-01-04",
+          "fechaRealizada": null,
+          "estado": "Pendiente",
+          "valoracion": null,
+          "observaciones": null,
+          "realizadoPor": null,
+          "vencido": false
+        },
+        {
+          "id": "0f85672f-f206-44db-978b-a02961e3cb09",
+          "contratacionId": "f16f41e7-41a5-44fb-8687-069b7684202e",
+          "postulanteId": "64ac4b65-0ea6-4a3d-a31f-cba8369a99ad",
+          "anuncioId": 21,
+          "hitoDias": 90,
+          "fechaProgramada": "2027-02-03",
+          "fechaRealizada": null,
+          "estado": "Pendiente",
+          "valoracion": null,
+          "observaciones": null,
+          "realizadoPor": null,
+          "vencido": false
+        }
+      ]
+    },
+    "dashboard": {
+      "postulaciones": 2,
+      "postulantesUnicos": 2,
+      "enProceso": 1,
+      "contratados": 1,
+      "descartados": 0,
+      "tasaContratacion": 50,
+      "tasaDescarte": 0,
+      "diasPromedioContratacion": 0,
+      "anunciosActivos": 0,
+      "vacantesActivas": 0,
+      "vacantesCubiertas": 0,
+      "coberturaVacantes": 0,
+      "evaluaciones": 2,
+      "puntajePromedio": 70,
+      "porcentajeApto": 50,
+      "entrevistasHoy": 0,
+      "entrevistasProximas": 0,
+      "entrevistasRealizadas": 1,
+      "seguimientosPendientes": 2,
+      "seguimientosVencidos": 0,
+      "ingresosPorIniciar": 0
+    },
+    "limpieza": {
+      "contratacion": 200,
+      "anuncio": 204,
+      "empresa": 204
+    }
+  },
+  "funcionalidades": {
+    "F01": "Autenticación y roles",
+    "F02": "Usuarios del ERP",
+    "F03": "Empresas clientes",
+    "F04": "Anuncios (vacantes)",
+    "F05": "Postulantes",
+    "F06": "Documentos del postulante",
+    "F07": "Postulaciones y pipeline",
+    "F08": "Evaluaciones por competencias",
+    "F09": "Entrevistas",
+    "F10": "Contrataciones",
+    "F11": "Seguimiento post-ingreso",
+    "F12": "Dashboard y reportes",
+    "F13": "Comunicaciones (WhatsApp)",
+    "F14": "Ayuda",
+    "F15": "Portal: búsqueda de ofertas",
+    "F16": "Portal: postulación e historial",
+    "F17": "Portal: perfil del postulante"
+  },
+  "verificaciones": [
+    {
+      "id": "F01-I1",
+      "funcionalidad": "Autenticación y roles",
+      "sub": "Idoneidad",
+      "que": "RRHH no ve el Dashboard: se le redirige a Postulantes",
+      "esperado": "/postulantes",
+      "obtenido": "/postulantes",
+      "ok": true
+    },
+    {
+      "id": "F01-I2",
+      "funcionalidad": "Autenticación y roles",
+      "sub": "Idoneidad",
+      "que": "El Supervisor no puede crear empresas (solo el Admin)",
+      "esperado": "403",
+      "obtenido": "403",
+      "ok": true
+    },
+    {
+      "id": "F01-C1",
+      "funcionalidad": "Autenticación y roles",
+      "sub": "Completitud",
+      "que": "Los 3 roles (Admin, RRHH, Supervisor) inician sesión",
+      "esperado": "{\"admin@test.com\":true,\"rrhh@test.com\":true,\"super@test.com\":true}",
+      "obtenido": "{\"admin@test.com\":true,\"rrhh@test.com\":true,\"super@test.com\":true}",
+      "ok": true
+    },
+    {
+      "id": "F01-O1",
+      "funcionalidad": "Autenticación y roles",
+      "sub": "Corrección",
+      "que": "Sin sesión, los datos del ERP no se entregan",
+      "esperado": "401",
+      "obtenido": "401",
+      "ok": true
+    },
+    {
+      "id": "F01-O2",
+      "funcionalidad": "Autenticación y roles",
+      "sub": "Corrección",
+      "que": "El Admin entra a su inicio (Dashboard)",
+      "esperado": "/dashboard",
+      "obtenido": "/dashboard",
+      "ok": true,
+      "evidencia": "F01-admin-dashboard.png"
+    },
+    {
+      "id": "F02-C1",
+      "funcionalidad": "Usuarios del ERP",
+      "sub": "Completitud",
+      "que": "Se listan los usuarios del ERP",
+      "esperado": "200 y al menos 3 usuarios",
+      "obtenido": "200 y 5 usuarios",
+      "ok": true
+    },
+    {
+      "id": "F02-O1",
+      "funcionalidad": "Usuarios del ERP",
+      "sub": "Corrección",
+      "que": "Cada usuario de prueba tiene su rol",
+      "esperado": "{\"admin\":\"Admin\",\"rrhh\":\"RRHH\",\"super\":\"Supervisor\"}",
+      "obtenido": "{\"admin\":\"Admin\",\"rrhh\":\"RRHH\",\"super\":\"Supervisor\"}",
+      "ok": true
+    },
+    {
+      "id": "F02-I1",
+      "funcionalidad": "Usuarios del ERP",
+      "sub": "Idoneidad",
+      "que": "El Admin gestiona a los trabajadores desde su perfil (pestaña Gestión de Trabajadores)",
+      "esperado": "visible",
+      "obtenido": "visible",
+      "ok": true,
+      "evidencia": "F02-usuarios.png"
+    },
+    {
+      "id": "F13-C1",
+      "funcionalidad": "Comunicaciones (WhatsApp)",
+      "sub": "Completitud",
+      "que": "Se listan las conversaciones de WhatsApp",
+      "esperado": "200",
+      "obtenido": "200",
+      "ok": true
+    },
+    {
+      "id": "F13-C2",
+      "funcionalidad": "Comunicaciones (WhatsApp)",
+      "sub": "Completitud",
+      "que": "Se listan las plantillas aprobadas por Meta",
+      "esperado": "200 y al menos 1",
+      "obtenido": "200 y 16",
+      "ok": true
+    },
+    {
+      "id": "F13-O1",
+      "funcionalidad": "Comunicaciones (WhatsApp)",
+      "sub": "Corrección",
+      "que": "Cada plantilla trae su nombre e idioma desde Meta",
+      "esperado": "todas",
+      "obtenido": "todas",
+      "ok": true
+    },
+    {
+      "id": "F13-I1",
+      "funcionalidad": "Comunicaciones (WhatsApp)",
+      "sub": "Idoneidad",
+      "que": "Las plantillas se ven en el ERP para usarlas en los chats (no se envió ningún mensaje)",
+      "esperado": "pantalla de plantillas",
+      "obtenido": "pantalla de plantillas",
+      "ok": true,
+      "evidencia": "F13-plantillas.png"
+    },
+    {
+      "id": "F14-C1",
+      "funcionalidad": "Ayuda",
+      "sub": "Completitud",
+      "que": "La ayuda explica cada módulo",
+      "esperado": "[\"Postulantes\",\"Entrevistas\",\"Contrataciones\",\"Anuncios\",\"Empresas\"]",
+      "obtenido": "[\"Postulantes\",\"Entrevistas\",\"Contrataciones\",\"Anuncios\",\"Empresas\"]",
+      "ok": true,
+      "evidencia": "F14-ayuda.png"
+    },
+    {
+      "id": "F14-O1",
+      "funcionalidad": "Ayuda",
+      "sub": "Corrección",
+      "que": "El buscador de la ayuda encuentra «contratación»",
+      "esperado": "con resultados",
+      "obtenido": "con resultados",
+      "ok": true
+    },
+    {
+      "id": "F14-I1",
+      "funcionalidad": "Ayuda",
+      "sub": "Idoneidad",
+      "que": "La ayuda está a un clic, en el menú lateral",
+      "esperado": "en el menú",
+      "obtenido": "en el menú",
+      "ok": true
+    },
+    {
+      "id": "F03-C1",
+      "funcionalidad": "Empresas clientes",
+      "sub": "Completitud",
+      "que": "Se registra una empresa cliente",
+      "esperado": "201",
+      "obtenido": "201",
+      "ok": true
+    },
+    {
+      "id": "F03-O1",
+      "funcionalidad": "Empresas clientes",
+      "sub": "Corrección",
+      "que": "La empresa guarda razón social y RUC tal cual",
+      "esperado": "{\"razonSocial\":\"PRUEBA FUNCIONAL 8206353 S.A.C.\",\"ruc\":\"20820635399\"}",
+      "obtenido": "{\"razonSocial\":\"PRUEBA FUNCIONAL 8206353 S.A.C.\",\"ruc\":\"20820635399\"}",
+      "ok": true
+    },
+    {
+      "id": "F03-O2",
+      "funcionalidad": "Empresas clientes",
+      "sub": "Corrección",
+      "que": "Un RUC de 10 dígitos se rechaza",
+      "esperado": "400 o 422",
+      "obtenido": "422",
+      "ok": true
+    },
+    {
+      "id": "F03-O3",
+      "funcionalidad": "Empresas clientes",
+      "sub": "Corrección",
+      "que": "Un RUC repetido se rechaza",
+      "esperado": "409",
+      "obtenido": "409",
+      "ok": true
+    },
+    {
+      "id": "F03-C2",
+      "funcionalidad": "Empresas clientes",
+      "sub": "Completitud",
+      "que": "Se editan los datos de la empresa",
+      "esperado": "200 · sector Retail",
+      "obtenido": "200 · sector Retail",
+      "ok": true
+    },
+    {
+      "id": "F03-C3",
+      "funcionalidad": "Empresas clientes",
+      "sub": "Completitud",
+      "que": "La ficha de la empresa muestra sus datos",
+      "esperado": "visible",
+      "obtenido": "visible",
+      "ok": true,
+      "evidencia": "F03-empresa.png"
+    },
+    {
+      "id": "F04-C1",
+      "funcionalidad": "Anuncios (vacantes)",
+      "sub": "Completitud",
+      "que": "Se publica un anuncio para la empresa",
+      "esperado": "201",
+      "obtenido": "201",
+      "ok": true
+    },
+    {
+      "id": "F04-O1",
+      "funcionalidad": "Anuncios (vacantes)",
+      "sub": "Corrección",
+      "que": "El anuncio nace «Abierto» y con la razón social de su empresa",
+      "esperado": "{\"empresa\":\"PRUEBA FUNCIONAL 8206353 S.A.C.\",\"estado\":\"Abierto\"}",
+      "obtenido": "{\"empresa\":\"PRUEBA FUNCIONAL 8206353 S.A.C.\",\"estado\":\"Abierto\"}",
+      "ok": true
+    },
+    {
+      "id": "F04-O2",
+      "funcionalidad": "Anuncios (vacantes)",
+      "sub": "Corrección",
+      "que": "Salario máximo menor que el mínimo se rechaza",
+      "esperado": "400 o 422",
+      "obtenido": "422",
+      "ok": true
+    },
+    {
+      "id": "F04-O3",
+      "funcionalidad": "Anuncios (vacantes)",
+      "sub": "Corrección",
+      "que": "Una fecha límite pasada se rechaza",
+      "esperado": "400 o 422",
+      "obtenido": "422",
+      "ok": true
+    },
+    {
+      "id": "F03-I1",
+      "funcionalidad": "Empresas clientes",
+      "sub": "Idoneidad",
+      "que": "No se puede borrar una empresa con anuncios activos",
+      "esperado": "409",
+      "obtenido": "409",
+      "ok": true
+    },
+    {
+      "id": "F04-C2",
+      "funcionalidad": "Anuncios (vacantes)",
+      "sub": "Completitud",
+      "que": "La ficha del anuncio muestra cargo, salario y vacantes",
+      "esperado": "visible",
+      "obtenido": "visible",
+      "ok": true,
+      "evidencia": "F04-anuncio.png"
+    },
+    {
+      "id": "F15-C1",
+      "funcionalidad": "Portal: búsqueda de ofertas",
+      "sub": "Completitud",
+      "que": "El anuncio recién publicado aparece en el portal",
+      "esperado": "publicado",
+      "obtenido": "publicado",
+      "ok": true
+    },
+    {
+      "id": "F15-O1",
+      "funcionalidad": "Portal: búsqueda de ofertas",
+      "sub": "Corrección",
+      "que": "El portal muestra el mismo salario y vacantes",
+      "esperado": "{\"salarioMax\":4000,\"salarioMin\":3000,\"vacantes\":1}",
+      "obtenido": "{\"salarioMax\":4000,\"salarioMin\":3000,\"vacantes\":1}",
+      "ok": true
+    },
+    {
+      "id": "F15-I1",
+      "funcionalidad": "Portal: búsqueda de ofertas",
+      "sub": "Idoneidad",
+      "que": "Buscar por el cargo deja solo ese anuncio",
+      "esperado": "1 · QA Funcional 8206353",
+      "obtenido": "1 · QA Funcional 8206353",
+      "ok": true,
+      "evidencia": "F15-portal-busqueda.png"
+    },
+    {
+      "id": "F17-C1",
+      "funcionalidad": "Portal: perfil del postulante",
+      "sub": "Completitud",
+      "que": "El perfil del postulante muestra sus datos y su CV",
+      "esperado": "visible",
+      "obtenido": "visible",
+      "ok": true,
+      "evidencia": "F17-perfil.png"
+    },
+    {
+      "id": "F17-O1",
+      "funcionalidad": "Portal: perfil del postulante",
+      "sub": "Corrección",
+      "que": "La completitud del perfil corresponde a datos + teléfono + CV",
+      "esperado": "65% completado",
+      "obtenido": "65% completado",
+      "ok": true
+    },
+    {
+      "id": "F16-C1",
+      "funcionalidad": "Portal: postulación e historial",
+      "sub": "Completitud",
+      "que": "El postulante se postula desde el portal y lo ve en su historial",
+      "esperado": "en el historial",
+      "obtenido": "en el historial",
+      "ok": true,
+      "evidencia": "F16-historial.png"
+    },
+    {
+      "id": "F16-O1",
+      "funcionalidad": "Portal: postulación e historial",
+      "sub": "Corrección",
+      "que": "En el ERP aparece esa postulación en «Postulado»",
+      "esperado": "1 · POSTULADO",
+      "obtenido": "1 · POSTULADO",
+      "ok": true
+    },
+    {
+      "id": "F16-I1",
+      "funcionalidad": "Portal: postulación e historial",
+      "sub": "Idoneidad",
+      "que": "Al volver al anuncio no puede postularse otra vez",
+      "esperado": "«Ya postulado» deshabilitado",
+      "obtenido": "«Ya postulado» deshabilitado",
+      "ok": true,
+      "evidencia": "F16-ya-postulado.png"
+    },
+    {
+      "id": "F05-C1",
+      "funcionalidad": "Postulantes",
+      "sub": "Completitud",
+      "que": "Se registra un postulante en el ERP",
+      "esperado": "201",
+      "obtenido": "201",
+      "ok": true
+    },
+    {
+      "id": "F05-O1",
+      "funcionalidad": "Postulantes",
+      "sub": "Corrección",
+      "que": "Se guardan documento, correo y consentimiento (Ley 29733)",
+      "esperado": "{\"consentimiento\":true,\"documento\":\"88206353\",\"email\":\"success+funcional8206353@simulator.amazonses.com\"}",
+      "obtenido": "{\"consentimiento\":true,\"documento\":\"88206353\",\"email\":\"success+funcional8206353@simulator.amazonses.com\"}",
+      "ok": true
+    },
+    {
+      "id": "F05-O2",
+      "funcionalidad": "Postulantes",
+      "sub": "Corrección",
+      "que": "Un número de documento repetido se rechaza",
+      "esperado": "409",
+      "obtenido": "409",
+      "ok": true
+    },
+    {
+      "id": "F05-O3",
+      "funcionalidad": "Postulantes",
+      "sub": "Corrección",
+      "que": "Un teléfono con letras se rechaza",
+      "esperado": "400 o 422",
+      "obtenido": "400",
+      "ok": true
+    },
+    {
+      "id": "F05-C2",
+      "funcionalidad": "Postulantes",
+      "sub": "Completitud",
+      "que": "El postulante aparece en el listado",
+      "esperado": "en el listado",
+      "obtenido": "en el listado",
+      "ok": true
+    },
+    {
+      "id": "F05-I1",
+      "funcionalidad": "Postulantes",
+      "sub": "Idoneidad",
+      "que": "Registrado por RRHH/Admin: aún no tiene cuenta y se le puede invitar",
+      "esperado": "sin cuenta",
+      "obtenido": "sin cuenta",
+      "ok": true
+    },
+    {
+      "id": "F06-C1",
+      "funcionalidad": "Documentos del postulante",
+      "sub": "Completitud",
+      "que": "Se sube el CV del postulante",
+      "esperado": "201",
+      "obtenido": "201",
+      "ok": true
+    },
+    {
+      "id": "F06-O1",
+      "funcionalidad": "Documentos del postulante",
+      "sub": "Corrección",
+      "que": "Un archivo «.pdf» que no es PDF (magic bytes) se rechaza",
+      "esperado": "400",
+      "obtenido": "400",
+      "ok": true
+    },
+    {
+      "id": "F06-O2",
+      "funcionalidad": "Documentos del postulante",
+      "sub": "Corrección",
+      "que": "Un archivo vacío se rechaza",
+      "esperado": "400 o 422",
+      "obtenido": "400",
+      "ok": true
+    },
+    {
+      "id": "F06-O3",
+      "funcionalidad": "Documentos del postulante",
+      "sub": "Corrección",
+      "que": "5 MB + 1 byte se rechaza",
+      "esperado": "400 o 413",
+      "obtenido": "400",
+      "ok": true
+    },
+    {
+      "id": "F06-I1",
+      "funcionalidad": "Documentos del postulante",
+      "sub": "Idoneidad",
+      "que": "Se descarga exactamente el mismo archivo que se subió",
+      "esperado": "idéntico",
+      "obtenido": "idéntico",
+      "ok": true
+    },
+    {
+      "id": "F06-C2",
+      "funcionalidad": "Documentos del postulante",
+      "sub": "Completitud",
+      "que": "El CV aparece en la pestaña Documentos de la ficha",
+      "esperado": "visible",
+      "obtenido": "visible",
+      "ok": true,
+      "evidencia": "F06-documentos.png"
+    },
+    {
+      "id": "F07-C1",
+      "funcionalidad": "Postulaciones y pipeline",
+      "sub": "Completitud",
+      "que": "Se asocia el postulante al anuncio",
+      "esperado": "201 · POSTULADO",
+      "obtenido": "201 · POSTULADO",
+      "ok": true
+    },
+    {
+      "id": "F07-O1",
+      "funcionalidad": "Postulaciones y pipeline",
+      "sub": "Corrección",
+      "que": "No se puede postular dos veces al mismo anuncio",
+      "esperado": "409",
+      "obtenido": "409",
+      "ok": true
+    },
+    {
+      "id": "F07-O2",
+      "funcionalidad": "Postulaciones y pipeline",
+      "sub": "Corrección",
+      "que": "Mover a «En evaluación» cambia la etapa y deja 2 líneas de historial",
+      "esperado": "EN_EVALUACION · 2 registros",
+      "obtenido": "EN_EVALUACION · 2 registros (respuesta: EN_EVALUACION)",
+      "ok": true
+    },
+    {
+      "id": "F07-I1",
+      "funcionalidad": "Postulaciones y pipeline",
+      "sub": "Idoneidad",
+      "que": "Mover a la misma etapa se rechaza (no duplica historial)",
+      "esperado": "409",
+      "obtenido": "409",
+      "ok": true
+    },
+    {
+      "id": "F07-I2",
+      "funcionalidad": "Postulaciones y pipeline",
+      "sub": "Idoneidad",
+      "que": "No se pasa a «Contratado» sin registrar la contratación",
+      "esperado": "409",
+      "obtenido": "409",
+      "ok": true
+    },
+    {
+      "id": "F07-C2",
+      "funcionalidad": "Postulaciones y pipeline",
+      "sub": "Completitud",
+      "que": "La postulación se ve en el pipeline, en la columna Entrevista",
+      "esperado": "visible",
+      "obtenido": "visible",
+      "ok": true,
+      "evidencia": "F07-pipeline.png"
+    },
+    {
+      "id": "F08-C1",
+      "funcionalidad": "Evaluaciones por competencias",
+      "sub": "Completitud",
+      "que": "Se registra una evaluación de 6 competencias",
+      "esperado": "201",
+      "obtenido": "201",
+      "ok": true
+    },
+    {
+      "id": "F08-O1",
+      "funcionalidad": "Evaluaciones por competencias",
+      "sub": "Corrección",
+      "que": "Seis competencias en 4 dan 80 puntos y APTO",
+      "esperado": "80 · APTO",
+      "obtenido": "80 · APTO",
+      "ok": true
+    },
+    {
+      "id": "F08-O2",
+      "funcionalidad": "Evaluaciones por competencias",
+      "sub": "Corrección",
+      "que": "Seis en 3 dan 60 y NO_APTO (umbral 70)",
+      "esperado": "60 · NO_APTO",
+      "obtenido": "60 · NO_APTO",
+      "ok": true
+    },
+    {
+      "id": "F08-I1",
+      "funcionalidad": "Evaluaciones por competencias",
+      "sub": "Idoneidad",
+      "que": "El puntaje lo calcula el servidor: enviar «100 · APTO» no cambia el resultado",
+      "esperado": "60 · NO_APTO",
+      "obtenido": "60 · NO_APTO",
+      "ok": true
+    },
+    {
+      "id": "F08-O3",
+      "funcionalidad": "Evaluaciones por competencias",
+      "sub": "Corrección",
+      "que": "Una competencia fuera de 1..5 se rechaza",
+      "esperado": "422",
+      "obtenido": "422",
+      "ok": true
+    },
+    {
+      "id": "F08-C2",
+      "funcionalidad": "Evaluaciones por competencias",
+      "sub": "Completitud",
+      "que": "Las evaluaciones se ven en la ficha",
+      "esperado": "visible",
+      "obtenido": "visible",
+      "ok": true,
+      "evidencia": "F08-evaluaciones.png"
+    },
+    {
+      "id": "F09-C1",
+      "funcionalidad": "Entrevistas",
+      "sub": "Completitud",
+      "que": "Se programa una entrevista",
+      "esperado": "201 · Programada",
+      "obtenido": "201 · Programada",
+      "ok": true
+    },
+    {
+      "id": "F09-O1",
+      "funcionalidad": "Entrevistas",
+      "sub": "Corrección",
+      "que": "El mismo entrevistador no puede tener dos entrevistas que se crucen",
+      "esperado": "409",
+      "obtenido": "409",
+      "ok": true
+    },
+    {
+      "id": "F09-O3",
+      "funcionalidad": "Entrevistas",
+      "sub": "Corrección",
+      "que": "No se marca «Realizada» una entrevista que aún no ocurre",
+      "esperado": "400",
+      "obtenido": "400",
+      "ok": true
+    },
+    {
+      "id": "F09-I1",
+      "funcionalidad": "Entrevistas",
+      "sub": "Idoneidad",
+      "que": "Un estado que no existe se rechaza",
+      "esperado": "400 o 422",
+      "obtenido": "400",
+      "ok": true
+    },
+    {
+      "id": "F09-I2",
+      "funcionalidad": "Entrevistas",
+      "sub": "Idoneidad",
+      "que": "Con una fecha pasada, el formulario dice lo mismo que el servidor",
+      "esperado": "formulario: «debe ser futura» · servidor: 400",
+      "obtenido": "formulario: «debe ser futura» · servidor: 400",
+      "ok": true,
+      "evidencia": "F09-fecha-pasada.png"
+    },
+    {
+      "id": "F09-O2",
+      "funcionalidad": "Entrevistas",
+      "sub": "Corrección",
+      "que": "Ya ocurrida, se registra el resultado: Realizada y Aprobada",
+      "esperado": "Realizada · Aprobada",
+      "obtenido": "Realizada · Aprobada",
+      "ok": true
+    },
+    {
+      "id": "F09-C2",
+      "funcionalidad": "Entrevistas",
+      "sub": "Completitud",
+      "que": "La entrevista realizada se ve en la agenda",
+      "esperado": "visible",
+      "obtenido": "visible",
+      "ok": true,
+      "evidencia": "F09-entrevistas.png"
+    },
+    {
+      "id": "F10-C1",
+      "funcionalidad": "Contrataciones",
+      "sub": "Completitud",
+      "que": "Se registra la contratación",
+      "esperado": "201",
+      "obtenido": "201",
+      "ok": true
+    },
+    {
+      "id": "F10-O1",
+      "funcionalidad": "Contrataciones",
+      "sub": "Corrección",
+      "que": "Con ingreso hoy queda «Activo»",
+      "esperado": "Activo",
+      "obtenido": "Activo",
+      "ok": true
+    },
+    {
+      "id": "F10-O2",
+      "funcionalidad": "Contrataciones",
+      "sub": "Corrección",
+      "que": "Se programan los controles de 30, 60 y 90 días desde el ingreso",
+      "esperado": "[\"30:2026-12-05\",\"60:2027-01-04\",\"90:2027-02-03\"]",
+      "obtenido": "[\"30:2026-12-05\",\"60:2027-01-04\",\"90:2027-02-03\"]",
+      "ok": true
+    },
+    {
+      "id": "F10-O3",
+      "funcionalidad": "Contrataciones",
+      "sub": "Corrección",
+      "que": "La postulación pasa sola a «Contratado»",
+      "esperado": "CONTRATADO",
+      "obtenido": "CONTRATADO",
+      "ok": true
+    },
+    {
+      "id": "F10-I1",
+      "funcionalidad": "Contrataciones",
+      "sub": "Idoneidad",
+      "que": "La misma postulación no se contrata dos veces",
+      "esperado": "409",
+      "obtenido": "409",
+      "ok": true
+    },
+    {
+      "id": "F10-I2",
+      "funcionalidad": "Contrataciones",
+      "sub": "Idoneidad",
+      "que": "Al cubrir su única vacante, el anuncio se cierra solo",
+      "esperado": "Cerrado",
+      "obtenido": "Cerrado",
+      "ok": true
+    },
+    {
+      "id": "F10-I3",
+      "funcionalidad": "Contrataciones",
+      "sub": "Idoneidad",
+      "que": "El anuncio cerrado deja de mostrarse en el portal",
+      "esperado": "no aparece",
+      "obtenido": "no aparece",
+      "ok": true
+    },
+    {
+      "id": "F10-C2",
+      "funcionalidad": "Contrataciones",
+      "sub": "Completitud",
+      "que": "La contratación aparece en el módulo Contrataciones",
+      "esperado": "visible",
+      "obtenido": "visible",
+      "ok": true,
+      "evidencia": "F10-contrataciones.png"
+    },
+    {
+      "id": "F11-C1",
+      "funcionalidad": "Seguimiento post-ingreso",
+      "sub": "Completitud",
+      "que": "Los 3 controles se listan en Seguimiento",
+      "esperado": "3 · Pendiente",
+      "obtenido": "3 · Pendiente",
+      "ok": true
+    },
+    {
+      "id": "F11-O1",
+      "funcionalidad": "Seguimiento post-ingreso",
+      "sub": "Corrección",
+      "que": "Marcar «Realizado» sin valoración se rechaza",
+      "esperado": "400",
+      "obtenido": "400",
+      "ok": true
+    },
+    {
+      "id": "F11-O2",
+      "funcionalidad": "Seguimiento post-ingreso",
+      "sub": "Corrección",
+      "que": "Con valoración se cierra y guarda la fecha de realización",
+      "esperado": "Realizado · Satisfactorio · con fecha",
+      "obtenido": "Realizado · Satisfactorio · con fecha",
+      "ok": true
+    },
+    {
+      "id": "F11-I1",
+      "funcionalidad": "Seguimiento post-ingreso",
+      "sub": "Idoneidad",
+      "que": "Un control realizado ya no cuenta como vencido",
+      "esperado": "false",
+      "obtenido": "false",
+      "ok": true
+    },
+    {
+      "id": "F12-C1",
+      "funcionalidad": "Dashboard y reportes",
+      "sub": "Completitud",
+      "que": "El dashboard filtra por empresa y fechas",
+      "esperado": "200",
+      "obtenido": "200",
+      "ok": true
+    },
+    {
+      "id": "F12-O1",
+      "funcionalidad": "Dashboard y reportes",
+      "sub": "Corrección",
+      "que": "Indicadores de la empresa de prueba = lo que se hizo hoy",
+      "esperado": "{\"contratados\":1,\"evaluaciones\":2,\"porcentajeApto\":50,\"postulaciones\":2,\"puntajePromedio\":70}",
+      "obtenido": "{\"contratados\":1,\"evaluaciones\":2,\"porcentajeApto\":50,\"postulaciones\":2,\"puntajePromedio\":70}",
+      "ok": true
+    },
+    {
+      "id": "F12-I1",
+      "funcionalidad": "Dashboard y reportes",
+      "sub": "Idoneidad",
+      "que": "El embudo suma lo mismo que las postulaciones",
+      "esperado": "2",
+      "obtenido": "2",
+      "ok": true
+    },
+    {
+      "id": "F12-C2",
+      "funcionalidad": "Dashboard y reportes",
+      "sub": "Completitud",
+      "que": "El reporte se exporta a CSV",
+      "esperado": ".csv",
+      "obtenido": ".csv",
+      "ok": true,
+      "evidencia": "F12-dashboard.png"
+    },
+    {
+      "id": "F10-I4",
+      "funcionalidad": "Contrataciones",
+      "sub": "Idoneidad",
+      "que": "Cancelar la contratación descarta la postulación (no queda «Contratado» suelto)",
+      "esperado": "200 · DESCARTADO",
+      "obtenido": "200 · DESCARTADO",
+      "ok": true
+    },
+    {
+      "id": "F03-I2",
+      "funcionalidad": "Empresas clientes",
+      "sub": "Idoneidad",
+      "que": "Sin anuncios, la empresa se borra y deja de listarse",
+      "esperado": "204 · no listada",
+      "obtenido": "204 · no listada",
+      "ok": true
+    }
+  ]
+}

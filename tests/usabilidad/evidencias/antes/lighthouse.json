@@ -1,0 +1,62 @@
+{
+  "fecha": "2026-11-05T20:12:12.747Z",
+  "etapa": "antes",
+  "resumen": {
+    "portal-portada (movil)": {
+      "url": "https://d188pgulvqbzh4.cloudfront.net",
+      "accesibilidad": 98,
+      "buenas_practicas": 96,
+      "rendimiento": 88,
+      "seo": 100,
+      "fallas_accesibilidad": [
+        "heading-order"
+      ]
+    },
+    "portal-portada (escritorio)": {
+      "url": "https://d188pgulvqbzh4.cloudfront.net",
+      "accesibilidad": 98,
+      "buenas_practicas": 96,
+      "rendimiento": 100,
+      "seo": 100,
+      "fallas_accesibilidad": [
+        "heading-order"
+      ]
+    },
+    "portal-registro (movil)": {
+      "url": "https://d188pgulvqbzh4.cloudfront.net/registro",
+      "accesibilidad": 96,
+      "buenas_practicas": 96,
+      "rendimiento": 96,
+      "seo": 100,
+      "fallas_accesibilidad": [
+        "color-contrast"
+      ]
+    },
+    "portal-registro (escritorio)": {
+      "url": "https://d188pgulvqbzh4.cloudfront.net/registro",
+      "accesibilidad": 96,
+      "buenas_practicas": 96,
+      "rendimiento": 100,
+      "seo": 100,
+      "fallas_accesibilidad": [
+        "color-contrast"
+      ]
+    },
+    "erp-login (movil)": {
+      "url": "https://d31inue0zw9dve.cloudfront.net/login",
+      "accesibilidad": 100,
+      "buenas_practicas": 100,
+      "rendimiento": 95,
+      "seo": 91,
+      "fallas_accesibilidad": []
+    },
+    "erp-login (escritorio)": {
+      "url": "https://d31inue0zw9dve.cloudfront.net/login",
+      "accesibilidad": 100,
+      "buenas_practicas": 100,
+      "rendimiento": 100,
+      "seo": 91,
+      "fallas_accesibilidad": []
+    }
+  }
+}

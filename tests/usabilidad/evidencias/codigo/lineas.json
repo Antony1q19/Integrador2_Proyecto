@@ -1,0 +1,61 @@
+{
+  "CP-USAB-01": {
+    "archivo": "frontend/ERP/middleware.ts",
+    "existia_antes": true,
+    "codigo-antes": 65,
+    "codigo-despues": 65
+  },
+  "CP-USAB-02": {
+    "archivo": "frontend/ERP/features/postulantes/components/PostulanteForm/SectionNavigation.tsx",
+    "existia_antes": true,
+    "codigo-antes": 29,
+    "codigo-despues": 31
+  },
+  "CP-USAB-03": {
+    "archivo": "frontend/ERP/features/anuncios/components/AnunciosView.tsx",
+    "existia_antes": true,
+    "codigo-antes": 61,
+    "codigo-despues": 84
+  },
+  "CP-USAB-07": {
+    "archivo": "frontend/ERP/features/postulantes/hooks/usePostulanteForm.ts",
+    "existia_antes": true,
+    "codigo-antes": 275,
+    "codigo-despues": 293
+  },
+  "CP-USAB-12": {
+    "archivo": "frontend/ANUNCIOS/features/anuncios/components/JobDetailPanel.tsx",
+    "existia_antes": true,
+    "codigo-antes": 85,
+    "codigo-despues": 108
+  },
+  "CP-USAB-13": {
+    "archivo": "frontend/ERP/features/postulantes/components/PostulanteForm/DatosPersonalesSection.tsx",
+    "existia_antes": true,
+    "codigo-antes": 23,
+    "codigo-despues": 30
+  },
+  "CP-USAB-16": {
+    "archivo": "frontend/ANUNCIOS/app/not-found.tsx",
+    "existia_antes": false,
+    "codigo-despues": 12
+  },
+  "CP-USAB-18": {
+    "archivo": "frontend/ERP/app/(dashboard)/layout.tsx",
+    "existia_antes": true,
+    "codigo-antes": 114,
+    "codigo-despues": 115
+  },
+  "CP-USAB-18b": {
+    "archivo": "frontend/ANUNCIOS/app/registro/page.tsx",
+    "existia_antes": true,
+    "codigo-antes": 259,
+    "codigo-despues": 259
+  },
+  "CP-USAB-22": {
+    "archivo": "frontend/ANUNCIOS/features/anuncios/components/AnunciosBuscador.tsx",
+    "existia_antes": true,
+    "codigo-antes": 64,
+    "codigo-despues": 64
+  }
+}

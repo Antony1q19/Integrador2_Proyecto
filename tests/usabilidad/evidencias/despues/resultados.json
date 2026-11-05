@@ -1,0 +1,1267 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\playwright.config.ts",
+    "rootDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/programas/pruebas",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 2
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "../evidencias/despues/resultados.json"
+        }
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "../evidencias/despues/reporte-html",
+          "open": "never"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/evidencias/despues/.playwright",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 2
+        },
+        "id": "sesion",
+        "name": "sesion",
+        "testDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/programas/pruebas",
+        "testIgnore": [],
+        "testMatch": [
+          "/sesion\\.setup\\.ts/"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/evidencias/despues/.playwright",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 2
+        },
+        "id": "escritorio",
+        "name": "escritorio",
+        "testDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/programas/pruebas",
+        "testIgnore": [
+          "/(movil|flujo-postulante)\\.spec\\.ts/"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/evidencias/despues/.playwright",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 2
+        },
+        "id": "movil",
+        "name": "movil",
+        "testDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/programas/pruebas",
+        "testIgnore": [],
+        "testMatch": [
+          "/movil\\.spec\\.ts/"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/evidencias/despues/.playwright",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 2
+        },
+        "id": "flujo",
+        "name": "flujo",
+        "testDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/programas/pruebas",
+        "testIgnore": [],
+        "testMatch": [
+          "/flujo-postulante\\.spec\\.ts/"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.56.1",
+    "workers": 2,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "sesion.setup.ts",
+      "file": "sesion.setup.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "iniciar sesión como admin@test.com",
+          "ok": true,
+          "tags": [
+            "test.com"
+          ],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "sesion",
+              "projectName": "sesion",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2623,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:24:31.940Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "189343bfb694ac6c5112-aa5f70373d084b9a351e",
+          "file": "sesion.setup.ts",
+          "line": 12,
+          "column": 8
+        },
+        {
+          "title": "iniciar sesión como rrhh@test.com",
+          "ok": true,
+          "tags": [
+            "test.com"
+          ],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "sesion",
+              "projectName": "sesion",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2537,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:24:34.778Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "189343bfb694ac6c5112-d6fe2f0bc851417bd620",
+          "file": "sesion.setup.ts",
+          "line": 12,
+          "column": 8
+        }
+      ]
+    },
+    {
+      "title": "aprendizaje.spec.ts",
+      "file": "aprendizaje.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "CP-USAB-04 · el buscador del portal se entiende a la primera y muestra resultados",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "escritorio",
+              "projectName": "escritorio",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2049,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:24:46.477Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ec60d67731c81f02d3e5-00efa9d6a9579b37d963",
+          "file": "aprendizaje.spec.ts",
+          "line": 39,
+          "column": 5
+        }
+      ],
+      "suites": [
+        {
+          "title": "con rol RRHH",
+          "file": "aprendizaje.spec.ts",
+          "line": 6,
+          "column": 6,
+          "specs": [
+            {
+              "title": "CP-USAB-01 · al entrar a una sección sin permiso, el sistema explica por qué",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "escritorio",
+                  "projectName": "escritorio",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2110,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T21:24:38.027Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ec60d67731c81f02d3e5-7f317c80ea20b5e5e541",
+              "file": "aprendizaje.spec.ts",
+              "line": 9,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "con rol Admin",
+          "file": "aprendizaje.spec.ts",
+          "line": 16,
+          "column": 6,
+          "specs": [
+            {
+              "title": "CP-USAB-02 · el formulario por pasos muestra en qué paso va y cuánto falta",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "escritorio",
+                  "projectName": "escritorio",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2005,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T21:24:40.365Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ec60d67731c81f02d3e5-a0a11925259402fa71f0",
+              "file": "aprendizaje.spec.ts",
+              "line": 19,
+              "column": 7
+            },
+            {
+              "title": "CP-USAB-03 · una lista vacía orienta y ofrece crear el primer registro",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "escritorio",
+                  "projectName": "escritorio",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2112,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T21:24:42.386Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ec60d67731c81f02d3e5-077a1f7ac279bdd5dd1e",
+              "file": "aprendizaje.spec.ts",
+              "line": 24,
+              "column": 7
+            },
+            {
+              "title": "CP-USAB-06 · la ayuda está organizada por módulos y su buscador filtra",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "escritorio",
+                  "projectName": "escritorio",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1960,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T21:24:44.508Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ec60d67731c81f02d3e5-c568c131cf4f4e8ebca3",
+              "file": "aprendizaje.spec.ts",
+              "line": 31,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "asistencia.spec.ts",
+      "file": "asistencia.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "CP-USAB-18b · el texto del portal tiene contraste suficiente (WCAG 1.4.3, 4.5:1)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "escritorio",
+              "projectName": "escritorio",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2254,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:24:42.873Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "9b72d2ce24f353c135a9-1d0fe67322eec43e6d22",
+          "file": "asistencia.spec.ts",
+          "line": 28,
+          "column": 5
+        },
+        {
+          "title": "CP-USAB-16 · una dirección que no existe orienta al usuario en el portal",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "escritorio",
+              "projectName": "escritorio",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 1855,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:24:45.137Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "9b72d2ce24f353c135a9-bfdae69a103d15a90c10",
+          "file": "asistencia.spec.ts",
+          "line": 36,
+          "column": 5
+        },
+        {
+          "title": "CP-USAB-17 · el ERP y el portal declaran su idioma (WCAG 3.1.1)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "escritorio",
+              "projectName": "escritorio",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2779,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:24:47.002Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "9b72d2ce24f353c135a9-3d2e34bd0d22bb0384aa",
+          "file": "asistencia.spec.ts",
+          "line": 43,
+          "column": 5
+        },
+        {
+          "title": "CP-USAB-AXE · auditoría WCAG 2.1 AA completa de la portada del portal y del login del ERP",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "axe",
+                  "description": "sin violaciones graves"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "escritorio",
+              "projectName": "escritorio",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 5029,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:24:49.792Z",
+                  "annotations": [
+                    {
+                      "type": "axe",
+                      "description": "sin violaciones graves"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "9b72d2ce24f353c135a9-8642475ed04ad969c81c",
+          "file": "asistencia.spec.ts",
+          "line": 52,
+          "column": 5
+        }
+      ],
+      "suites": [
+        {
+          "title": "con rol Admin",
+          "file": "asistencia.spec.ts",
+          "line": 6,
+          "column": 6,
+          "specs": [
+            {
+              "title": "CP-USAB-13 · cada campo del formulario tiene una etiqueta accesible",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "escritorio",
+                  "projectName": "escritorio",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2322,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T21:24:38.027Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9b72d2ce24f353c135a9-a24d825ab9499fab3843",
+              "file": "asistencia.spec.ts",
+              "line": 9,
+              "column": 7
+            },
+            {
+              "title": "CP-USAB-18 · el texto del ERP tiene contraste suficiente (WCAG 1.4.3, 4.5:1)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "escritorio",
+                  "projectName": "escritorio",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2287,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T21:24:40.576Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9b72d2ce24f353c135a9-fc41c432c8168d99584e",
+              "file": "asistencia.spec.ts",
+              "line": 19,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "compromiso.spec.ts",
+      "file": "compromiso.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "CP-USAB-23 · la política de privacidad está a mano y en español claro",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "escritorio",
+              "projectName": "escritorio",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1920,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:24:56.482Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "96d1a448ae3996962388-5f6e764e4a9416827257",
+          "file": "compromiso.spec.ts",
+          "line": 31,
+          "column": 5
+        }
+      ],
+      "suites": [
+        {
+          "title": "con rol Admin",
+          "file": "compromiso.spec.ts",
+          "line": 6,
+          "column": 6,
+          "specs": [
+            {
+              "title": "CP-USAB-19 · el dashboard muestra los indicadores clave de un vistazo",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "escritorio",
+                  "projectName": "escritorio",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2807,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T21:24:48.545Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "96d1a448ae3996962388-75a9f1ef606a09a65dad",
+              "file": "compromiso.spec.ts",
+              "line": 9,
+              "column": 7
+            },
+            {
+              "title": "CP-USAB-20 · el pipeline muestra a los candidatos como tablero por etapas",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "escritorio",
+                  "projectName": "escritorio",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2769,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T21:24:51.360Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "96d1a448ae3996962388-acdd1156b3439886e5f5",
+              "file": "compromiso.spec.ts",
+              "line": 16,
+              "column": 7
+            },
+            {
+              "title": "CP-USAB-21 · el reporte del dashboard se exporta a CSV con un clic",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "escritorio",
+                  "projectName": "escritorio",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2331,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T21:24:54.139Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "96d1a448ae3996962388-e4c489ccd0fde52b74d0",
+              "file": "compromiso.spec.ts",
+              "line": 22,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "errores.spec.ts",
+      "file": "errores.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "CP-USAB-09 · el registro del portal guía la contraseña y detecta que no coinciden",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "escritorio",
+              "projectName": "escritorio",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2147,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:25:07.962Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2f9586cf9b8e112d3034-50c397777e1420d6d7ac",
+          "file": "errores.spec.ts",
+          "line": 35,
+          "column": 5
+        }
+      ],
+      "suites": [
+        {
+          "title": "con rol Admin",
+          "file": "errores.spec.ts",
+          "line": 6,
+          "column": 6,
+          "specs": [
+            {
+              "title": "CP-USAB-07 · salir de un formulario con datos sin guardar pide confirmación",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "escritorio",
+                  "projectName": "escritorio",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 10024,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T21:24:54.836Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2f9586cf9b8e112d3034-f6f630cc1143317253c0",
+              "file": "errores.spec.ts",
+              "line": 9,
+              "column": 7
+            },
+            {
+              "title": "CP-USAB-08 · borrar una empresa pide confirmación explícita (y se puede cancelar)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "escritorio",
+                  "projectName": "escritorio",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 3082,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T21:25:04.871Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2f9586cf9b8e112d3034-a0929e197c0cbfc34d7e",
+              "file": "errores.spec.ts",
+              "line": 23,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "movil.spec.ts",
+      "file": "movil.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "CP-USAB-22 · en el celular, el buscador y sus accesos rápidos se tocan con comodidad (≥ 44 px)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "medidas",
+                  "description": "{\"buscador\":44,\"Desarrollador\":44,\"Contador\":44,\"Ventas\":44,\"Remoto\":44}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "movil",
+              "projectName": "movil",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2174,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:24:31.980Z",
+                  "annotations": [
+                    {
+                      "type": "medidas",
+                      "description": "{\"buscador\":44,\"Desarrollador\":44,\"Contador\":44,\"Ventas\":44,\"Remoto\":44}"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8fb9d0a3c42053ef1784-43872ad7a85b26539fd5",
+          "file": "movil.spec.ts",
+          "line": 6,
+          "column": 5
+        },
+        {
+          "title": "CP-USAB-22b · el portal se adapta al ancho del celular (sin scroll horizontal)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "movil",
+              "projectName": "movil",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2047,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:24:34.393Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8fb9d0a3c42053ef1784-d946dbcd597b3c487e71",
+          "file": "movil.spec.ts",
+          "line": 23,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "flujo-postulante.spec.ts",
+      "file": "flujo-postulante.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "CP-USAB-05 · el perfil muestra cuánto falta completar y se actualiza al subir el CV",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "crea datos de prueba: define FLUJO_DATOS_PRUEBA=1",
+                  "location": {
+                    "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\flujo-postulante.spec.ts",
+                    "line": 10,
+                    "column": 6
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "flujo",
+              "projectName": "flujo",
+              "results": [
+                {
+                  "workerIndex": -1,
+                  "parallelIndex": -1,
+                  "status": "skipped",
+                  "duration": 0,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:24:58.415Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "54a2c523a161c805f32f-289d0e107b46b544dfda",
+          "file": "flujo-postulante.spec.ts",
+          "line": 42,
+          "column": 5
+        },
+        {
+          "title": "CP-USAB-10 · el CV rechaza formatos y tamaños no permitidos y acepta un PDF válido",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "crea datos de prueba: define FLUJO_DATOS_PRUEBA=1",
+                  "location": {
+                    "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\flujo-postulante.spec.ts",
+                    "line": 10,
+                    "column": 6
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "flujo",
+              "projectName": "flujo",
+              "results": [
+                {
+                  "workerIndex": -1,
+                  "parallelIndex": -1,
+                  "status": "skipped",
+                  "duration": 0,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:24:58.415Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "54a2c523a161c805f32f-a01e00141a828ba3a643",
+          "file": "flujo-postulante.spec.ts",
+          "line": 79,
+          "column": 5
+        },
+        {
+          "title": "CP-USAB-12a · el postulante se postula a un anuncio (dato de prueba)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "crea datos de prueba: define FLUJO_DATOS_PRUEBA=1",
+                  "location": {
+                    "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\flujo-postulante.spec.ts",
+                    "line": 10,
+                    "column": 6
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "flujo",
+              "projectName": "flujo",
+              "results": [
+                {
+                  "workerIndex": -1,
+                  "parallelIndex": -1,
+                  "status": "skipped",
+                  "duration": 0,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:24:58.415Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "54a2c523a161c805f32f-1d0962b5c88be901b8ea",
+          "file": "flujo-postulante.spec.ts",
+          "line": 105,
+          "column": 5
+        },
+        {
+          "title": "CP-USAB-11 · un doble clic en «Programar» crea UNA sola entrevista",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "crea datos de prueba: define FLUJO_DATOS_PRUEBA=1",
+                  "location": {
+                    "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\flujo-postulante.spec.ts",
+                    "line": 10,
+                    "column": 6
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "flujo",
+              "projectName": "flujo",
+              "results": [
+                {
+                  "workerIndex": -1,
+                  "parallelIndex": -1,
+                  "status": "skipped",
+                  "duration": 0,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:24:58.415Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "54a2c523a161c805f32f-cfa737bef3ca43b1f2c7",
+          "file": "flujo-postulante.spec.ts",
+          "line": 121,
+          "column": 5
+        },
+        {
+          "title": "CP-USAB-15 · cada operación avisa con un toast (programar y cancelar)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "crea datos de prueba: define FLUJO_DATOS_PRUEBA=1",
+                  "location": {
+                    "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\flujo-postulante.spec.ts",
+                    "line": 10,
+                    "column": 6
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "flujo",
+              "projectName": "flujo",
+              "results": [
+                {
+                  "workerIndex": -1,
+                  "parallelIndex": -1,
+                  "status": "skipped",
+                  "duration": 0,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:24:58.415Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "54a2c523a161c805f32f-1e6aefe5007608835fdb",
+          "file": "flujo-postulante.spec.ts",
+          "line": 141,
+          "column": 5
+        },
+        {
+          "title": "CP-USAB-12 · un anuncio al que ya postuló se ve como «Ya postulado» y no admite otra postulación",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "crea datos de prueba: define FLUJO_DATOS_PRUEBA=1",
+                  "location": {
+                    "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\flujo-postulante.spec.ts",
+                    "line": 10,
+                    "column": 6
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "flujo",
+              "projectName": "flujo",
+              "results": [
+                {
+                  "workerIndex": -1,
+                  "parallelIndex": -1,
+                  "status": "skipped",
+                  "duration": 0,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:24:58.415Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "54a2c523a161c805f32f-c026cdb59930b3e95eed",
+          "file": "flujo-postulante.spec.ts",
+          "line": 155,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-05T21:24:31.223Z",
+    "duration": 38954.877,
+    "expected": 22,
+    "skipped": 6,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

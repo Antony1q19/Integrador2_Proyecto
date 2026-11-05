@@ -1,0 +1,77 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Postula Ya" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img [ref=e6]
+        - generic [ref=e9]: Postula Ya
+      - link "Iniciar sesión" [ref=e10] [cursor=pointer]:
+        - /url: /login
+  - main [ref=e11]:
+    - generic [ref=e12]:
+      - heading "Crear cuenta" [level=1] [ref=e13]
+      - paragraph [ref=e14]: Regístrate para postular a empleos y hacer seguimiento a tus postulaciones.
+      - generic [ref=e15]:
+        - generic [ref=e16]:
+          - generic [ref=e17]:
+            - generic [ref=e18]: Nombres *
+            - textbox "Nombres *" [ref=e19]:
+              - /placeholder: Juan
+          - generic [ref=e20]:
+            - generic [ref=e21]: Apellidos *
+            - textbox "Apellidos *" [ref=e22]:
+              - /placeholder: Pérez
+          - generic [ref=e23]:
+            - generic [ref=e24]: Tipo de documento *
+            - combobox "Tipo de documento *" [ref=e25]:
+              - option "DNI" [selected]
+              - option "Carné de extranjería"
+              - option "Pasaporte"
+          - generic [ref=e26]:
+            - generic [ref=e27]: N.º de documento *
+            - textbox "N.º de documento *" [ref=e28]:
+              - /placeholder: "87654321"
+          - generic [ref=e29]:
+            - generic [ref=e30]: Correo electrónico *
+            - textbox "Correo electrónico *" [ref=e31]:
+              - /placeholder: tu@email.com
+          - generic [ref=e32]:
+            - generic [ref=e33]: Teléfono (Opcional)
+            - textbox "Teléfono (Opcional)" [ref=e34]:
+              - /placeholder: +51 987 654 321
+          - generic [ref=e35]:
+            - generic [ref=e36]: Fecha de nacimiento (Opcional)
+            - textbox "Fecha de nacimiento (Opcional)" [ref=e37]
+        - generic [ref=e38]:
+          - generic [ref=e39]:
+            - generic [ref=e40]: Contraseña *
+            - textbox "Contraseña *" [ref=e41]:
+              - /placeholder: Mínimo 8 caracteres
+          - generic [ref=e42]:
+            - generic [ref=e43]: Confirmar contraseña *
+            - textbox "Confirmar contraseña *" [ref=e44]:
+              - /placeholder: Repite tu contraseña
+        - paragraph [ref=e45]: La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, una minúscula y un número.
+        - generic [ref=e46]:
+          - generic [ref=e47] [cursor=pointer]:
+            - checkbox "He leído y acepto la Política de Privacidad y Términos y Condiciones, y autorizo el tratamiento de mis datos personales para fines de los procesos de selección. (Obligatorio)" [ref=e48]
+            - generic [ref=e49]:
+              - text: He leído y acepto la
+              - link "Política de Privacidad y Términos y Condiciones" [ref=e50]:
+                - /url: /legal/privacidad
+              - text: ", y autorizo el tratamiento de mis datos personales para fines de los procesos de selección. (Obligatorio)"
+          - generic [ref=e51] [cursor=pointer]:
+            - checkbox "Acepto recibir comunicaciones sobre nuevas convocatorias y ofertas laborales. (Opcional)" [ref=e52]
+            - generic [ref=e53]: Acepto recibir comunicaciones sobre nuevas convocatorias y ofertas laborales. (Opcional)
+        - button "Crear cuenta" [disabled] [ref=e54]
+      - paragraph [ref=e55]:
+        - text: ¿Ya tienes cuenta?
+        - link "Inicia sesión" [ref=e56] [cursor=pointer]:
+          - /url: /login
+      - link "Volver al listado de ofertas" [ref=e57] [cursor=pointer]:
+        - /url: /
+  - alert [ref=e58]
+```

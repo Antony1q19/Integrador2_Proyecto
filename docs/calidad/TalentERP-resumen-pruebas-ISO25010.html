@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<title>Resumen de pruebas</title>
+<style>
+  :root {
+    --fondo: #f3f6f6; --tarjeta: #ffffff; --tinta: #0f2a29; --tinta-2: #4a5a59; --tinta-3: #6b7b7a; --linea: #dfe7e6;
+    --marca: #0f3b3a; --verde: #17785a; --verde-suave: #e3f3ec; --rojo: #b3261e; --rojo-suave: #fbe9e7;
+    --azul: #2b5f97; --ambar: #b26b00;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { width: 1920px; height: 1080px; background: var(--fondo); color: var(--tinta); font-family: "Segoe UI", Arial, sans-serif; }
+  .lienzo { padding: 34px 44px; height: 100%; display: flex; flex-direction: column; gap: 22px; }
+  header { display: flex; align-items: flex-end; justify-content: space-between; }
+  h1 { font-family: Cambria, Georgia, serif; font-size: 40px; color: var(--marca); letter-spacing: -0.3px; }
+  .sub { font-size: 18px; color: var(--tinta-2); margin-top: 4px; }
+  .sello { text-align: right; font-size: 15px; color: var(--tinta-3); line-height: 1.5; }
+  .sello b { color: var(--marca); }
+
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .kpi { background: var(--marca); color: #fff; border-radius: 14px; padding: 18px 22px; display: flex; align-items: center; gap: 18px; }
+  .kpi .n { font-family: Cambria, Georgia, serif; font-size: 52px; font-weight: 700; line-height: 1; }
+  .kpi .t { font-size: 17px; line-height: 1.3; color: #d5e6e4; }
+  .kpi .t b { color: #fff; font-weight: 600; display: block; font-size: 18px; }
+
+  .areas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; flex: 1; min-height: 0; }
+  .area { background: var(--tarjeta); border: 1px solid var(--linea); border-radius: 14px; padding: 22px 24px; display: flex; flex-direction: column; gap: 20px; }
+  .cab { display: flex; align-items: center; gap: 12px; }
+  .num { width: 40px; height: 40px; border-radius: 50%; background: var(--marca); color: #fff; font-weight: 700; font-size: 19px; display: grid; place-items: center; flex: none; }
+  .cab h2 { font-family: Cambria, Georgia, serif; font-size: 26px; line-height: 1.1; }
+  .cab small { display: block; font-family: "Segoe UI", Arial, sans-serif; font-size: 16px; color: var(--tinta-3); font-weight: 400; margin-top: 3px; }
+
+  .resultado { display: flex; align-items: baseline; gap: 10px; padding: 12px 14px; background: var(--fondo); border-radius: 10px; }
+  .resultado .grande { white-space: nowrap; font-family: Cambria, Georgia, serif; font-size: 40px; font-weight: 700; color: var(--verde); }
+  .resultado .det { font-size: 17px; color: var(--tinta-2); line-height: 1.35; }
+
+  .seccion h3 { font-size: 15px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--tinta-3); margin-bottom: 7px; font-weight: 700; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { font-size: 16px; padding: 5px 12px; border-radius: 999px; background: #e8eef5; color: var(--azul); font-weight: 600; }
+  ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  li { font-size: 18px; line-height: 1.4; padding-left: 26px; position: relative; color: var(--tinta); }
+  li::before { position: absolute; left: 0; top: 0; font-weight: 700; }
+  .hallazgos li::before { content: "⚠"; color: var(--rojo); }
+  .soluciones li::before { content: "✓"; color: var(--verde); }
+  .ninguno li::before { content: "✓"; color: var(--verde); }
+  li code { font-family: Consolas, monospace; font-size: 16px; background: #f0f3f3; padding: 0 4px; border-radius: 4px; }
+  .pie { margin-top: auto; font-size: 15px; color: var(--tinta-3); border-top: 1px solid var(--linea); padding-top: 10px; }
+  footer { display: flex; justify-content: space-between; font-size: 14px; color: var(--tinta-3); }
+  footer b { color: var(--tinta-2); font-weight: 600; }
+</style>
+<body>
+<div class="lienzo">
+  <header>
+    <div>
+      <h1>TalentERP · Resumen de pruebas de calidad (ISO/IEC 25010)</h1>
+      <p class="sub">Qué se probó, con qué programas, qué se encontró y cómo se solucionó · ERP y portal de empleos en AWS</p>
+    </div>
+    <div class="sello">Proyecto Integrador II<br><b>05-11-2026</b> · AWS us-east-1</div>
+  </header>
+
+  <section class="kpis">
+    <div class="kpi"><span class="n">4</span><span class="t"><b>Características ISO 25010</b>probadas en el sistema real</span></div>
+    <div class="kpi"><span class="n">538</span><span class="t"><b>Pruebas y verificaciones</b>automáticas ejecutadas</span></div>
+    <div class="kpi"><span class="n">16/16</span><span class="t"><b>Fallos inyectados</b>detectados por las pruebas</span></div>
+    <div class="kpi"><span class="n">16</span><span class="t"><b>Defectos y hallazgos</b>corregidos · 0 abiertos</span></div>
+  </section>
+
+  <section class="areas">
+    <article class="area">
+      <div class="cab"><span class="num">1</span><h2>Adecuación funcional · V&amp;V<small>Completitud, corrección y pertinencia</small></h2></div>
+      <div class="resultado"><span class="grande">168/168</span><span class="det">pruebas unitarias<br>8 de 8 fallos inyectados detectados</span></div>
+      <div class="seccion"><h3>Programas</h3><div class="chips"><span class="chip">pytest</span><span class="chip">FastAPI TestClient</span><span class="chip">Inyección de fallos</span></div></div>
+      <div class="seccion"><h3>Se encontró</h3><ul class="hallazgos">
+        <li>El Supervisor podía modificar entrevistas (BUG-VNV-001)</li>
+        <li>4 errores del frontend: compilación y listas sin datos (DEF-02 a 05)</li></ul></div>
+      <div class="seccion"><h3>Solución</h3><ul class="soluciones">
+        <li>Permiso solo para <code>Admin</code> y <code>RRHH</code></li>
+        <li>Páginas y datos corregidos en empresas y anuncios</li></ul></div>
+      <p class="pie">TalentERP-pruebas-funcionales.pptx</p>
+    </article>
+
+    <article class="area">
+      <div class="cab"><span class="num">2</span><h2>Compatibilidad<small>Interoperabilidad y co-existencia</small></h2></div>
+      <div class="resultado"><span class="grande">255/255</span><span class="det">pruebas: 155 automáticas, 21 en AWS<br>y 79 en navegadores · 8 de 8 fallos inyectados</span></div>
+      <div class="seccion"><h3>Programas</h3><div class="chips"><span class="chip">pytest</span><span class="chip">respx (Meta)</span><span class="chip">moto (SES y S3)</span><span class="chip">OpenAPI</span><span class="chip">Playwright · 5 navegadores</span></div></div>
+      <div class="seccion"><h3>Se encontró</h3><ul class="ninguno">
+        <li>Sin fallos reales: Meta, SES, S3, contratos de API y red/BD compartidas responden bien</li>
+        <li>Con WhatsApp caído, ERP y portal siguen funcionando</li></ul></div>
+      <div class="seccion"><h3>Solución</h3><ul class="soluciones">
+        <li>Las pruebas quedan como red de seguridad: detectaron los 8 fallos inyectados (formato de Meta, permisos, esquemas, logs…)</li></ul></div>
+      <p class="pie">TalentERP-pruebas-compatibilidad.pptx</p>
+    </article>
+
+    <article class="area">
+      <div class="cab"><span class="num">3</span><h2>Usabilidad<small>Capacidad de interacción</small></h2></div>
+      <div class="resultado"><span class="grande">11 → 25</span><span class="det">casos que pasan (de 20 a 25 casos)<br>Lighthouse: accesibilidad 98–100</span></div>
+      <div class="seccion"><h3>Programas</h3><div class="chips"><span class="chip">Playwright</span><span class="chip">axe-core (WCAG 2.1 AA)</span><span class="chip">Lighthouse</span><span class="chip">Postulante de prueba</span></div></div>
+      <div class="seccion"><h3>Se encontró</h3><ul class="hallazgos">
+        <li>8 fallas: sin aviso de permisos, sin progreso, datos que se pierden, etiquetas y contraste</li>
+        <li>Chips de búsqueda de 36 px en el celular</li>
+        <li>Al volver a un anuncio no decía «Ya postulado»</li></ul></div>
+      <div class="seccion"><h3>Solución</h3><ul class="soluciones">
+        <li>Mejoras del 05-11 desplegadas y medidas</li>
+        <li>Chips de 44 px y botón «Ya postulado» deshabilitado</li></ul></div>
+      <p class="pie">TalentERP-pruebas-usabilidad-ISO25010.pptx</p>
+    </article>
+
+    <article class="area">
+      <div class="cab"><span class="num">4</span><h2>Funcionalidad por módulo<small>Completitud, corrección e idoneidad</small></h2></div>
+      <div class="resultado"><span class="grande">83 → 84</span><span class="det">verificaciones que se cumplen<br>en 17 funcionalidades (ERP y portal)</span></div>
+      <div class="seccion"><h3>Programas</h3><div class="chips"><span class="chip">Playwright de punta a punta</span><span class="chip">API del ERP</span><span class="chip">pytest</span></div></div>
+      <div class="seccion"><h3>Se encontró</h3><ul class="hallazgos">
+        <li>Entrevistas: el formulario decía «Puedes guardarla igual» con fecha pasada y el servidor la rechazaba (400)</li></ul></div>
+      <div class="seccion"><h3>Solución</h3><ul class="soluciones">
+        <li>El formulario aplica la misma regla: avisa en rojo y no envía</li>
+        <li>Flujo completo verificado: empresa → anuncio → contratación → seguimiento</li></ul></div>
+      <p class="pie">TalentERP-pruebas-funcionalidad-ISO25010.pptx</p>
+    </article>
+  </section>
+
+  <footer><span><b>Antes</b> = versión desplegada sin correcciones · <b>Después</b> = versión publicada y medida de nuevo en AWS</span><span>Evidencias: tests/funcional · tests/compatibilidad · tests/usabilidad · tests/funcionalidad</span></footer>
+</div>
+</body>
+</html>

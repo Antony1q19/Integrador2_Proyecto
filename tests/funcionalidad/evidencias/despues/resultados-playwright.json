@@ -1,0 +1,966 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\funcionalidad\\programas\\playwright.config.ts",
+    "rootDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/funcionalidad/programas/pruebas",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "../evidencias/despues/resultados-playwright.json"
+        }
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "../evidencias/despues/reporte-html",
+          "open": "never"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/funcionalidad/evidencias/despues/.playwright",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/funcionalidad/programas/pruebas",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 120000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.56.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "funcionalidades.spec.ts",
+      "file": "funcionalidades.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "F01 · autenticación y roles",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7290,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "✓ F01-I1 [Idoneidad] RRHH no ve el Dashboard: se le redirige a Postulantes · esperado /postulantes · obtenido /postulantes\n"
+                    },
+                    {
+                      "text": "✓ F01-I2 [Idoneidad] El Supervisor no puede crear empresas (solo el Admin) · esperado 403 · obtenido 403\n"
+                    },
+                    {
+                      "text": "✓ F01-C1 [Completitud] Los 3 roles (Admin, RRHH, Supervisor) inician sesión · esperado {\"admin@test.com\":true,\"rrhh@test.com\":true,\"super@test.com\":true} · obtenido {\"admin@test.com\":true,\"rrhh@test.com\":true,\"super@test.com\":true}\n"
+                    },
+                    {
+                      "text": "✓ F01-O1 [Corrección] Sin sesión, los datos del ERP no se entregan · esperado 401 · obtenido 401\n"
+                    },
+                    {
+                      "text": "✓ F01-O2 [Corrección] El Admin entra a su inicio (Dashboard) · esperado /dashboard · obtenido /dashboard\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T22:36:46.361Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8fc004ac7b67115e1a5e-5eed54d151490ffc3d0f",
+          "file": "funcionalidades.spec.ts",
+          "line": 96,
+          "column": 5
+        },
+        {
+          "title": "F02 · usuarios del ERP",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1766,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "✓ F02-C1 [Completitud] Se listan los usuarios del ERP · esperado 200 y al menos 3 usuarios · obtenido 200 y 5 usuarios\n"
+                    },
+                    {
+                      "text": "✓ F02-O1 [Corrección] Cada usuario de prueba tiene su rol · esperado {\"admin\":\"Admin\",\"rrhh\":\"RRHH\",\"super\":\"Supervisor\"} · obtenido {\"admin\":\"Admin\",\"rrhh\":\"RRHH\",\"super\":\"Supervisor\"}\n"
+                    },
+                    {
+                      "text": "✓ F02-I1 [Idoneidad] El Admin gestiona a los trabajadores desde su perfil (pestaña Gestión de Trabajadores) · esperado visible · obtenido visible\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T22:36:57.304Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8fc004ac7b67115e1a5e-a59549cad6a3ca6ca70e",
+          "file": "funcionalidades.spec.ts",
+          "line": 120,
+          "column": 5
+        },
+        {
+          "title": "F13 · comunicaciones de WhatsApp (solo lectura)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2211,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "✓ F13-C1 [Completitud] Se listan las conversaciones de WhatsApp · esperado 200 · obtenido 200\n"
+                    },
+                    {
+                      "text": "✓ F13-C2 [Completitud] Se listan las plantillas aprobadas por Meta · esperado 200 y al menos 1 · obtenido 200 y 16\n"
+                    },
+                    {
+                      "text": "✓ F13-O1 [Corrección] Cada plantilla trae su nombre e idioma desde Meta · esperado todas · obtenido todas\n"
+                    },
+                    {
+                      "text": "✓ F13-I1 [Idoneidad] Las plantillas se ven en el ERP para usarlas en los chats (no se envió ningún mensaje) · esperado pantalla de plantillas · obtenido pantalla de plantillas\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T22:36:59.081Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8fc004ac7b67115e1a5e-e400e034c556a8f6cc87",
+          "file": "funcionalidades.spec.ts",
+          "line": 134,
+          "column": 5
+        },
+        {
+          "title": "F14 · ayuda",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2256,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "✓ F14-C1 [Completitud] La ayuda explica cada módulo · esperado [\"Postulantes\",\"Entrevistas\",\"Contrataciones\",\"Anuncios\",\"Empresas\"] · obtenido [\"Postulantes\",\"Entrevistas\",\"Contrataciones\",\"Anuncios\",\"Empresas\"]\n"
+                    },
+                    {
+                      "text": "✓ F14-O1 [Corrección] El buscador de la ayuda encuentra «contratación» · esperado con resultados · obtenido con resultados\n"
+                    },
+                    {
+                      "text": "✓ F14-I1 [Idoneidad] La ayuda está a un clic, en el menú lateral · esperado en el menú · obtenido en el menú\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T22:37:01.300Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8fc004ac7b67115e1a5e-71faa2541a4372f8f3b8",
+          "file": "funcionalidades.spec.ts",
+          "line": 148,
+          "column": 5
+        },
+        {
+          "title": "F03 · empresas clientes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2653,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "✓ F03-C1 [Completitud] Se registra una empresa cliente · esperado 201 · obtenido 201\n"
+                    },
+                    {
+                      "text": "✓ F03-O1 [Corrección] La empresa guarda razón social y RUC tal cual · esperado {\"razonSocial\":\"PRUEBA FUNCIONAL 8206353 S.A.C.\",\"ruc\":\"20820635399\"} · obtenido {\"razonSocial\":\"PRUEBA FUNCIONAL 8206353 S.A.C.\",\"ruc\":\"20820635399\"}\n"
+                    },
+                    {
+                      "text": "✓ F03-O2 [Corrección] Un RUC de 10 dígitos se rechaza · esperado 400 o 422 · obtenido 422\n"
+                    },
+                    {
+                      "text": "✓ F03-O3 [Corrección] Un RUC repetido se rechaza · esperado 409 · obtenido 409\n"
+                    },
+                    {
+                      "text": "✓ F03-C2 [Completitud] Se editan los datos de la empresa · esperado 200 · sector Retail · obtenido 200 · sector Retail\n"
+                    },
+                    {
+                      "text": "✓ F03-C3 [Completitud] La ficha de la empresa muestra sus datos · esperado visible · obtenido visible\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T22:37:03.564Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8fc004ac7b67115e1a5e-45b7e542f2bd60bb1165",
+          "file": "funcionalidades.spec.ts",
+          "line": 162,
+          "column": 5
+        },
+        {
+          "title": "F04 · anuncios (vacantes)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2209,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "✓ F04-C1 [Completitud] Se publica un anuncio para la empresa · esperado 201 · obtenido 201\n"
+                    },
+                    {
+                      "text": "✓ F04-O1 [Corrección] El anuncio nace «Abierto» y con la razón social de su empresa · esperado {\"empresa\":\"PRUEBA FUNCIONAL 8206353 S.A.C.\",\"estado\":\"Abierto\"} · obtenido {\"empresa\":\"PRUEBA FUNCIONAL 8206353 S.A.C.\",\"estado\":\"Abierto\"}\n"
+                    },
+                    {
+                      "text": "✓ F04-O2 [Corrección] Salario máximo menor que el mínimo se rechaza · esperado 400 o 422 · obtenido 422\n"
+                    },
+                    {
+                      "text": "✓ F04-O3 [Corrección] Una fecha límite pasada se rechaza · esperado 400 o 422 · obtenido 422\n"
+                    },
+                    {
+                      "text": "✓ F03-I1 [Idoneidad] No se puede borrar una empresa con anuncios activos · esperado 409 · obtenido 409\n"
+                    },
+                    {
+                      "text": "✓ F04-C2 [Completitud] La ficha del anuncio muestra cargo, salario y vacantes · esperado visible · obtenido visible\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T22:37:06.224Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8fc004ac7b67115e1a5e-661186773cc794e02e31",
+          "file": "funcionalidades.spec.ts",
+          "line": 181,
+          "column": 5
+        },
+        {
+          "title": "F15 · portal: búsqueda de ofertas",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 16001,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "✓ F15-C1 [Completitud] El anuncio recién publicado aparece en el portal · esperado publicado · obtenido publicado\n"
+                    },
+                    {
+                      "text": "✓ F15-O1 [Corrección] El portal muestra el mismo salario y vacantes · esperado {\"salarioMax\":4000,\"salarioMin\":3000,\"vacantes\":1} · obtenido {\"salarioMax\":4000,\"salarioMin\":3000,\"vacantes\":1}\n"
+                    },
+                    {
+                      "text": "✓ F15-I1 [Idoneidad] Buscar por el cargo deja solo ese anuncio · esperado 1 · QA Funcional 8206353 · obtenido 1 · QA Funcional 8206353\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T22:37:08.441Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8fc004ac7b67115e1a5e-9adaa94f9b2a1bfa5264",
+          "file": "funcionalidades.spec.ts",
+          "line": 202,
+          "column": 5
+        },
+        {
+          "title": "F16 · portal: postulación e historial · F17 perfil",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 12998,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "✓ F17-C1 [Completitud] El perfil del postulante muestra sus datos y su CV · esperado visible · obtenido visible\n"
+                    },
+                    {
+                      "text": "✓ F17-O1 [Corrección] La completitud del perfil corresponde a datos + teléfono + CV · esperado 65% completado · obtenido 65% completado\n"
+                    },
+                    {
+                      "text": "✓ F16-C1 [Completitud] El postulante se postula desde el portal y lo ve en su historial · esperado en el historial · obtenido en el historial\n"
+                    },
+                    {
+                      "text": "✓ F16-O1 [Corrección] En el ERP aparece esa postulación en «Postulado» · esperado 1 · POSTULADO · obtenido 1 · POSTULADO\n"
+                    },
+                    {
+                      "text": "✓ F16-I1 [Idoneidad] Al volver al anuncio no puede postularse otra vez · esperado «Ya postulado» deshabilitado · obtenido «Ya postulado» deshabilitado\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T22:37:24.450Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8fc004ac7b67115e1a5e-92ccf63e23852af5c61a",
+          "file": "funcionalidades.spec.ts",
+          "line": 230,
+          "column": 5
+        },
+        {
+          "title": "F05 · postulantes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3565,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "✓ F05-C1 [Completitud] Se registra un postulante en el ERP · esperado 201 · obtenido 201\n"
+                    },
+                    {
+                      "text": "✓ F05-O1 [Corrección] Se guardan documento, correo y consentimiento (Ley 29733) · esperado {\"consentimiento\":true,\"documento\":\"88206353\",\"email\":\"success+funcional8206353@simulator.amazonses.com\"} · obtenido {\"consentimiento\":true,\"documento\":\"88206353\",\"email\":\"success+funcional8206353@simulator.amazonses.com\"}\n"
+                    },
+                    {
+                      "text": "✓ F05-O2 [Corrección] Un número de documento repetido se rechaza · esperado 409 · obtenido 409\n"
+                    },
+                    {
+                      "text": "✓ F05-O3 [Corrección] Un teléfono con letras se rechaza · esperado 400 o 422 · obtenido 400\n"
+                    },
+                    {
+                      "text": "✓ F05-C2 [Completitud] El postulante aparece en el listado · esperado en el listado · obtenido en el listado\n"
+                    },
+                    {
+                      "text": "✓ F05-I1 [Idoneidad] Registrado por RRHH/Admin: aún no tiene cuenta y se le puede invitar · esperado sin cuenta · obtenido sin cuenta\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T22:37:37.461Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8fc004ac7b67115e1a5e-2775598003258d961bff",
+          "file": "funcionalidades.spec.ts",
+          "line": 265,
+          "column": 5
+        },
+        {
+          "title": "F06 · documentos del postulante",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4048,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "✓ F06-C1 [Completitud] Se sube el CV del postulante · esperado 201 · obtenido 201\n"
+                    },
+                    {
+                      "text": "✓ F06-O1 [Corrección] Un archivo «.pdf» que no es PDF (magic bytes) se rechaza · esperado 400 · obtenido 400\n"
+                    },
+                    {
+                      "text": "✓ F06-O2 [Corrección] Un archivo vacío se rechaza · esperado 400 o 422 · obtenido 400\n"
+                    },
+                    {
+                      "text": "✓ F06-O3 [Corrección] 5 MB + 1 byte se rechaza · esperado 400 o 413 · obtenido 400\n"
+                    },
+                    {
+                      "text": "✓ F06-I1 [Idoneidad] Se descarga exactamente el mismo archivo que se subió · esperado idéntico · obtenido idéntico\n"
+                    },
+                    {
+                      "text": "✓ F06-C2 [Completitud] El CV aparece en la pestaña Documentos de la ficha · esperado visible · obtenido visible\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T22:37:41.033Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8fc004ac7b67115e1a5e-762e76cfe264550b3581",
+          "file": "funcionalidades.spec.ts",
+          "line": 288,
+          "column": 5
+        },
+        {
+          "title": "F07 · postulaciones y pipeline",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3767,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "✓ F07-C1 [Completitud] Se asocia el postulante al anuncio · esperado 201 · POSTULADO · obtenido 201 · POSTULADO\n"
+                    },
+                    {
+                      "text": "✓ F07-O1 [Corrección] No se puede postular dos veces al mismo anuncio · esperado 409 · obtenido 409\n"
+                    },
+                    {
+                      "text": "✓ F07-O2 [Corrección] Mover a «En evaluación» cambia la etapa y deja 2 líneas de historial · esperado EN_EVALUACION · 2 registros · obtenido EN_EVALUACION · 2 registros (respuesta: EN_EVALUACION)\n"
+                    },
+                    {
+                      "text": "✓ F07-I1 [Idoneidad] Mover a la misma etapa se rechaza (no duplica historial) · esperado 409 · obtenido 409\n"
+                    },
+                    {
+                      "text": "✓ F07-I2 [Idoneidad] No se pasa a «Contratado» sin registrar la contratación · esperado 409 · obtenido 409\n"
+                    },
+                    {
+                      "text": "✓ F07-C2 [Completitud] La postulación se ve en el pipeline, en la columna Entrevista · esperado visible · obtenido visible\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T22:37:45.089Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8fc004ac7b67115e1a5e-b9046cfee7ea1b017571",
+          "file": "funcionalidades.spec.ts",
+          "line": 310,
+          "column": 5
+        },
+        {
+          "title": "F08 · evaluaciones por competencias",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2308,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "✓ F08-C1 [Completitud] Se registra una evaluación de 6 competencias · esperado 201 · obtenido 201\n"
+                    },
+                    {
+                      "text": "✓ F08-O1 [Corrección] Seis competencias en 4 dan 80 puntos y APTO · esperado 80 · APTO · obtenido 80 · APTO\n"
+                    },
+                    {
+                      "text": "✓ F08-O2 [Corrección] Seis en 3 dan 60 y NO_APTO (umbral 70) · esperado 60 · NO_APTO · obtenido 60 · NO_APTO\n"
+                    },
+                    {
+                      "text": "✓ F08-I1 [Idoneidad] El puntaje lo calcula el servidor: enviar «100 · APTO» no cambia el resultado · esperado 60 · NO_APTO · obtenido 60 · NO_APTO\n"
+                    },
+                    {
+                      "text": "✓ F08-O3 [Corrección] Una competencia fuera de 1..5 se rechaza · esperado 422 · obtenido 422\n"
+                    },
+                    {
+                      "text": "✓ F08-C2 [Completitud] Las evaluaciones se ven en la ficha · esperado visible · obtenido visible\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T22:37:48.864Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8fc004ac7b67115e1a5e-797815b4bb2b698cc8b0",
+          "file": "funcionalidades.spec.ts",
+          "line": 334,
+          "column": 5
+        },
+        {
+          "title": "F09 · entrevistas",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 300000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 86219,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "✓ F09-C1 [Completitud] Se programa una entrevista · esperado 201 · Programada · obtenido 201 · Programada\n"
+                    },
+                    {
+                      "text": "✓ F09-O1 [Corrección] El mismo entrevistador no puede tener dos entrevistas que se crucen · esperado 409 · obtenido 409\n"
+                    },
+                    {
+                      "text": "✓ F09-O3 [Corrección] No se marca «Realizada» una entrevista que aún no ocurre · esperado 400 · obtenido 400\n"
+                    },
+                    {
+                      "text": "✓ F09-I1 [Idoneidad] Un estado que no existe se rechaza · esperado 400 o 422 · obtenido 400\n"
+                    },
+                    {
+                      "text": "✓ F09-I2 [Idoneidad] Con una fecha pasada, el formulario dice lo mismo que el servidor · esperado formulario: «debe ser futura» · servidor: 400 · obtenido formulario: «debe ser futura» · servidor: 400\n"
+                    },
+                    {
+                      "text": "✓ F09-O2 [Corrección] Ya ocurrida, se registra el resultado: Realizada y Aprobada · esperado Realizada · Aprobada · obtenido Realizada · Aprobada\n"
+                    },
+                    {
+                      "text": "✓ F09-C2 [Completitud] La entrevista realizada se ve en la agenda · esperado visible · obtenido visible\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T22:37:51.179Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8fc004ac7b67115e1a5e-2c960dca74c35fdbb8ec",
+          "file": "funcionalidades.spec.ts",
+          "line": 350,
+          "column": 5
+        },
+        {
+          "title": "F10 · contrataciones",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3348,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "✓ F10-C1 [Completitud] Se registra la contratación · esperado 201 · obtenido 201\n"
+                    },
+                    {
+                      "text": "✓ F10-O1 [Corrección] Con ingreso hoy queda «Activo» · esperado Activo · obtenido Activo\n"
+                    },
+                    {
+                      "text": "✓ F10-O2 [Corrección] Se programan los controles de 30, 60 y 90 días desde el ingreso · esperado [\"30:2026-12-05\",\"60:2027-01-04\",\"90:2027-02-03\"] · obtenido [\"30:2026-12-05\",\"60:2027-01-04\",\"90:2027-02-03\"]\n"
+                    },
+                    {
+                      "text": "✓ F10-O3 [Corrección] La postulación pasa sola a «Contratado» · esperado CONTRATADO · obtenido CONTRATADO\n"
+                    },
+                    {
+                      "text": "✓ F10-I1 [Idoneidad] La misma postulación no se contrata dos veces · esperado 409 · obtenido 409\n"
+                    },
+                    {
+                      "text": "✓ F10-I2 [Idoneidad] Al cubrir su única vacante, el anuncio se cierra solo · esperado Cerrado · obtenido Cerrado\n"
+                    },
+                    {
+                      "text": "✓ F10-I3 [Idoneidad] El anuncio cerrado deja de mostrarse en el portal · esperado no aparece · obtenido no aparece\n"
+                    },
+                    {
+                      "text": "✓ F10-C2 [Completitud] La contratación aparece en el módulo Contrataciones · esperado visible · obtenido visible\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T22:39:17.405Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8fc004ac7b67115e1a5e-bd2c771b2a688395904c",
+          "file": "funcionalidades.spec.ts",
+          "line": 398,
+          "column": 5
+        },
+        {
+          "title": "F11 · seguimiento post-ingreso",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2606,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "✓ F11-C1 [Completitud] Los 3 controles se listan en Seguimiento · esperado 3 · Pendiente · obtenido 3 · Pendiente\n"
+                    },
+                    {
+                      "text": "✓ F11-O1 [Corrección] Marcar «Realizado» sin valoración se rechaza · esperado 400 · obtenido 400\n"
+                    },
+                    {
+                      "text": "✓ F11-O2 [Corrección] Con valoración se cierra y guarda la fecha de realización · esperado Realizado · Satisfactorio · con fecha · obtenido Realizado · Satisfactorio · con fecha\n"
+                    },
+                    {
+                      "text": "✓ F11-I1 [Idoneidad] Un control realizado ya no cuenta como vencido · esperado false · obtenido false\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T22:39:20.761Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8fc004ac7b67115e1a5e-846fdbcaa98c9f1bf51f",
+          "file": "funcionalidades.spec.ts",
+          "line": 425,
+          "column": 5
+        },
+        {
+          "title": "F12 · dashboard y reportes",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4263,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "✓ F12-C1 [Completitud] El dashboard filtra por empresa y fechas · esperado 200 · obtenido 200\n"
+                    },
+                    {
+                      "text": "✓ F12-O1 [Corrección] Indicadores de la empresa de prueba = lo que se hizo hoy · esperado {\"contratados\":1,\"evaluaciones\":2,\"porcentajeApto\":50,\"postulaciones\":2,\"puntajePromedio\":70} · obtenido {\"contratados\":1,\"evaluaciones\":2,\"porcentajeApto\":50,\"postulaciones\":2,\"puntajePromedio\":70}\n"
+                    },
+                    {
+                      "text": "✓ F12-I1 [Idoneidad] El embudo suma lo mismo que las postulaciones · esperado 2 · obtenido 2\n"
+                    },
+                    {
+                      "text": "✓ F12-C2 [Completitud] El reporte se exporta a CSV · esperado .csv · obtenido .csv\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T22:39:23.374Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8fc004ac7b67115e1a5e-b5acd953a4184fd18e9c",
+          "file": "funcionalidades.spec.ts",
+          "line": 441,
+          "column": 5
+        },
+        {
+          "title": "limpieza · cancelar contratación y borrar anuncio y empresa de prueba",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 595,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "✓ F10-I4 [Idoneidad] Cancelar la contratación descarta la postulación (no queda «Contratado» suelto) · esperado 200 · DESCARTADO · obtenido 200 · DESCARTADO\n"
+                    },
+                    {
+                      "text": "✓ F03-I2 [Idoneidad] Sin anuncios, la empresa se borra y deja de listarse · esperado 204 · no listada · obtenido 204 · no listada\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T22:39:27.644Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8fc004ac7b67115e1a5e-6c15cc41a3729f553fec",
+          "file": "funcionalidades.spec.ts",
+          "line": 463,
+          "column": 5
+        },
+        {
+          "title": "resumen · todas las verificaciones se cumplen",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T22:39:28.252Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8fc004ac7b67115e1a5e-fdbde505f5d89873b67b",
+          "file": "funcionalidades.spec.ts",
+          "line": 477,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-05T22:36:45.762Z",
+    "duration": 162573.836,
+    "expected": 18,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

@@ -1,0 +1,419 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\playwright.config.ts",
+    "rootDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/programas/pruebas",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "../evidencias/despues/resultados-flujo.json"
+        }
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "../evidencias/despues/reporte-html-flujo",
+          "open": "never"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/evidencias/despues/.playwright",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "sesion",
+        "name": "sesion",
+        "testDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/programas/pruebas",
+        "testIgnore": [],
+        "testMatch": [
+          "/sesion\\.setup\\.ts/"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/evidencias/despues/.playwright",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "escritorio",
+        "name": "escritorio",
+        "testDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/programas/pruebas",
+        "testIgnore": [
+          "/(movil|flujo-postulante)\\.spec\\.ts/"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/evidencias/despues/.playwright",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "movil",
+        "name": "movil",
+        "testDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/programas/pruebas",
+        "testIgnore": [],
+        "testMatch": [
+          "/movil\\.spec\\.ts/"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/evidencias/despues/.playwright",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "flujo",
+        "name": "flujo",
+        "testDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/programas/pruebas",
+        "testIgnore": [],
+        "testMatch": [
+          "/flujo-postulante\\.spec\\.ts/"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.56.1",
+    "workers": 2,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "sesion.setup.ts",
+      "file": "sesion.setup.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "iniciar sesión como admin@test.com",
+          "ok": true,
+          "tags": [
+            "test.com"
+          ],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "sesion",
+              "projectName": "sesion",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2603,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:25:28.097Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "189343bfb694ac6c5112-aa5f70373d084b9a351e",
+          "file": "sesion.setup.ts",
+          "line": 12,
+          "column": 8
+        },
+        {
+          "title": "iniciar sesión como rrhh@test.com",
+          "ok": true,
+          "tags": [
+            "test.com"
+          ],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "sesion",
+              "projectName": "sesion",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2591,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:25:30.905Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "189343bfb694ac6c5112-d6fe2f0bc851417bd620",
+          "file": "sesion.setup.ts",
+          "line": 12,
+          "column": 8
+        }
+      ]
+    },
+    {
+      "title": "flujo-postulante.spec.ts",
+      "file": "flujo-postulante.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "CP-USAB-05 · el perfil muestra cuánto falta completar y se actualiza al subir el CV",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "flujo",
+              "projectName": "flujo",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4830,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:25:34.122Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "54a2c523a161c805f32f-289d0e107b46b544dfda",
+          "file": "flujo-postulante.spec.ts",
+          "line": 42,
+          "column": 5
+        },
+        {
+          "title": "CP-USAB-10 · el CV rechaza formatos y tamaños no permitidos y acepta un PDF válido",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "flujo",
+              "projectName": "flujo",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5957,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:25:39.218Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "54a2c523a161c805f32f-a01e00141a828ba3a643",
+          "file": "flujo-postulante.spec.ts",
+          "line": 79,
+          "column": 5
+        },
+        {
+          "title": "CP-USAB-12a · el postulante se postula a un anuncio (dato de prueba)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "flujo",
+              "projectName": "flujo",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3170,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:25:45.183Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "54a2c523a161c805f32f-1d0962b5c88be901b8ea",
+          "file": "flujo-postulante.spec.ts",
+          "line": 105,
+          "column": 5
+        },
+        {
+          "title": "CP-USAB-11 · un doble clic en «Programar» crea UNA sola entrevista",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "flujo",
+              "projectName": "flujo",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3692,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:25:48.360Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "54a2c523a161c805f32f-cfa737bef3ca43b1f2c7",
+          "file": "flujo-postulante.spec.ts",
+          "line": 124,
+          "column": 5
+        },
+        {
+          "title": "CP-USAB-15 · cada operación avisa con un toast (programar y cancelar)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "flujo",
+              "projectName": "flujo",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3785,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:25:52.062Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "54a2c523a161c805f32f-1e6aefe5007608835fdb",
+          "file": "flujo-postulante.spec.ts",
+          "line": 144,
+          "column": 5
+        },
+        {
+          "title": "CP-USAB-12 · un anuncio al que ya postuló se ve como «Ya postulado» y no admite otra postulación",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "flujo",
+              "projectName": "flujo",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2247,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T21:25:55.863Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "54a2c523a161c805f32f-c026cdb59930b3e95eed",
+          "file": "flujo-postulante.spec.ts",
+          "line": 158,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-05T21:25:27.411Z",
+    "duration": 30784.262,
+    "expected": 8,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

@@ -80,3 +80,6 @@ tests/evidencias/
 
 # Sesión del ERP que guarda Playwright (contiene la cookie de inicio de sesión)
 tests/compatibilidad/navegadores/.auth/
+tests/usabilidad/programas/.auth/
+tests/usabilidad/evidencias/*/.playwright/
+tests/funcionalidad/evidencias/*/.playwright/

@@ -1,14 +1,15 @@
 // features/anuncios/components/JobDetailPanel.tsx
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { MapPin, Briefcase, DollarSign, Share2, Users, CalendarClock, Check } from 'lucide-react';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { Anuncio } from '../types';
 import { formatearSalario } from '../utils/formatearSalario';
 import { formatearFechaRelativa } from '../utils/formatearFecha';
-import { postularseAAnuncio } from '@/features/postulaciones/services/postulacionesService';
+import { obtenerAnunciosPostulados, postularseAAnuncio } from '@/features/postulaciones/services/postulacionesService';
 
 interface JobDetailPanelProps {
   anuncio: Anuncio;
@@ -24,6 +25,21 @@ export default function JobDetailPanel({ anuncio }: JobDetailPanelProps) {
   const [aviso, setAviso] = useState<string | null>(null);
   const [enlaceCopiado, setEnlaceCopiado] = useState(false);
   const [postulando, setPostulando] = useState(false);
+  // Protección contra errores: si ya postuló a ESTE anuncio, se le dice antes de que haga clic.
+  const [anunciosPostulados, setAnunciosPostulados] = useState<Set<number>>(new Set());
+  const [rechazadoPorDuplicado, setRechazadoPorDuplicado] = useState(false);
+  const yaPostulado = estaAutenticado && (anunciosPostulados.has(Number(anuncio.id)) || rechazadoPorDuplicado);
+
+  useEffect(() => {
+    if (!estaAutenticado) return;
+    let vigente = true;
+    void obtenerAnunciosPostulados().then((ids) => {
+      if (vigente) setAnunciosPostulados(ids);
+    });
+    return () => {
+      vigente = false;
+    };
+  }, [estaAutenticado]);
 
   // Sin sesión → al login, y de vuelta a ESTE anuncio al entrar.
   // Con sesión → crea la postulación en el backend y redirige al historial.
@@ -43,7 +59,13 @@ export default function JobDetailPanel({ anuncio }: JobDetailPanelProps) {
       setAviso('¡Te postulaste correctamente! Redirigiendo a tu historial...');
       setTimeout(() => router.push('/his_postulaciones'), 1500);
     } catch (err) {
-      setAviso(err instanceof Error ? err.message : 'No se pudo completar la postulación');
+      const mensaje = err instanceof Error ? err.message : 'No se pudo completar la postulación';
+      if (/ya está postulado/i.test(mensaje)) {
+        setRechazadoPorDuplicado(true);
+        setAviso('Ya te postulaste a esta oferta. Puedes ver su avance en tu historial.');
+      } else {
+        setAviso(mensaje);
+      }
     } finally {
       setPostulando(false);
     }
@@ -76,14 +98,32 @@ export default function JobDetailPanel({ anuncio }: JobDetailPanelProps) {
         <p className="text-sm text-gray-500 mb-4">{ubicacion ?? empresa.rubro}</p>
 
         <div className="flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            disabled={postulando}
-            className="bg-primary-600 hover:bg-primary-700 text-white font-medium px-5 py-2.5 rounded-lg transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
-            onClick={postular}
-          >
-            {postulando ? 'Postulando...' : 'Postularme a esta oferta'}
-          </button>
+          {yaPostulado ? (
+            <>
+              <button
+                type="button"
+                disabled
+                className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-800 border border-emerald-200 font-medium px-5 py-2.5 rounded-lg cursor-not-allowed"
+              >
+                <Check size={18} className="text-emerald-600" /> Ya postulado
+              </button>
+              <Link
+                href="/his_postulaciones"
+                className="text-sm font-medium text-primary-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded"
+              >
+                Ver mi historial
+              </Link>
+            </>
+          ) : (
+            <button
+              type="button"
+              disabled={postulando}
+              className="bg-primary-600 hover:bg-primary-700 text-white font-medium px-5 py-2.5 rounded-lg transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
+              onClick={postular}
+            >
+              {postulando ? 'Postulando...' : 'Postularme a esta oferta'}
+            </button>
+          )}
           <button
             type="button"
             onClick={() => void compartir()}

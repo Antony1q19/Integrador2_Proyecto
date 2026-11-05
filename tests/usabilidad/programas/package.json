@@ -1,0 +1,14 @@
+{
+  "name": "talenterp-pruebas-usabilidad",
+  "private": true,
+  "description": "Capacidad de interacción (usabilidad, ISO/IEC 25010) con programas: Playwright (flujos), axe-core (accesibilidad WCAG) y Lighthouse (puntajes).",
+  "scripts": {
+    "pruebas": "playwright test",
+    "lighthouse": "node lighthouse.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.10.2",
+    "@playwright/test": "1.56.1",
+    "lighthouse": "12.6.1"
+  }
+}

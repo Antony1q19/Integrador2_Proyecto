@@ -61,7 +61,7 @@ export default function AnunciosBuscador({ anuncios }: AnunciosBuscadorProps) {
                 key={tag}
                 type="button"
                 onClick={() => setBusqueda(busqueda === tag ? '' : tag)}
-                className={`min-h-[36px] sm:min-h-[32px] inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium transition ${
+                className={`min-h-[44px] sm:min-h-[32px] inline-flex items-center px-4 py-2 rounded-full text-xs font-medium transition ${
                   busqueda.toLowerCase() === tag.toLowerCase()
                     ? 'bg-primary-600 text-white shadow-sm'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'

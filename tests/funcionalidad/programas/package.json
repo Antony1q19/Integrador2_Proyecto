@@ -1,0 +1,11 @@
+{
+  "name": "talenterp-pruebas-funcionalidad",
+  "private": true,
+  "description": "Adecuación funcional (ISO/IEC 25010): completitud, corrección e idoneidad de cada funcionalidad, de punta a punta en AWS con Playwright.",
+  "scripts": {
+    "pruebas": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1"
+  }
+}

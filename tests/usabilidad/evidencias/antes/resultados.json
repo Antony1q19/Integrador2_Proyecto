@@ -1,0 +1,1641 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\playwright.config.ts",
+    "rootDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/programas/pruebas",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 2
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "../evidencias/antes/resultados.json"
+        }
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "../evidencias/antes/reporte-html",
+          "open": "never"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/evidencias/antes/.playwright",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 2
+        },
+        "id": "sesion",
+        "name": "sesion",
+        "testDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/programas/pruebas",
+        "testIgnore": [],
+        "testMatch": [
+          "/sesion\\.setup\\.ts/"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/evidencias/antes/.playwright",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 2
+        },
+        "id": "escritorio",
+        "name": "escritorio",
+        "testDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/programas/pruebas",
+        "testIgnore": [
+          "/movil\\.spec\\.ts/"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/evidencias/antes/.playwright",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 2
+        },
+        "id": "movil",
+        "name": "movil",
+        "testDir": "C:/Users/Administrator/Desktop/Proyectos/Integrador2_Proyecto/tests/usabilidad/programas/pruebas",
+        "testIgnore": [],
+        "testMatch": [
+          "/movil\\.spec\\.ts/"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.56.1",
+    "workers": 2,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "sesion.setup.ts",
+      "file": "sesion.setup.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "iniciar sesión como admin@test.com",
+          "ok": true,
+          "tags": [
+            "test.com"
+          ],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "sesion",
+              "projectName": "sesion",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5601,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T20:08:51.229Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "189343bfb694ac6c5112-aa5f70373d084b9a351e",
+          "file": "sesion.setup.ts",
+          "line": 12,
+          "column": 8
+        },
+        {
+          "title": "iniciar sesión como rrhh@test.com",
+          "ok": true,
+          "tags": [
+            "test.com"
+          ],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "sesion",
+              "projectName": "sesion",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2611,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T20:08:57.467Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "189343bfb694ac6c5112-d6fe2f0bc851417bd620",
+          "file": "sesion.setup.ts",
+          "line": 12,
+          "column": 8
+        }
+      ]
+    },
+    {
+      "title": "aprendizaje.spec.ts",
+      "file": "aprendizaje.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "CP-USAB-04 · el buscador del portal se entiende a la primera y muestra resultados",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "escritorio",
+              "projectName": "escritorio",
+              "results": [
+                {
+                  "workerIndex": 21,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 800,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T20:10:43.610Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "ec60d67731c81f02d3e5-00efa9d6a9579b37d963",
+          "file": "aprendizaje.spec.ts",
+          "line": 39,
+          "column": 5
+        }
+      ],
+      "suites": [
+        {
+          "title": "con rol RRHH",
+          "file": "aprendizaje.spec.ts",
+          "line": 6,
+          "column": 6,
+          "specs": [
+            {
+              "title": "CP-USAB-01 · al entrar a una sección sin permiso, el sistema explica por qué",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "escritorio",
+                  "projectName": "escritorio",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 15885,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Acceso restringido')\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Acceso restringido')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Acceso restringido')\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Acceso restringido')\u001b[22m\n\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts:12:74",
+                        "location": {
+                          "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts",
+                          "column": 74,
+                          "line": 12
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 10 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`${ERP_URL}/dashboard`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/postulantes/\u001b[39m)\u001b[33m;\u001b[39m \u001b[90m// RRHH no ve el Dashboard: se le redirige\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 12 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(\u001b[32m\"Acceso restringido\"\u001b[39m\u001b[33m,\u001b[39m { exact\u001b[33m:\u001b[39m \u001b[36mfalse\u001b[39m }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                                          \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 13 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 14 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 15 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts",
+                            "column": 74,
+                            "line": 12
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Acceso restringido')\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Acceso restringido')\u001b[22m\n\n\n  10 |     await page.goto(`${ERP_URL}/dashboard`);\n  11 |     await expect(page).toHaveURL(/\\/postulantes/); // RRHH no ve el Dashboard: se le redirige\n> 12 |     await expect(page.getByText(\"Acceso restringido\", { exact: false })).toBeVisible();\n     |                                                                          ^\n  13 |   });\n  14 | });\n  15 |\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts:12:74"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T20:09:00.799Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\evidencias\\antes\\.playwright\\aprendizaje-con-rol-RRHH-C-a6168--el-sistema-explica-por-qué-escritorio\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts",
+                        "column": 74,
+                        "line": 12
+                      }
+                    },
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 15912,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Acceso restringido')\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Acceso restringido')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Acceso restringido')\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Acceso restringido')\u001b[22m\n\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts:12:74",
+                        "location": {
+                          "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts",
+                          "column": 74,
+                          "line": 12
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 10 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`${ERP_URL}/dashboard`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 11 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/postulantes/\u001b[39m)\u001b[33m;\u001b[39m \u001b[90m// RRHH no ve el Dashboard: se le redirige\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 12 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(\u001b[32m\"Acceso restringido\"\u001b[39m\u001b[33m,\u001b[39m { exact\u001b[33m:\u001b[39m \u001b[36mfalse\u001b[39m }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                                          \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 13 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 14 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 15 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts",
+                            "column": 74,
+                            "line": 12
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText('Acceso restringido')\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByText('Acceso restringido')\u001b[22m\n\n\n  10 |     await page.goto(`${ERP_URL}/dashboard`);\n  11 |     await expect(page).toHaveURL(/\\/postulantes/); // RRHH no ve el Dashboard: se le redirige\n> 12 |     await expect(page.getByText(\"Acceso restringido\", { exact: false })).toBeVisible();\n     |                                                                          ^\n  13 |   });\n  14 | });\n  15 |\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts:12:74"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-11-05T20:09:17.647Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\evidencias\\antes\\.playwright\\aprendizaje-con-rol-RRHH-C-a6168--el-sistema-explica-por-qué-escritorio-retry1\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts",
+                        "column": 74,
+                        "line": 12
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "ec60d67731c81f02d3e5-7f317c80ea20b5e5e541",
+              "file": "aprendizaje.spec.ts",
+              "line": 9,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "con rol Admin",
+          "file": "aprendizaje.spec.ts",
+          "line": 16,
+          "column": 6,
+          "specs": [
+            {
+              "title": "CP-USAB-02 · el formulario por pasos muestra en qué paso va y cuánto falta",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "escritorio",
+                  "projectName": "escritorio",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 15759,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/Paso 1 de \\d+ \\(\\d+% completado\\)/)\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/Paso 1 de \\d+ \\(\\d+% completado\\)/)\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/Paso 1 de \\d+ \\(\\d+% completado\\)/)\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/Paso 1 de \\d+ \\(\\d+% completado\\)/)\u001b[22m\n\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts:21:71",
+                        "location": {
+                          "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts",
+                          "column": 71,
+                          "line": 21
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 19 |\u001b[39m   test(\u001b[32m\"CP-USAB-02 · el formulario por pasos muestra en qué paso va y cuánto falta\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 20 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`${ERP_URL}/postulantes/nuevo`\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 21 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(\u001b[35m/Paso 1 de \\d+ \\(\\d+% completado\\)/\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                                       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 22 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 23 |\u001b[39m\n \u001b[90m 24 |\u001b[39m   test(\u001b[32m\"CP-USAB-03 · una lista vacía orienta y ofrece crear el primer registro\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts",
+                            "column": 71,
+                            "line": 21
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/Paso 1 de \\d+ \\(\\d+% completado\\)/)\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/Paso 1 de \\d+ \\(\\d+% completado\\)/)\u001b[22m\n\n\n  19 |   test(\"CP-USAB-02 · el formulario por pasos muestra en qué paso va y cuánto falta\", async ({ page }) => {\n  20 |     await page.goto(`${ERP_URL}/postulantes/nuevo`);\n> 21 |     await expect(page.getByText(/Paso 1 de \\d+ \\(\\d+% completado\\)/)).toBeVisible();\n     |                                                                       ^\n  22 |   });\n  23 |\n  24 |   test(\"CP-USAB-03 · una lista vacía orienta y ofrece crear el primer registro\", async ({ page }) => {\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts:21:71"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T20:09:34.523Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\evidencias\\antes\\.playwright\\aprendizaje-con-rol-Admin--1d247--qué-paso-va-y-cuánto-falta-escritorio\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts",
+                        "column": 71,
+                        "line": 21
+                      }
+                    },
+                    {
+                      "workerIndex": 14,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 15747,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/Paso 1 de \\d+ \\(\\d+% completado\\)/)\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/Paso 1 de \\d+ \\(\\d+% completado\\)/)\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/Paso 1 de \\d+ \\(\\d+% completado\\)/)\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/Paso 1 de \\d+ \\(\\d+% completado\\)/)\u001b[22m\n\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts:21:71",
+                        "location": {
+                          "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts",
+                          "column": 71,
+                          "line": 21
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 19 |\u001b[39m   test(\u001b[32m\"CP-USAB-02 · el formulario por pasos muestra en qué paso va y cuánto falta\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m 20 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`${ERP_URL}/postulantes/nuevo`\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 21 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(\u001b[35m/Paso 1 de \\d+ \\(\\d+% completado\\)/\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                                       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 22 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 23 |\u001b[39m\n \u001b[90m 24 |\u001b[39m   test(\u001b[32m\"CP-USAB-03 · una lista vacía orienta y ofrece crear el primer registro\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts",
+                            "column": 71,
+                            "line": 21
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByText(/Paso 1 de \\d+ \\(\\d+% completado\\)/)\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByText(/Paso 1 de \\d+ \\(\\d+% completado\\)/)\u001b[22m\n\n\n  19 |   test(\"CP-USAB-02 · el formulario por pasos muestra en qué paso va y cuánto falta\", async ({ page }) => {\n  20 |     await page.goto(`${ERP_URL}/postulantes/nuevo`);\n> 21 |     await expect(page.getByText(/Paso 1 de \\d+ \\(\\d+% completado\\)/)).toBeVisible();\n     |                                                                       ^\n  22 |   });\n  23 |\n  24 |   test(\"CP-USAB-03 · una lista vacía orienta y ofrece crear el primer registro\", async ({ page }) => {\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts:21:71"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-11-05T20:09:51.214Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\evidencias\\antes\\.playwright\\aprendizaje-con-rol-Admin--1d247--qué-paso-va-y-cuánto-falta-escritorio-retry1\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts",
+                        "column": 71,
+                        "line": 21
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "ec60d67731c81f02d3e5-a0a11925259402fa71f0",
+              "file": "aprendizaje.spec.ts",
+              "line": 19,
+              "column": 7
+            },
+            {
+              "title": "CP-USAB-03 · una lista vacía orienta y ofrece crear el primer registro",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "escritorio",
+                  "projectName": "escritorio",
+                  "results": [
+                    {
+                      "workerIndex": 16,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 16782,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('link', { name: /Crear Primer Anuncio/i })\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('link', { name: /Crear Primer Anuncio/i })\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('link', { name: /Crear Primer Anuncio/i })\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('link', { name: /Crear Primer Anuncio/i })\u001b[22m\n\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts:28:77",
+                        "location": {
+                          "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts",
+                          "column": 77,
+                          "line": 28
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 26 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByPlaceholder(\u001b[32m\"Buscar por cargo o empresa...\"\u001b[39m)\u001b[33m.\u001b[39mfill(\u001b[32m\"zzzz-sin-resultados\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 27 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(\u001b[35m/No se encontraron anuncios/i\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 28 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"link\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/Crear Primer Anuncio/i\u001b[39m }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                                             \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 29 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 30 |\u001b[39m\n \u001b[90m 31 |\u001b[39m   test(\u001b[32m\"CP-USAB-06 · la ayuda está organizada por módulos y su buscador filtra\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts",
+                            "column": 77,
+                            "line": 28
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('link', { name: /Crear Primer Anuncio/i })\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('link', { name: /Crear Primer Anuncio/i })\u001b[22m\n\n\n  26 |     await page.getByPlaceholder(\"Buscar por cargo o empresa...\").fill(\"zzzz-sin-resultados\");\n  27 |     await expect(page.getByText(/No se encontraron anuncios/i)).toBeVisible();\n> 28 |     await expect(page.getByRole(\"link\", { name: /Crear Primer Anuncio/i })).toBeVisible();\n     |                                                                             ^\n  29 |   });\n  30 |\n  31 |   test(\"CP-USAB-06 · la ayuda está organizada por módulos y su buscador filtra\", async ({ page }) => {\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts:28:77"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T20:10:07.822Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\evidencias\\antes\\.playwright\\aprendizaje-con-rol-Admin--31429-ce-crear-el-primer-registro-escritorio\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts",
+                        "column": 77,
+                        "line": 28
+                      }
+                    },
+                    {
+                      "workerIndex": 18,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 16089,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('link', { name: /Crear Primer Anuncio/i })\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('link', { name: /Crear Primer Anuncio/i })\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('link', { name: /Crear Primer Anuncio/i })\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('link', { name: /Crear Primer Anuncio/i })\u001b[22m\n\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts:28:77",
+                        "location": {
+                          "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts",
+                          "column": 77,
+                          "line": 28
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 26 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByPlaceholder(\u001b[32m\"Buscar por cargo o empresa...\"\u001b[39m)\u001b[33m.\u001b[39mfill(\u001b[32m\"zzzz-sin-resultados\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 27 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByText(\u001b[35m/No se encontraron anuncios/i\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 28 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"link\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/Crear Primer Anuncio/i\u001b[39m }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                                             \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 29 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 30 |\u001b[39m\n \u001b[90m 31 |\u001b[39m   test(\u001b[32m\"CP-USAB-06 · la ayuda está organizada por módulos y su buscador filtra\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts",
+                            "column": 77,
+                            "line": 28
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('link', { name: /Crear Primer Anuncio/i })\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('link', { name: /Crear Primer Anuncio/i })\u001b[22m\n\n\n  26 |     await page.getByPlaceholder(\"Buscar por cargo o empresa...\").fill(\"zzzz-sin-resultados\");\n  27 |     await expect(page.getByText(/No se encontraron anuncios/i)).toBeVisible();\n> 28 |     await expect(page.getByRole(\"link\", { name: /Crear Primer Anuncio/i })).toBeVisible();\n     |                                                                             ^\n  29 |   });\n  30 |\n  31 |   test(\"CP-USAB-06 · la ayuda está organizada por módulos y su buscador filtra\", async ({ page }) => {\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts:28:77"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-11-05T20:10:25.570Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\evidencias\\antes\\.playwright\\aprendizaje-con-rol-Admin--31429-ce-crear-el-primer-registro-escritorio-retry1\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\aprendizaje.spec.ts",
+                        "column": 77,
+                        "line": 28
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "ec60d67731c81f02d3e5-077a1f7ac279bdd5dd1e",
+              "file": "aprendizaje.spec.ts",
+              "line": 24,
+              "column": 7
+            },
+            {
+              "title": "CP-USAB-06 · la ayuda está organizada por módulos y su buscador filtra",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "escritorio",
+                  "projectName": "escritorio",
+                  "results": [
+                    {
+                      "workerIndex": 21,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 796,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T20:10:42.570Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ec60d67731c81f02d3e5-c568c131cf4f4e8ebca3",
+              "file": "aprendizaje.spec.ts",
+              "line": 31,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "asistencia.spec.ts",
+      "file": "asistencia.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "CP-USAB-18b · el texto del portal tiene contraste suficiente (WCAG 1.4.3, 4.5:1)",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "escritorio",
+              "projectName": "escritorio",
+              "results": [
+                {
+                  "workerIndex": 11,
+                  "parallelIndex": 1,
+                  "status": "failed",
+                  "duration": 1096,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 5\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"label[for=\\\"telefono\\\"] > .font-normal.text-gray-400\",\u001b[39m\n\u001b[31m+   \"label[for=\\\"fechaNacimiento\\\"] > .font-normal.text-gray-400\",\u001b[39m\n\u001b[31m+   \"span > .text-gray-400\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 5\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"label[for=\\\"telefono\\\"] > .font-normal.text-gray-400\",\u001b[39m\n\u001b[31m+   \"label[for=\\\"fechaNacimiento\\\"] > .font-normal.text-gray-400\",\u001b[39m\n\u001b[31m+   \"span > .text-gray-400\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts:33:78",
+                    "location": {
+                      "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts",
+                      "column": 78,
+                      "line": 33
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 31 |\u001b[39m   \u001b[36mconst\u001b[39m violaciones \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m auditarAccesibilidad(page\u001b[33m,\u001b[39m \u001b[32m\"CP-USAB-18b\"\u001b[39m\u001b[33m,\u001b[39m [\u001b[32m\"color-contrast\"\u001b[39m])\u001b[33m;\u001b[39m\n \u001b[90m 32 |\u001b[39m   \u001b[36mawait\u001b[39m resaltar(page\u001b[33m,\u001b[39m violaciones\u001b[33m.\u001b[39mflatMap((v) \u001b[33m=>\u001b[39m v\u001b[33m.\u001b[39mnodes\u001b[33m.\u001b[39mmap((n) \u001b[33m=>\u001b[39m n\u001b[33m.\u001b[39mtarget\u001b[33m.\u001b[39mjoin(\u001b[32m\" \"\u001b[39m))))\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 33 |\u001b[39m   expect(violaciones\u001b[33m.\u001b[39mflatMap((v) \u001b[33m=>\u001b[39m v\u001b[33m.\u001b[39mnodes\u001b[33m.\u001b[39mmap((n) \u001b[33m=>\u001b[39m n\u001b[33m.\u001b[39mtarget\u001b[33m.\u001b[39mjoin(\u001b[32m\" \"\u001b[39m))))\u001b[33m.\u001b[39mtoEqual([])\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                                              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 34 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m test(\u001b[32m\"CP-USAB-16 · una dirección que no existe orienta al usuario en el portal\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts",
+                        "column": 78,
+                        "line": 33
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 5\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"label[for=\\\"telefono\\\"] > .font-normal.text-gray-400\",\u001b[39m\n\u001b[31m+   \"label[for=\\\"fechaNacimiento\\\"] > .font-normal.text-gray-400\",\u001b[39m\n\u001b[31m+   \"span > .text-gray-400\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\n  31 |   const violaciones = await auditarAccesibilidad(page, \"CP-USAB-18b\", [\"color-contrast\"]);\n  32 |   await resaltar(page, violaciones.flatMap((v) => v.nodes.map((n) => n.target.join(\" \"))));\n> 33 |   expect(violaciones.flatMap((v) => v.nodes.map((n) => n.target.join(\" \")))).toEqual([]);\n     |                                                                              ^\n  34 | });\n  35 |\n  36 | test(\"CP-USAB-16 · una dirección que no existe orienta al usuario en el portal\", async ({ page }) => {\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts:33:78"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T20:09:39.095Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\evidencias\\antes\\.playwright\\asistencia-CP-USAB-18b-·-e-9ebf4-uficiente-WCAG-1-4-3-4-5-1--escritorio\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts",
+                    "column": 78,
+                    "line": 33
+                  }
+                },
+                {
+                  "workerIndex": 12,
+                  "parallelIndex": 1,
+                  "status": "failed",
+                  "duration": 1092,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 5\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"label[for=\\\"telefono\\\"] > .font-normal.text-gray-400\",\u001b[39m\n\u001b[31m+   \"label[for=\\\"fechaNacimiento\\\"] > .font-normal.text-gray-400\",\u001b[39m\n\u001b[31m+   \"span > .text-gray-400\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 5\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"label[for=\\\"telefono\\\"] > .font-normal.text-gray-400\",\u001b[39m\n\u001b[31m+   \"label[for=\\\"fechaNacimiento\\\"] > .font-normal.text-gray-400\",\u001b[39m\n\u001b[31m+   \"span > .text-gray-400\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts:33:78",
+                    "location": {
+                      "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts",
+                      "column": 78,
+                      "line": 33
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 31 |\u001b[39m   \u001b[36mconst\u001b[39m violaciones \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m auditarAccesibilidad(page\u001b[33m,\u001b[39m \u001b[32m\"CP-USAB-18b\"\u001b[39m\u001b[33m,\u001b[39m [\u001b[32m\"color-contrast\"\u001b[39m])\u001b[33m;\u001b[39m\n \u001b[90m 32 |\u001b[39m   \u001b[36mawait\u001b[39m resaltar(page\u001b[33m,\u001b[39m violaciones\u001b[33m.\u001b[39mflatMap((v) \u001b[33m=>\u001b[39m v\u001b[33m.\u001b[39mnodes\u001b[33m.\u001b[39mmap((n) \u001b[33m=>\u001b[39m n\u001b[33m.\u001b[39mtarget\u001b[33m.\u001b[39mjoin(\u001b[32m\" \"\u001b[39m))))\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 33 |\u001b[39m   expect(violaciones\u001b[33m.\u001b[39mflatMap((v) \u001b[33m=>\u001b[39m v\u001b[33m.\u001b[39mnodes\u001b[33m.\u001b[39mmap((n) \u001b[33m=>\u001b[39m n\u001b[33m.\u001b[39mtarget\u001b[33m.\u001b[39mjoin(\u001b[32m\" \"\u001b[39m))))\u001b[33m.\u001b[39mtoEqual([])\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                                              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 34 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m test(\u001b[32m\"CP-USAB-16 · una dirección que no existe orienta al usuario en el portal\"\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts",
+                        "column": 78,
+                        "line": 33
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 5\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \"label[for=\\\"telefono\\\"] > .font-normal.text-gray-400\",\u001b[39m\n\u001b[31m+   \"label[for=\\\"fechaNacimiento\\\"] > .font-normal.text-gray-400\",\u001b[39m\n\u001b[31m+   \"span > .text-gray-400\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\n  31 |   const violaciones = await auditarAccesibilidad(page, \"CP-USAB-18b\", [\"color-contrast\"]);\n  32 |   await resaltar(page, violaciones.flatMap((v) => v.nodes.map((n) => n.target.join(\" \"))));\n> 33 |   expect(violaciones.flatMap((v) => v.nodes.map((n) => n.target.join(\" \")))).toEqual([]);\n     |                                                                              ^\n  34 | });\n  35 |\n  36 | test(\"CP-USAB-16 · una dirección que no existe orienta al usuario en el portal\", async ({ page }) => {\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts:33:78"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 1,
+                  "startTime": "2026-11-05T20:09:41.082Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\evidencias\\antes\\.playwright\\asistencia-CP-USAB-18b-·-e-9ebf4-uficiente-WCAG-1-4-3-4-5-1--escritorio-retry1\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts",
+                    "column": 78,
+                    "line": 33
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "9b72d2ce24f353c135a9-1d0fe67322eec43e6d22",
+          "file": "asistencia.spec.ts",
+          "line": 28,
+          "column": 5
+        },
+        {
+          "title": "CP-USAB-16 · una dirección que no existe orienta al usuario en el portal",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "escritorio",
+              "projectName": "escritorio",
+              "results": [
+                {
+                  "workerIndex": 13,
+                  "parallelIndex": 1,
+                  "status": "failed",
+                  "duration": 15683,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('heading', { name: /no encontrada/i })\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: /no encontrada/i })\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('heading', { name: /no encontrada/i })\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: /no encontrada/i })\u001b[22m\n\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts:39:71",
+                    "location": {
+                      "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts",
+                      "column": 71,
+                      "line": 39
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 37 |\u001b[39m   \u001b[36mconst\u001b[39m respuesta \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`${PORTAL_URL}/vacante-que-no-existe-123`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 38 |\u001b[39m   expect(respuesta\u001b[33m?\u001b[39m\u001b[33m.\u001b[39mstatus())\u001b[33m.\u001b[39mtoBe(\u001b[35m404\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 39 |\u001b[39m   \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"heading\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/no encontrada/i\u001b[39m }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                                       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 40 |\u001b[39m   \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"link\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/Explorar ofertas/i\u001b[39m }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m 41 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 42 |\u001b[39m\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts",
+                        "column": 71,
+                        "line": 39
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('heading', { name: /no encontrada/i })\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: /no encontrada/i })\u001b[22m\n\n\n  37 |   const respuesta = await page.goto(`${PORTAL_URL}/vacante-que-no-existe-123`);\n  38 |   expect(respuesta?.status()).toBe(404);\n> 39 |   await expect(page.getByRole(\"heading\", { name: /no encontrada/i })).toBeVisible();\n     |                                                                       ^\n  40 |   await expect(page.getByRole(\"link\", { name: /Explorar ofertas/i })).toBeVisible();\n  41 | });\n  42 |\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts:39:71"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T20:09:43.058Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\evidencias\\antes\\.playwright\\asistencia-CP-USAB-16-·-un-be790-nta-al-usuario-en-el-portal-escritorio\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts",
+                    "column": 71,
+                    "line": 39
+                  }
+                },
+                {
+                  "workerIndex": 15,
+                  "parallelIndex": 1,
+                  "status": "failed",
+                  "duration": 15760,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('heading', { name: /no encontrada/i })\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: /no encontrada/i })\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('heading', { name: /no encontrada/i })\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: /no encontrada/i })\u001b[22m\n\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts:39:71",
+                    "location": {
+                      "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts",
+                      "column": 71,
+                      "line": 39
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 37 |\u001b[39m   \u001b[36mconst\u001b[39m respuesta \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[32m`${PORTAL_URL}/vacante-que-no-existe-123`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 38 |\u001b[39m   expect(respuesta\u001b[33m?\u001b[39m\u001b[33m.\u001b[39mstatus())\u001b[33m.\u001b[39mtoBe(\u001b[35m404\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 39 |\u001b[39m   \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"heading\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/no encontrada/i\u001b[39m }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                                       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 40 |\u001b[39m   \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"link\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/Explorar ofertas/i\u001b[39m }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m 41 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 42 |\u001b[39m\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts",
+                        "column": 71,
+                        "line": 39
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('heading', { name: /no encontrada/i })\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('heading', { name: /no encontrada/i })\u001b[22m\n\n\n  37 |   const respuesta = await page.goto(`${PORTAL_URL}/vacante-que-no-existe-123`);\n  38 |   expect(respuesta?.status()).toBe(404);\n> 39 |   await expect(page.getByRole(\"heading\", { name: /no encontrada/i })).toBeVisible();\n     |                                                                       ^\n  40 |   await expect(page.getByRole(\"link\", { name: /Explorar ofertas/i })).toBeVisible();\n  41 | });\n  42 |\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts:39:71"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 1,
+                  "startTime": "2026-11-05T20:09:59.651Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\evidencias\\antes\\.playwright\\asistencia-CP-USAB-16-·-un-be790-nta-al-usuario-en-el-portal-escritorio-retry1\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts",
+                    "column": 71,
+                    "line": 39
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "9b72d2ce24f353c135a9-bfdae69a103d15a90c10",
+          "file": "asistencia.spec.ts",
+          "line": 36,
+          "column": 5
+        },
+        {
+          "title": "CP-USAB-17 · el ERP y el portal declaran su idioma (WCAG 3.1.1)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "escritorio",
+              "projectName": "escritorio",
+              "results": [
+                {
+                  "workerIndex": 17,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 1659,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T20:10:16.293Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "9b72d2ce24f353c135a9-3d2e34bd0d22bb0384aa",
+          "file": "asistencia.spec.ts",
+          "line": 43,
+          "column": 5
+        },
+        {
+          "title": "CP-USAB-AXE · auditoría WCAG 2.1 AA completa de la portada del portal y del login del ERP",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "axe",
+                  "description": "sin violaciones graves"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "escritorio",
+              "projectName": "escritorio",
+              "results": [
+                {
+                  "workerIndex": 17,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 3271,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T20:10:18.159Z",
+                  "annotations": [
+                    {
+                      "type": "axe",
+                      "description": "sin violaciones graves"
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "9b72d2ce24f353c135a9-8642475ed04ad969c81c",
+          "file": "asistencia.spec.ts",
+          "line": 52,
+          "column": 5
+        }
+      ],
+      "suites": [
+        {
+          "title": "con rol Admin",
+          "file": "asistencia.spec.ts",
+          "line": 6,
+          "column": 6,
+          "specs": [
+            {
+              "title": "CP-USAB-13 · cada campo del formulario tiene una etiqueta accesible",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "escritorio",
+                  "projectName": "escritorio",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 16147,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel('Nombres')\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Nombres')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel('Nombres')\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Nombres')\u001b[22m\n\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts:15:46",
+                        "location": {
+                          "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts",
+                          "column": 46,
+                          "line": 15
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m resaltar(page\u001b[33m,\u001b[39m violaciones\u001b[33m.\u001b[39mflatMap((v) \u001b[33m=>\u001b[39m v\u001b[33m.\u001b[39mnodes\u001b[33m.\u001b[39mmap((n) \u001b[33m=>\u001b[39m n\u001b[33m.\u001b[39mtarget\u001b[33m.\u001b[39mjoin(\u001b[32m\" \"\u001b[39m))))\u001b[33m;\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[90m// Un lector de pantalla llega al campo por su etiqueta:\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 15 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByLabel(\u001b[32m\"Nombres\"\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 16 |\u001b[39m     expect(violaciones\u001b[33m.\u001b[39mmap((v) \u001b[33m=>\u001b[39m \u001b[32m`${v.id}: ${v.nodes.length} campos`\u001b[39m))\u001b[33m.\u001b[39mtoEqual([])\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 18 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts",
+                            "column": 46,
+                            "line": 15
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel('Nombres')\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Nombres')\u001b[22m\n\n\n  13 |     await resaltar(page, violaciones.flatMap((v) => v.nodes.map((n) => n.target.join(\" \"))));\n  14 |     // Un lector de pantalla llega al campo por su etiqueta:\n> 15 |     await expect(page.getByLabel(\"Nombres\")).toBeVisible();\n     |                                              ^\n  16 |     expect(violaciones.map((v) => `${v.id}: ${v.nodes.length} campos`)).toEqual([]);\n  17 |   });\n  18 |\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts:15:46"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T20:09:00.796Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\evidencias\\antes\\.playwright\\asistencia-con-rol-Admin-C-60b21-iene-una-etiqueta-accesible-escritorio\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts",
+                        "column": 46,
+                        "line": 15
+                      }
+                    },
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 16065,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel('Nombres')\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Nombres')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel('Nombres')\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Nombres')\u001b[22m\n\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts:15:46",
+                        "location": {
+                          "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts",
+                          "column": 46,
+                          "line": 15
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 13 |\u001b[39m     \u001b[36mawait\u001b[39m resaltar(page\u001b[33m,\u001b[39m violaciones\u001b[33m.\u001b[39mflatMap((v) \u001b[33m=>\u001b[39m v\u001b[33m.\u001b[39mnodes\u001b[33m.\u001b[39mmap((n) \u001b[33m=>\u001b[39m n\u001b[33m.\u001b[39mtarget\u001b[33m.\u001b[39mjoin(\u001b[32m\" \"\u001b[39m))))\u001b[33m;\u001b[39m\n \u001b[90m 14 |\u001b[39m     \u001b[90m// Un lector de pantalla llega al campo por su etiqueta:\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 15 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByLabel(\u001b[32m\"Nombres\"\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 16 |\u001b[39m     expect(violaciones\u001b[33m.\u001b[39mmap((v) \u001b[33m=>\u001b[39m \u001b[32m`${v.id}: ${v.nodes.length} campos`\u001b[39m))\u001b[33m.\u001b[39mtoEqual([])\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 18 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts",
+                            "column": 46,
+                            "line": 15
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByLabel('Nombres')\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel('Nombres')\u001b[22m\n\n\n  13 |     await resaltar(page, violaciones.flatMap((v) => v.nodes.map((n) => n.target.join(\" \"))));\n  14 |     // Un lector de pantalla llega al campo por su etiqueta:\n> 15 |     await expect(page.getByLabel(\"Nombres\")).toBeVisible();\n     |                                              ^\n  16 |     expect(violaciones.map((v) => `${v.id}: ${v.nodes.length} campos`)).toEqual([]);\n  17 |   });\n  18 |\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts:15:46"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-11-05T20:09:17.959Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\evidencias\\antes\\.playwright\\asistencia-con-rol-Admin-C-60b21-iene-una-etiqueta-accesible-escritorio-retry1\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts",
+                        "column": 46,
+                        "line": 15
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "9b72d2ce24f353c135a9-a24d825ab9499fab3843",
+              "file": "asistencia.spec.ts",
+              "line": 9,
+              "column": 7
+            },
+            {
+              "title": "CP-USAB-18 · el texto del ERP tiene contraste suficiente (WCAG 1.4.3, 4.5:1)",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "escritorio",
+                  "projectName": "escritorio",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 1145,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \".text-xs.text-slate-400\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \".text-xs.text-slate-400\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts:24:80",
+                        "location": {
+                          "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts",
+                          "column": 80,
+                          "line": 24
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 22 |\u001b[39m     \u001b[36mconst\u001b[39m violaciones \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m auditarAccesibilidad(page\u001b[33m,\u001b[39m \u001b[32m\"CP-USAB-18\"\u001b[39m\u001b[33m,\u001b[39m [\u001b[32m\"color-contrast\"\u001b[39m])\u001b[33m;\u001b[39m\n \u001b[90m 23 |\u001b[39m     \u001b[36mawait\u001b[39m resaltar(page\u001b[33m,\u001b[39m violaciones\u001b[33m.\u001b[39mflatMap((v) \u001b[33m=>\u001b[39m v\u001b[33m.\u001b[39mnodes\u001b[33m.\u001b[39mmap((n) \u001b[33m=>\u001b[39m n\u001b[33m.\u001b[39mtarget\u001b[33m.\u001b[39mjoin(\u001b[32m\" \"\u001b[39m))))\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 24 |\u001b[39m     expect(violaciones\u001b[33m.\u001b[39mflatMap((v) \u001b[33m=>\u001b[39m v\u001b[33m.\u001b[39mnodes\u001b[33m.\u001b[39mmap((n) \u001b[33m=>\u001b[39m n\u001b[33m.\u001b[39mtarget\u001b[33m.\u001b[39mjoin(\u001b[32m\" \"\u001b[39m))))\u001b[33m.\u001b[39mtoEqual([])\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 25 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 26 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 27 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts",
+                            "column": 80,
+                            "line": 24
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \".text-xs.text-slate-400\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\n  22 |     const violaciones = await auditarAccesibilidad(page, \"CP-USAB-18\", [\"color-contrast\"]);\n  23 |     await resaltar(page, violaciones.flatMap((v) => v.nodes.map((n) => n.target.join(\" \"))));\n> 24 |     expect(violaciones.flatMap((v) => v.nodes.map((n) => n.target.join(\" \")))).toEqual([]);\n     |                                                                                ^\n  25 |   });\n  26 | });\n  27 |\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts:24:80"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T20:09:34.994Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\evidencias\\antes\\.playwright\\asistencia-con-rol-Admin-C-2b947-uficiente-WCAG-1-4-3-4-5-1--escritorio\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts",
+                        "column": 80,
+                        "line": 24
+                      }
+                    },
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 1193,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \".text-xs.text-slate-400\",\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \".text-xs.text-slate-400\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts:24:80",
+                        "location": {
+                          "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts",
+                          "column": 80,
+                          "line": 24
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 22 |\u001b[39m     \u001b[36mconst\u001b[39m violaciones \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m auditarAccesibilidad(page\u001b[33m,\u001b[39m \u001b[32m\"CP-USAB-18\"\u001b[39m\u001b[33m,\u001b[39m [\u001b[32m\"color-contrast\"\u001b[39m])\u001b[33m;\u001b[39m\n \u001b[90m 23 |\u001b[39m     \u001b[36mawait\u001b[39m resaltar(page\u001b[33m,\u001b[39m violaciones\u001b[33m.\u001b[39mflatMap((v) \u001b[33m=>\u001b[39m v\u001b[33m.\u001b[39mnodes\u001b[33m.\u001b[39mmap((n) \u001b[33m=>\u001b[39m n\u001b[33m.\u001b[39mtarget\u001b[33m.\u001b[39mjoin(\u001b[32m\" \"\u001b[39m))))\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 24 |\u001b[39m     expect(violaciones\u001b[33m.\u001b[39mflatMap((v) \u001b[33m=>\u001b[39m v\u001b[33m.\u001b[39mnodes\u001b[33m.\u001b[39mmap((n) \u001b[33m=>\u001b[39m n\u001b[33m.\u001b[39mtarget\u001b[33m.\u001b[39mjoin(\u001b[32m\" \"\u001b[39m))))\u001b[33m.\u001b[39mtoEqual([])\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 25 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 26 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 27 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts",
+                            "column": 80,
+                            "line": 24
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  - 1\u001b[39m\n\u001b[31m+ Received  + 3\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   \".text-xs.text-slate-400\",\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\n  22 |     const violaciones = await auditarAccesibilidad(page, \"CP-USAB-18\", [\"color-contrast\"]);\n  23 |     await resaltar(page, violaciones.flatMap((v) => v.nodes.map((n) => n.target.join(\" \"))));\n> 24 |     expect(violaciones.flatMap((v) => v.nodes.map((n) => n.target.join(\" \")))).toEqual([]);\n     |                                                                                ^\n  25 |   });\n  26 | });\n  27 |\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts:24:80"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-11-05T20:09:37.032Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\evidencias\\antes\\.playwright\\asistencia-con-rol-Admin-C-2b947-uficiente-WCAG-1-4-3-4-5-1--escritorio-retry1\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\asistencia.spec.ts",
+                        "column": 80,
+                        "line": 24
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "9b72d2ce24f353c135a9-fc41c432c8168d99584e",
+              "file": "asistencia.spec.ts",
+              "line": 19,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "compromiso.spec.ts",
+      "file": "compromiso.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "CP-USAB-23 · la política de privacidad está a mano y en español claro",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "escritorio",
+              "projectName": "escritorio",
+              "results": [
+                {
+                  "workerIndex": 17,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 701,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T20:10:25.858Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "96d1a448ae3996962388-5f6e764e4a9416827257",
+          "file": "compromiso.spec.ts",
+          "line": 31,
+          "column": 5
+        }
+      ],
+      "suites": [
+        {
+          "title": "con rol Admin",
+          "file": "compromiso.spec.ts",
+          "line": 6,
+          "column": 6,
+          "specs": [
+            {
+              "title": "CP-USAB-19 · el dashboard muestra los indicadores clave de un vistazo",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "escritorio",
+                  "projectName": "escritorio",
+                  "results": [
+                    {
+                      "workerIndex": 17,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1622,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T20:10:21.445Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "96d1a448ae3996962388-75a9f1ef606a09a65dad",
+              "file": "compromiso.spec.ts",
+              "line": 9,
+              "column": 7
+            },
+            {
+              "title": "CP-USAB-20 · el pipeline muestra a los candidatos como tablero por etapas",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "escritorio",
+                  "projectName": "escritorio",
+                  "results": [
+                    {
+                      "workerIndex": 17,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1588,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T20:10:23.075Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "96d1a448ae3996962388-acdd1156b3439886e5f5",
+              "file": "compromiso.spec.ts",
+              "line": 16,
+              "column": 7
+            },
+            {
+              "title": "CP-USAB-21 · el reporte del dashboard se exporta a CSV con un clic",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "escritorio",
+                  "projectName": "escritorio",
+                  "results": [
+                    {
+                      "workerIndex": 17,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1174,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T20:10:24.673Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "96d1a448ae3996962388-e4c489ccd0fde52b74d0",
+              "file": "compromiso.spec.ts",
+              "line": 22,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "errores.spec.ts",
+      "file": "errores.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "CP-USAB-09 · el registro del portal guía la contraseña y detecta que no coinciden",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "escritorio",
+              "projectName": "escritorio",
+              "results": [
+                {
+                  "workerIndex": 20,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 839,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T20:10:31.972Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "2f9586cf9b8e112d3034-50c397777e1420d6d7ac",
+          "file": "errores.spec.ts",
+          "line": 35,
+          "column": 5
+        }
+      ],
+      "suites": [
+        {
+          "title": "con rol Admin",
+          "file": "errores.spec.ts",
+          "line": 6,
+          "column": 6,
+          "specs": [
+            {
+              "title": "CP-USAB-07 · salir de un formulario con datos sin guardar pide confirmación",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "escritorio",
+                  "projectName": "escritorio",
+                  "results": [
+                    {
+                      "workerIndex": 17,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 1401,
+                      "error": {
+                        "message": "Error: el navegador debía preguntar antes de salir (beforeunload)\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"beforeunload\"\u001b[39m\nReceived: \u001b[31mnull\u001b[39m",
+                        "stack": "Error: el navegador debía preguntar antes de salir (beforeunload)\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"beforeunload\"\u001b[39m\nReceived: \u001b[31mnull\u001b[39m\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\errores.spec.ts:19:81",
+                        "location": {
+                          "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\errores.spec.ts",
+                          "column": 81,
+                          "line": 19
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 17 |\u001b[39m     })\u001b[33m;\u001b[39m\n \u001b[90m 18 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mreload({ timeout\u001b[33m:\u001b[39m \u001b[35m8\u001b[39m_000 })\u001b[33m.\u001b[39m\u001b[36mcatch\u001b[39m(() \u001b[33m=>\u001b[39m {})\u001b[33m;\u001b[39m \u001b[90m// si aparece el aviso, la recarga se cancela\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m     expect(aviso\u001b[33m,\u001b[39m \u001b[32m\"el navegador debía preguntar antes de salir (beforeunload)\"\u001b[39m)\u001b[33m.\u001b[39mtoBe(\u001b[32m\"beforeunload\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByPlaceholder(\u001b[32m\"Ej: Juan Carlos\"\u001b[39m))\u001b[33m.\u001b[39mtoHaveValue(\u001b[32m\"Ana María\"\u001b[39m)\u001b[33m;\u001b[39m \u001b[90m// no se perdió nada\u001b[39m\n \u001b[90m 21 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 22 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\errores.spec.ts",
+                            "column": 81,
+                            "line": 19
+                          },
+                          "message": "Error: el navegador debía preguntar antes de salir (beforeunload)\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"beforeunload\"\u001b[39m\nReceived: \u001b[31mnull\u001b[39m\n\n  17 |     });\n  18 |     await page.reload({ timeout: 8_000 }).catch(() => {}); // si aparece el aviso, la recarga se cancela\n> 19 |     expect(aviso, \"el navegador debía preguntar antes de salir (beforeunload)\").toBe(\"beforeunload\");\n     |                                                                                 ^\n  20 |     await expect(page.getByPlaceholder(\"Ej: Juan Carlos\")).toHaveValue(\"Ana María\"); // no se perdió nada\n  21 |   });\n  22 |\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\errores.spec.ts:19:81"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T20:10:26.574Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\evidencias\\antes\\.playwright\\errores-con-rol-Admin-CP-U-ead6c-n-guardar-pide-confirmación-escritorio\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\errores.spec.ts",
+                        "column": 81,
+                        "line": 19
+                      }
+                    },
+                    {
+                      "workerIndex": 19,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 1017,
+                      "error": {
+                        "message": "Error: el navegador debía preguntar antes de salir (beforeunload)\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"beforeunload\"\u001b[39m\nReceived: \u001b[31mnull\u001b[39m",
+                        "stack": "Error: el navegador debía preguntar antes de salir (beforeunload)\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"beforeunload\"\u001b[39m\nReceived: \u001b[31mnull\u001b[39m\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\errores.spec.ts:19:81",
+                        "location": {
+                          "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\errores.spec.ts",
+                          "column": 81,
+                          "line": 19
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 17 |\u001b[39m     })\u001b[33m;\u001b[39m\n \u001b[90m 18 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mreload({ timeout\u001b[33m:\u001b[39m \u001b[35m8\u001b[39m_000 })\u001b[33m.\u001b[39m\u001b[36mcatch\u001b[39m(() \u001b[33m=>\u001b[39m {})\u001b[33m;\u001b[39m \u001b[90m// si aparece el aviso, la recarga se cancela\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m     expect(aviso\u001b[33m,\u001b[39m \u001b[32m\"el navegador debía preguntar antes de salir (beforeunload)\"\u001b[39m)\u001b[33m.\u001b[39mtoBe(\u001b[32m\"beforeunload\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByPlaceholder(\u001b[32m\"Ej: Juan Carlos\"\u001b[39m))\u001b[33m.\u001b[39mtoHaveValue(\u001b[32m\"Ana María\"\u001b[39m)\u001b[33m;\u001b[39m \u001b[90m// no se perdió nada\u001b[39m\n \u001b[90m 21 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 22 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\errores.spec.ts",
+                            "column": 81,
+                            "line": 19
+                          },
+                          "message": "Error: el navegador debía preguntar antes de salir (beforeunload)\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"beforeunload\"\u001b[39m\nReceived: \u001b[31mnull\u001b[39m\n\n  17 |     });\n  18 |     await page.reload({ timeout: 8_000 }).catch(() => {}); // si aparece el aviso, la recarga se cancela\n> 19 |     expect(aviso, \"el navegador debía preguntar antes de salir (beforeunload)\").toBe(\"beforeunload\");\n     |                                                                                 ^\n  20 |     await expect(page.getByPlaceholder(\"Ej: Juan Carlos\")).toHaveValue(\"Ana María\"); // no se perdió nada\n  21 |   });\n  22 |\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\errores.spec.ts:19:81"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-11-05T20:10:28.664Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\evidencias\\antes\\.playwright\\errores-con-rol-Admin-CP-U-ead6c-n-guardar-pide-confirmación-escritorio-retry1\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\errores.spec.ts",
+                        "column": 81,
+                        "line": 19
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "2f9586cf9b8e112d3034-f6f630cc1143317253c0",
+              "file": "errores.spec.ts",
+              "line": 9,
+              "column": 7
+            },
+            {
+              "title": "CP-USAB-08 · borrar una empresa pide confirmación explícita (y se puede cancelar)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "escritorio",
+                  "projectName": "escritorio",
+                  "results": [
+                    {
+                      "workerIndex": 20,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1195,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T20:10:30.566Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2f9586cf9b8e112d3034-a0929e197c0cbfc34d7e",
+              "file": "errores.spec.ts",
+              "line": 23,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "movil.spec.ts",
+      "file": "movil.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "CP-USAB-22 · en el celular, el buscador y sus accesos rápidos se tocan con comodidad (≥ 44 px)",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "medidas",
+                  "description": "{\"buscador\":40}"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "movil",
+              "projectName": "movil",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "failed",
+                  "duration": 3942,
+                  "error": {
+                    "message": "Error: accesos rápidos de búsqueda\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m1\u001b[39m\nReceived:   \u001b[31m1\u001b[39m",
+                    "stack": "Error: accesos rápidos de búsqueda\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m1\u001b[39m\nReceived:   \u001b[31m1\u001b[39m\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\movil.spec.ts:19:70",
+                    "location": {
+                      "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\movil.spec.ts",
+                      "column": 70,
+                      "line": 19
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 17 |\u001b[39m   \u001b[36mconst\u001b[39m chicos \u001b[33m=\u001b[39m \u001b[33mObject\u001b[39m\u001b[33m.\u001b[39mentries(medidas)\u001b[33m.\u001b[39mfilter(([\u001b[33m,\u001b[39m alto]) \u001b[33m=>\u001b[39m alto \u001b[33m<\u001b[39m \u001b[35m44\u001b[39m)\u001b[33m.\u001b[39mmap(([n\u001b[33m,\u001b[39m alto]) \u001b[33m=>\u001b[39m \u001b[32m`${n}: ${alto}px`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 18 |\u001b[39m   \u001b[36mif\u001b[39m (chicos\u001b[33m.\u001b[39mlength) \u001b[36mawait\u001b[39m resaltar(page\u001b[33m,\u001b[39m [\u001b[32m'button[class*=\"rounded-full\"]'\u001b[39m])\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m   expect(\u001b[33mObject\u001b[39m\u001b[33m.\u001b[39mkeys(medidas)\u001b[33m.\u001b[39mlength\u001b[33m,\u001b[39m \u001b[32m\"accesos rápidos de búsqueda\"\u001b[39m)\u001b[33m.\u001b[39mtoBeGreaterThan(\u001b[35m1\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                                      \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m   expect(chicos\u001b[33m,\u001b[39m \u001b[32m\"objetivos táctiles menores a 44 px\"\u001b[39m)\u001b[33m.\u001b[39mtoEqual([])\u001b[33m;\u001b[39m\n \u001b[90m 21 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 22 |\u001b[39m\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\movil.spec.ts",
+                        "column": 70,
+                        "line": 19
+                      },
+                      "message": "Error: accesos rápidos de búsqueda\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m1\u001b[39m\nReceived:   \u001b[31m1\u001b[39m\n\n  17 |   const chicos = Object.entries(medidas).filter(([, alto]) => alto < 44).map(([n, alto]) => `${n}: ${alto}px`);\n  18 |   if (chicos.length) await resaltar(page, ['button[class*=\"rounded-full\"]']);\n> 19 |   expect(Object.keys(medidas).length, \"accesos rápidos de búsqueda\").toBeGreaterThan(1);\n     |                                                                      ^\n  20 |   expect(chicos, \"objetivos táctiles menores a 44 px\").toEqual([]);\n  21 | });\n  22 |\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\movil.spec.ts:19:70"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T20:08:51.298Z",
+                  "annotations": [
+                    {
+                      "type": "medidas",
+                      "description": "{\"buscador\":40}"
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\evidencias\\antes\\.playwright\\movil-CP-USAB-22-·-en-el-c-4cfe2-ocan-con-comodidad-≥-44-px--movil\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\movil.spec.ts",
+                    "column": 70,
+                    "line": 19
+                  }
+                },
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 1,
+                  "status": "failed",
+                  "duration": 984,
+                  "error": {
+                    "message": "Error: accesos rápidos de búsqueda\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m1\u001b[39m\nReceived:   \u001b[31m1\u001b[39m",
+                    "stack": "Error: accesos rápidos de búsqueda\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m1\u001b[39m\nReceived:   \u001b[31m1\u001b[39m\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\movil.spec.ts:19:70",
+                    "location": {
+                      "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\movil.spec.ts",
+                      "column": 70,
+                      "line": 19
+                    },
+                    "snippet": "\u001b[0m \u001b[90m 17 |\u001b[39m   \u001b[36mconst\u001b[39m chicos \u001b[33m=\u001b[39m \u001b[33mObject\u001b[39m\u001b[33m.\u001b[39mentries(medidas)\u001b[33m.\u001b[39mfilter(([\u001b[33m,\u001b[39m alto]) \u001b[33m=>\u001b[39m alto \u001b[33m<\u001b[39m \u001b[35m44\u001b[39m)\u001b[33m.\u001b[39mmap(([n\u001b[33m,\u001b[39m alto]) \u001b[33m=>\u001b[39m \u001b[32m`${n}: ${alto}px`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 18 |\u001b[39m   \u001b[36mif\u001b[39m (chicos\u001b[33m.\u001b[39mlength) \u001b[36mawait\u001b[39m resaltar(page\u001b[33m,\u001b[39m [\u001b[32m'button[class*=\"rounded-full\"]'\u001b[39m])\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m   expect(\u001b[33mObject\u001b[39m\u001b[33m.\u001b[39mkeys(medidas)\u001b[33m.\u001b[39mlength\u001b[33m,\u001b[39m \u001b[32m\"accesos rápidos de búsqueda\"\u001b[39m)\u001b[33m.\u001b[39mtoBeGreaterThan(\u001b[35m1\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                                      \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m   expect(chicos\u001b[33m,\u001b[39m \u001b[32m\"objetivos táctiles menores a 44 px\"\u001b[39m)\u001b[33m.\u001b[39mtoEqual([])\u001b[33m;\u001b[39m\n \u001b[90m 21 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 22 |\u001b[39m\u001b[0m"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\movil.spec.ts",
+                        "column": 70,
+                        "line": 19
+                      },
+                      "message": "Error: accesos rápidos de búsqueda\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m1\u001b[39m\nReceived:   \u001b[31m1\u001b[39m\n\n  17 |   const chicos = Object.entries(medidas).filter(([, alto]) => alto < 44).map(([n, alto]) => `${n}: ${alto}px`);\n  18 |   if (chicos.length) await resaltar(page, ['button[class*=\"rounded-full\"]']);\n> 19 |   expect(Object.keys(medidas).length, \"accesos rápidos de búsqueda\").toBeGreaterThan(1);\n     |                                                                      ^\n  20 |   expect(chicos, \"objetivos táctiles menores a 44 px\").toEqual([]);\n  21 | });\n  22 |\n    at C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\movil.spec.ts:19:70"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 1,
+                  "startTime": "2026-11-05T20:08:56.475Z",
+                  "annotations": [
+                    {
+                      "type": "medidas",
+                      "description": "{\"buscador\":40}"
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\evidencias\\antes\\.playwright\\movil-CP-USAB-22-·-en-el-c-4cfe2-ocan-con-comodidad-≥-44-px--movil-retry1\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "C:\\Users\\Administrator\\Desktop\\Proyectos\\Integrador2_Proyecto\\tests\\usabilidad\\programas\\pruebas\\movil.spec.ts",
+                    "column": 70,
+                    "line": 19
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "8fb9d0a3c42053ef1784-43872ad7a85b26539fd5",
+          "file": "movil.spec.ts",
+          "line": 6,
+          "column": 5
+        },
+        {
+          "title": "CP-USAB-22b · el portal se adapta al ancho del celular (sin scroll horizontal)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "movil",
+              "projectName": "movil",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 903,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T20:08:58.412Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "8fb9d0a3c42053ef1784-d946dbcd597b3c487e71",
+          "file": "movil.spec.ts",
+          "line": 23,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-05T20:08:50.414Z",
+    "duration": 114060.508,
+    "expected": 13,
+    "skipped": 0,
+    "unexpected": 9,
+    "flaky": 0
+  }
+}

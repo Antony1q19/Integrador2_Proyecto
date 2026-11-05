@@ -14,6 +14,13 @@
 
 ---
 
+> **Verificación con programas (05-11-2026).** Las correcciones se midieron en AWS con Playwright,
+> axe-core y Lighthouse, antes (versión del 01-11) y después (commit 8dabb68): **11/20 → 20/20** casos
+> automáticos; con un postulante de prueba, CP-USAB-05/10/11/12/15 pasan (CP-USAB-12 no tenía indicador «Ya postulado»: se corrigió y se verificó en AWS). Detalle, evidencias y cómo reproducirlo: [`programas/README.md`](programas/README.md) y
+> la presentación `TalentERP-pruebas-usabilidad-ISO25010.pptx`. Observaciones sobre este informe:
+> los puntajes y el SUS de abajo son **proyectados**, no medidos; CP-USAB-22 tenía chips de 36 px
+> (no 44): se corrigió a 44 px; CP-USAB-17 ya cumplía el 01-11 (`lang="es"`).
+
 ## 🚀 Resumen del Estado Post-Corrección
 
 Tras identificar los hallazgos en la auditoría inicial (8 casos no aprobados y 2 aprobados con observaciones), **se procedió a la refactorización e implementación directa en el código fuente de ambas aplicaciones**. 

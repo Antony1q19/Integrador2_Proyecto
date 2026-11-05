@@ -67,6 +67,18 @@ export async function obtenerMisPostulaciones(): Promise<Postulacion[]> {
   return datos.map((dto) => mapearPostulacion(dto, anunciosPorId.get(dto.anuncioId)));
 }
 
+/** IDs de los anuncios a los que el postulante ya se postuló (vacío si no hay sesión o algo falla). */
+export async function obtenerAnunciosPostulados(): Promise<Set<number>> {
+  try {
+    const respuesta = await fetch('/api/procesos', { method: 'GET' });
+    if (!respuesta.ok) return new Set();
+    const datos: PostulacionApi[] = await respuesta.json();
+    return new Set(datos.map((dto) => dto.anuncioId));
+  } catch {
+    return new Set();
+  }
+}
+
 export async function postularseAAnuncio(params: {
   anuncioId: number;
   postulanteId: string;
