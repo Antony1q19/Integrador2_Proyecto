@@ -20,6 +20,14 @@ tests/
 ├── ejecutar.py                 ← corre todas las suites y guarda la evidencia
 ├── requirements.txt
 ├── evidencias/                 ← reportes JUnit + resumen.md (lo genera ejecutar.py; git lo ignora)
+├── funcional/                  ← Adecuación Funcional (ISO/IEC 25010) y Verificación y Validación (V&V)
+│   ├── test_funcional_postulantes.py
+│   ├── test_funcional_seleccion.py
+│   ├── test_funcional_empresas.py
+│   ├── test_funcional_gateway.py
+│   ├── test_validacion_negocio_flujos.py
+│   ├── test_auditoria_funcional_vyv.py
+│   └── README.md
 └── compatibilidad/
     ├── interoperabilidad/
     │   ├── meta_whatsapp/      A1, A3, A5 · WhatsApp Cloud API (respx)

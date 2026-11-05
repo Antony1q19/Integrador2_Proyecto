@@ -13,6 +13,13 @@ import subprocess
 import sys
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
+
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 from datetime import datetime
 from pathlib import Path
 
@@ -48,6 +55,13 @@ SUITES = [
           "Interoperabilidad"),
     Suite("coexistencia-infraestructura", f"{COEXISTENCIA}/infraestructura_compartida", None, "Co-existencia"),
     Suite("coexistencia-sesiones", f"{COEXISTENCIA}/sesiones_erp_portal", "gateway", "Co-existencia"),
+    # Adecuación Funcional (ISO/IEC 25010) - Verificación y Validación (V&V)
+    Suite("funcional-postulantes", "funcional/test_funcional_postulantes.py", "servicio-postulantes", "Adecuación Funcional"),
+    Suite("funcional-seleccion", "funcional/test_funcional_seleccion.py", "servicio-procesos-seleccion", "Adecuación Funcional"),
+    Suite("funcional-empresas", "funcional/test_funcional_empresas.py", "servicio-empresas-vacantes", "Adecuación Funcional"),
+    Suite("funcional-gateway", "funcional/test_funcional_gateway.py", "gateway", "Adecuación Funcional"),
+    Suite("funcional-flujos", "funcional/test_validacion_negocio_flujos.py", "servicio-procesos-seleccion", "Adecuación Funcional"),
+    Suite("funcional-auditoria-vyv", "funcional/test_auditoria_funcional_vyv.py", "servicio-postulantes", "Adecuación Funcional"),
 ]
 
 # Valores de prueba: la configuración de los servicios se lee al importarlos, pero ninguna prueba se

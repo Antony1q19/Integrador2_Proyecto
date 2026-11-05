@@ -3,7 +3,7 @@
 Rutas (prefijo /entrevistas). El navegador las llama a través del Gateway, como /api/v1/entrevistas...:
     GET    /entrevistas?postulanteId=&anuncioId=&estado=&desde=&hasta=   → agenda / historial de entrevistas
     POST   /entrevistas                                                  → programar una entrevista (Admin, RRHH, Supervisor)
-    PATCH  /entrevistas/{id}                                             → reprogramar, cerrar o anotar cómo salió (Admin, RRHH, Supervisor)
+    PATCH  /entrevistas/{id}                                             → reprogramar, cerrar o anotar cómo salió (Admin, RRHH)
 
 Como en todo el servicio, RRHH y Supervisor solo ven las entrevistas de postulaciones a anuncios de las
 empresas que un Admin les asignó; lo demás responde 404.
@@ -180,7 +180,7 @@ async def actualizar_entrevista(
     entrevista_id: str,
     datos: EntrevistaActualizar,
     sesion: AsyncSession = Depends(obtener_sesion),
-    usuario: dict = Depends(requerir_rol("Admin", "RRHH", "Supervisor")),
+    usuario: dict = Depends(requerir_rol("Admin", "RRHH")),
 ) -> EntrevistaRespuesta:
     resultado = await sesion.execute(
         select(Entrevista).options(joinedload(Entrevista.proceso)).where(Entrevista.id == entrevista_id)
