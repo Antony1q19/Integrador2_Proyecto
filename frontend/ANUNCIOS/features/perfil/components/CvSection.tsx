@@ -81,7 +81,7 @@ export function CvSection({ cv, onSubir, onEliminar }: CvSectionProps) {
             </span>
             <div className="min-w-0">
               <p className="truncate text-sm font-medium text-gray-800">{cv.nombreArchivo}</p>
-              <p className="font-mono text-[11px] text-gray-400">
+              <p className="font-mono text-[11px] text-gray-600">
                 {cv.tamanioKb} KB · {new Date(cv.fechaCarga).toLocaleDateString('es-PE')}
               </p>
             </div>
@@ -105,7 +105,7 @@ export function CvSection({ cv, onSubir, onEliminar }: CvSectionProps) {
             </button>
             <button
               onClick={eliminar}
-              className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-400 transition-colors duration-150 hover:bg-red-50 hover:text-red-600 active:scale-[0.97]"
+              className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-600 transition-colors duration-150 hover:bg-red-50 hover:text-red-600 active:scale-[0.97]"
             >
               <Trash2 size={13} />
             </button>
@@ -132,11 +132,11 @@ export function CvSection({ cv, onSubir, onEliminar }: CvSectionProps) {
             subiendo ? 'pointer-events-none opacity-70' : '',
           ].join(' ')}
         >
-          <UploadCloud size={24} className="mb-2 text-gray-400" />
+          <UploadCloud size={24} className="mb-2 text-gray-600" />
           <p className="text-sm text-gray-600">
             {subiendo ? 'Subiendo CV…' : 'Arrastra tu CV o haz clic para seleccionarlo'}
           </p>
-          <p className="mt-1 text-xs text-gray-400">
+          <p className="mt-1 text-xs text-gray-600">
             PDF, JPG o PNG · máx. {TAMANIO_MAXIMO_MB}MB
           </p>
         </div>
@@ -162,7 +162,7 @@ export function CvSection({ cv, onSubir, onEliminar }: CvSectionProps) {
               style={{ width: `${Math.min(Math.round(progreso), 100)}%` }}
             />
           </div>
-          <p className="mt-1 text-right text-[11px] text-gray-400">
+          <p className="mt-1 text-right text-[11px] text-gray-600">
             {Math.min(Math.round(progreso), 100)}%
           </p>
         </div>

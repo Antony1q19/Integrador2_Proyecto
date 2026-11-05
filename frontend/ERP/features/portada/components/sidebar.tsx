@@ -99,7 +99,7 @@ export default function Sidebar({
                             <h1 className="text-xl font-bold tracking-tight">
                                 Talent<span className="text-primary-400">ERP</span>
                             </h1>
-                            <p className="text-[11px] text-slate-400">Recursos Humanos</p>
+                            <p className="text-[11px] text-slate-600">Recursos Humanos</p>
                         </div>
                     </div>
 
@@ -194,7 +194,7 @@ export default function Sidebar({
                                                             className={`block rounded-lg px-3 py-2 text-sm transition ${
                                                                 subActive
                                                                     ? "font-medium text-white"
-                                                                    : "text-slate-400 hover:bg-white/[0.08] hover:text-white"
+                                                                    : "text-slate-600 hover:bg-white/[0.08] hover:text-white"
                                                             }`}
                                                         >
                                                             {sub.name}
@@ -218,7 +218,7 @@ export default function Sidebar({
                         {/* Cerrar sesión */}
                         <button
                             onClick={handleLogout} 
-                            className="group flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-400 transition hover:bg-red-500/10 hover:text-red-300"
+                            className="group flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-slate-600 transition hover:bg-red-500/10 hover:text-red-300"
                         >
                             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 group-hover:bg-red-500/10">
                                 <LogOut size={18} />
@@ -237,7 +237,7 @@ export default function Sidebar({
                 {/* Botón cerrar en móvil */}
                 <button
                     onClick={() => setOpen(false)}
-                    className="absolute right-3 top-6 rounded-lg p-2 text-slate-400 hover:bg-white/10 lg:hidden"
+                    className="absolute right-3 top-6 rounded-lg p-2 text-slate-600 hover:bg-white/10 lg:hidden"
                 >
                     <ChevronLeft size={20} />
                 </button>

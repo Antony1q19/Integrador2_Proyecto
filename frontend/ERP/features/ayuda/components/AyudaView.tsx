@@ -37,7 +37,7 @@ export function AyudaView() {
       </div>
 
       <label className="relative block">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-600" />
         <span className="sr-only">Buscar en la ayuda</span>
         <input
           value={busqueda}
@@ -63,7 +63,7 @@ export function AyudaView() {
                   <p className="font-medium text-slate-900">{s.titulo}</p>
                   <p className="text-sm text-slate-500">{s.resumen}</p>
                 </div>
-                <ChevronDown className="h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:rotate-180" />
+                <ChevronDown className="h-4 w-4 shrink-0 text-slate-600 transition-transform group-open:rotate-180" />
               </summary>
               <div className="border-t border-slate-100 px-4 pb-4 pt-3">
                 <ol className="list-decimal space-y-1.5 pl-5 text-sm text-slate-700">
@@ -112,7 +112,7 @@ export function AyudaView() {
             <details key={p.pregunta} open={!!q} className="group rounded-xl border border-slate-100 bg-white">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-4 text-sm font-medium text-slate-900">
                 {p.pregunta}
-                <ChevronDown className="h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:rotate-180" />
+                <ChevronDown className="h-4 w-4 shrink-0 text-slate-600 transition-transform group-open:rotate-180" />
               </summary>
               <p className="border-t border-slate-100 px-4 pb-4 pt-3 text-sm text-slate-600">{p.respuesta}</p>
             </details>

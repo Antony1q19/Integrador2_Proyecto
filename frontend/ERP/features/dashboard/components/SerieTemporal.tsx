@@ -42,7 +42,7 @@ export function SerieTemporal({ puntos, granularidad }: SerieTemporalProps) {
         <span className="inline-flex items-center gap-1.5">
           <span className="h-0.5 w-4 rounded bg-emerald-500" /> Contrataciones
         </span>
-        <span className="text-slate-400">
+        <span className="text-slate-600">
           (agrupado por {granularidad === "dia" ? "día" : granularidad === "semana" ? "semana" : "mes"})
         </span>
       </div>
@@ -108,7 +108,7 @@ export function SerieTemporal({ puntos, granularidad }: SerieTemporalProps) {
         </svg>
 
         {!hayActividad && (
-          <p className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-slate-400">
+          <p className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-slate-600">
             Sin actividad en este periodo
           </p>
         )}

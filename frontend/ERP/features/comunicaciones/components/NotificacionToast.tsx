@@ -43,7 +43,7 @@ export function NotificacionToast({
           e.stopPropagation();
           onClose();
         }}
-        className="flex-shrink-0 text-slate-400 hover:text-slate-600 transition-colors"
+        className="flex-shrink-0 text-slate-600 hover:text-slate-600 transition-colors"
       >
         <X className="h-4 w-4" />
       </button>

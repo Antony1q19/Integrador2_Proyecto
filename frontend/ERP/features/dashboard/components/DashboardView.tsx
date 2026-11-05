@@ -44,7 +44,7 @@ function Tarjeta({ titulo, subtitulo, children, className = "" }: { titulo: stri
     <section className={`rounded-xl border border-slate-100 bg-white p-6 shadow-sm print:break-inside-avoid ${className}`}>
       <div className="mb-4">
         <h2 className="text-lg font-bold text-slate-800">{titulo}</h2>
-        {subtitulo && <p className="text-xs text-slate-400">{subtitulo}</p>}
+        {subtitulo && <p className="text-xs text-slate-600">{subtitulo}</p>}
       </div>
       {children}
     </section>
@@ -176,7 +176,7 @@ export function IndicadoresDashboard({
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Tarjeta titulo="Próximas entrevistas" subtitulo="Las siguientes entrevistas programadas">
           {datos.agenda.proximasEntrevistas.length === 0 ? (
-            <p className="py-6 text-center text-sm text-slate-400">No hay entrevistas programadas.</p>
+            <p className="py-6 text-center text-sm text-slate-600">No hay entrevistas programadas.</p>
           ) : (
             <ul className="divide-y divide-slate-50">
               {datos.agenda.proximasEntrevistas.map((e) => (
@@ -185,7 +185,7 @@ export function IndicadoresDashboard({
                     <Link href={`/postulantes/${e.postulanteId}`} className="truncate text-sm font-semibold text-slate-800 hover:underline">
                       {nombres[e.postulanteId] ?? "Postulante"}
                     </Link>
-                    <p className="truncate text-xs text-slate-400">
+                    <p className="truncate text-xs text-slate-600">
                       {e.cargo} · {e.empresa}
                     </p>
                   </div>
@@ -200,7 +200,7 @@ export function IndicadoresDashboard({
         </Tarjeta>
         <Tarjeta titulo="Controles post-ingreso por hacer" subtitulo="Seguimiento a las personas contratadas">
           {datos.agenda.seguimientosPorHacer.length === 0 ? (
-            <p className="py-6 text-center text-sm text-slate-400">No hay controles pendientes.</p>
+            <p className="py-6 text-center text-sm text-slate-600">No hay controles pendientes.</p>
           ) : (
             <ul className="divide-y divide-slate-50">
               {datos.agenda.seguimientosPorHacer.map((s) => (
@@ -209,7 +209,7 @@ export function IndicadoresDashboard({
                     <Link href={`/postulantes/${s.postulanteId}`} className="truncate text-sm font-semibold text-slate-800 hover:underline">
                       {nombres[s.postulanteId] ?? "Postulante"}
                     </Link>
-                    <p className="truncate text-xs text-slate-400">
+                    <p className="truncate text-xs text-slate-600">
                       Control a los {s.hitoDias} días · {s.cargo} · {s.empresa}
                     </p>
                   </div>
@@ -299,7 +299,7 @@ function DashboardContenido({ hoy }: { hoy: string }) {
         <p className="mt-1 text-slate-500">
           Indicadores de reclutamiento y selección · <span className="font-medium text-slate-600">{nombreEmpresa}</span> · {rangoTexto}
         </p>
-        <p className="mt-1 hidden text-xs text-slate-400 print:block">Reporte generado el {new Date().toLocaleString("es-PE")}</p>
+        <p className="mt-1 hidden text-xs text-slate-600 print:block">Reporte generado el {new Date().toLocaleString("es-PE")}</p>
       </div>
 
       <FiltrosDashboard

@@ -49,7 +49,7 @@ export function Modal({ titulo, subtitulo, onCerrar, bloqueado = false, ancho = 
             onClick={onCerrar}
             disabled={bloqueado}
             aria-label="Cerrar"
-            className="rounded-lg p-1 text-slate-400 hover:bg-slate-200 hover:text-slate-600 disabled:opacity-40"
+            className="rounded-lg p-1 text-slate-600 hover:bg-slate-200 hover:text-slate-600 disabled:opacity-40"
           >
             <X size={18} />
           </button>
@@ -62,7 +62,7 @@ export function Modal({ titulo, subtitulo, onCerrar, bloqueado = false, ancho = 
 
 // Estilos comunes de los campos de los formularios dentro de los modales.
 export const ESTILO_CAMPO =
-  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/15 disabled:bg-slate-50 disabled:text-slate-400";
+  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600/15 disabled:bg-slate-50 disabled:text-slate-600";
 
 export function Campo({ etiqueta, obligatorio, ayuda, children }: { etiqueta: string; obligatorio?: boolean; ayuda?: string; children: React.ReactNode }) {
   return (
@@ -71,7 +71,7 @@ export function Campo({ etiqueta, obligatorio, ayuda, children }: { etiqueta: st
         {etiqueta} {obligatorio && <span className="text-red-500">*</span>}
       </span>
       {children}
-      {ayuda && <span className="mt-1 block text-[11px] text-slate-400">{ayuda}</span>}
+      {ayuda && <span className="mt-1 block text-[11px] text-slate-600">{ayuda}</span>}
     </label>
   );
 }

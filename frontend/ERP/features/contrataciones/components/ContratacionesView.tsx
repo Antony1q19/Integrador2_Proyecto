@@ -86,7 +86,7 @@ export function ContratacionesView() {
             {f === "todas" ? "Todas" : f}
           </button>
         ))}
-        {actualizando && <span className="text-xs text-slate-400">Actualizando…</span>}
+        {actualizando && <span className="text-xs text-slate-600">Actualizando…</span>}
       </div>
 
       {cargando ? (
@@ -104,7 +104,7 @@ export function ContratacionesView() {
       ) : error ? (
         <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</p>
       ) : visibles.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-slate-200 bg-white py-14 text-center text-sm text-slate-400">
+        <div className="rounded-xl border border-dashed border-slate-200 bg-white py-14 text-center text-sm text-slate-600">
           <BadgeCheck className="mx-auto mb-2 text-slate-300" size={32} />
           {todas.length === 0 ? "Todavía no hay contrataciones registradas." : "No hay contrataciones con ese estado."}
         </div>
@@ -128,12 +128,12 @@ export function ContratacionesView() {
                     </p>
                   </div>
                   <div className="text-xs text-slate-500">
-                    <p className="text-[11px] uppercase tracking-wide text-slate-400">Ingreso</p>
+                    <p className="text-[11px] uppercase tracking-wide text-slate-600">Ingreso</p>
                     {formatoFecha(c.fechaIngreso)}
                   </div>
                   <PuntosDeSeguimiento seguimientos={c.seguimientos} />
                   <EstadoContratacionBadge estado={c.estado} />
-                  <ChevronDown size={18} className={`text-slate-400 transition-transform ${estaAbierta ? "rotate-180" : ""}`} />
+                  <ChevronDown size={18} className={`text-slate-600 transition-transform ${estaAbierta ? "rotate-180" : ""}`} />
                 </button>
                 {estaAbierta && (
                   <div className="space-y-4 border-t border-slate-100 p-4">

@@ -70,21 +70,21 @@ export function ContratacionDetalle({ contratacion: c, etiquetaVacante, puedeEdi
       </div>
       <dl className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-4">
         <div>
-          <dt className="text-[11px] uppercase tracking-wide text-slate-400">Ingreso</dt>
+          <dt className="text-[11px] uppercase tracking-wide text-slate-600">Ingreso</dt>
           <dd className="font-medium text-slate-700">{formatoFecha(c.fechaIngreso)}</dd>
         </div>
         <div>
-          <dt className="text-[11px] uppercase tracking-wide text-slate-400">Contrato</dt>
+          <dt className="text-[11px] uppercase tracking-wide text-slate-600">Contrato</dt>
           <dd className="font-medium text-slate-700">{c.tipoContrato}</dd>
         </div>
         <div>
-          <dt className="text-[11px] uppercase tracking-wide text-slate-400">Salario</dt>
+          <dt className="text-[11px] uppercase tracking-wide text-slate-600">Salario</dt>
           <dd className="font-medium text-slate-700">
             {c.salario != null ? `${c.moneda === "USD" ? "US$" : "S/"} ${c.salario.toLocaleString("es-PE", { minimumFractionDigits: 2 })}` : "—"}
           </dd>
         </div>
         <div>
-          <dt className="text-[11px] uppercase tracking-wide text-slate-400">Registrado por</dt>
+          <dt className="text-[11px] uppercase tracking-wide text-slate-600">Registrado por</dt>
           <dd className="font-medium text-slate-700">{c.creadoPor}</dd>
         </div>
       </dl>
@@ -93,7 +93,7 @@ export function ContratacionDetalle({ contratacion: c, etiquetaVacante, puedeEdi
       {/* Línea de tiempo de controles */}
       <div>
         <div className="mb-3 flex items-center justify-between">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Seguimiento post-ingreso</h4>
+          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600">Seguimiento post-ingreso</h4>
           {puedeEditar && viva && !agregando && (
             <button onClick={() => setAgregando(true)} className="inline-flex items-center gap-1 text-xs font-medium text-primary-600 hover:underline">
               <Plus size={13} /> Agregar control
@@ -134,10 +134,10 @@ export function ContratacionDetalle({ contratacion: c, etiquetaVacante, puedeEdi
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                   <p className="text-sm font-medium text-slate-700">Control a los {s.hitoDias} días</p>
                   {s.estado === "Realizado" && s.valoracion && <ValoracionBadge valoracion={s.valoracion} />}
-                  {s.estado === "Omitido" && <span className="text-[11px] text-slate-400">Omitido</span>}
+                  {s.estado === "Omitido" && <span className="text-[11px] text-slate-600">Omitido</span>}
                   {s.vencido && <span className="rounded-full bg-rose-50 px-2 py-0.5 text-[11px] font-medium text-rose-600">Vencido</span>}
                 </div>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-600">
                   {s.estado === "Realizado" && s.fechaRealizada
                     ? `Realizado el ${formatoFecha(s.fechaRealizada)}${s.realizadoPor ? ` por ${s.realizadoPor}` : ""}`
                     : `Programado para el ${formatoFecha(s.fechaProgramada)}`}
@@ -153,7 +153,7 @@ export function ContratacionDetalle({ contratacion: c, etiquetaVacante, puedeEdi
                         <button
                           onClick={() => void ejecutar(() => actualizarSeguimiento(s, { estado: "Omitido" }), "Control omitido")}
                           disabled={ocupado}
-                          className={`${estiloBoton} text-slate-400 hover:bg-slate-100`}
+                          className={`${estiloBoton} text-slate-600 hover:bg-slate-100`}
                         >
                           Omitir
                         </button>
@@ -163,7 +163,7 @@ export function ContratacionDetalle({ contratacion: c, etiquetaVacante, puedeEdi
                       <button
                         onClick={() => void ejecutar(() => actualizarSeguimiento(s, { estado: "Pendiente" }), "Control reabierto")}
                         disabled={ocupado}
-                        className={`${estiloBoton} text-slate-400 hover:bg-slate-100`}
+                        className={`${estiloBoton} text-slate-600 hover:bg-slate-100`}
                       >
                         Reabrir
                       </button>
@@ -174,7 +174,7 @@ export function ContratacionDetalle({ contratacion: c, etiquetaVacante, puedeEdi
             </li>
           ))}
           {c.seguimientos.length === 0 && (
-            <li className="flex items-center gap-2 text-xs text-slate-400">
+            <li className="flex items-center gap-2 text-xs text-slate-600">
               <Circle size={14} /> Sin controles programados.
             </li>
           )}
@@ -204,7 +204,7 @@ export function ContratacionDetalle({ contratacion: c, etiquetaVacante, puedeEdi
               <button
                 onClick={() => setConfirmandoEstado("Cancelado")}
                 disabled={ocupado}
-                className={`${estiloBoton} text-slate-400 hover:bg-red-50 hover:text-red-600`}
+                className={`${estiloBoton} text-slate-600 hover:bg-red-50 hover:text-red-600`}
               >
                 Cancelar contratación
               </button>

@@ -7,7 +7,7 @@ export function EmptyState() {
   return (
     <div className="flex h-full flex-col items-center justify-center p-8 text-center">
       <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-slate-100">
-        <MessageCircle className="h-10 w-10 text-slate-400" />
+        <MessageCircle className="h-10 w-10 text-slate-600" />
       </div>
       <h3 className="text-lg font-semibold text-slate-900">
         Selecciona una conversación

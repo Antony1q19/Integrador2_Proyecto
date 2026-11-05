@@ -75,7 +75,7 @@ export function Uploader({
           bloqueado ? "pointer-events-none opacity-60" : "",
         ].join(" ")}
       >
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="mb-2 text-gray-400">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="mb-2 text-gray-600">
           <path
             d="M12 16V4M12 4L7 9M12 4L17 9M5 20H19"
             stroke="currentColor"
@@ -87,7 +87,7 @@ export function Uploader({
         <p className="text-sm text-gray-600">
           {activo ? "Subiendo archivo…" : "Arrastra un archivo o haz clic para seleccionarlo"}
         </p>
-        <p className="mt-1 text-xs text-gray-400">
+        <p className="mt-1 text-xs text-gray-600">
           {formatosAceptados.replaceAll(".", "").toUpperCase()} · máx. {tamanioMaximoMb}MB
         </p>
         <input
@@ -111,7 +111,7 @@ export function Uploader({
               style={{ width: `${progreso}%` }}
             />
           </div>
-          <p className="mt-1 text-right text-[11px] text-gray-400">{progreso}%</p>
+          <p className="mt-1 text-right text-[11px] text-gray-600">{progreso}%</p>
         </div>
       )}
 

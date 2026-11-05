@@ -81,11 +81,11 @@ export function AgregarAAnuncioModal({
 
         <ul className="mt-3 flex-1 space-y-1.5 overflow-y-auto px-5 pb-2">
           {anuncios.length === 0 ? (
-            <li className="py-6 text-center text-sm text-gray-400">
+            <li className="py-6 text-center text-sm text-gray-600">
               No hay anuncios abiertos disponibles para este postulante.
             </li>
           ) : filtrados.length === 0 ? (
-            <li className="py-6 text-center text-sm text-gray-400">Ningún anuncio coincide con la búsqueda.</li>
+            <li className="py-6 text-center text-sm text-gray-600">Ningún anuncio coincide con la búsqueda.</li>
           ) : (
             filtrados.map((anuncio) => {
               const activo = anuncio.id === seleccionadoId;
@@ -102,7 +102,7 @@ export function AgregarAAnuncioModal({
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-sm font-medium text-gray-800">{anuncio.cargo}</span>
-                      <span className="shrink-0 font-mono text-[11px] text-gray-400">
+                      <span className="shrink-0 font-mono text-[11px] text-gray-600">
                         Cierra {new Date(anuncio.fechaLimite).toLocaleDateString("es-PE")}
                       </span>
                     </div>

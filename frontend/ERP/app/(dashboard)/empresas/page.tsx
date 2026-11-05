@@ -47,7 +47,7 @@ export default function EmpresasPage() {
 
         {cargando && (
           <div className="rounded-xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-            <p className="text-sm text-slate-400">Cargando empresas...</p>
+            <p className="text-sm text-slate-600">Cargando empresas...</p>
           </div>
         )}
 

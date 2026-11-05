@@ -105,7 +105,7 @@ export function EntrevistasView() {
             {v.etiqueta}
           </button>
         ))}
-        {actualizando && <span className="text-xs text-slate-400">Actualizando…</span>}
+        {actualizando && <span className="text-xs text-slate-600">Actualizando…</span>}
       </div>
 
       {cargando ? (
@@ -129,7 +129,7 @@ export function EntrevistasView() {
       ) : error ? (
         <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</p>
       ) : grupos.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-slate-200 bg-white py-14 text-center text-sm text-slate-400">
+        <div className="rounded-xl border border-dashed border-slate-200 bg-white py-14 text-center text-sm text-slate-600">
           <CalendarClock className="mx-auto mb-2 text-slate-300" size={32} />
           No hay entrevistas en esta vista.
         </div>
@@ -137,7 +137,7 @@ export function EntrevistasView() {
         <div className={`space-y-6 transition-opacity ${actualizando ? "opacity-60" : ""}`}>
           {grupos.map(([dia, entrevistas]) => (
             <section key={dia}>
-              <h2 className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-400">
+              <h2 className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-600">
                 {dia} · {entrevistas.length}
               </h2>
               <ul className="space-y-2">
@@ -149,7 +149,7 @@ export function EntrevistasView() {
                       <div className="flex flex-wrap items-start gap-4">
                         <div className="w-20 shrink-0 text-center">
                           <p className="text-lg font-bold text-slate-800">{formatoHora(e.fechaHora)}</p>
-                          <p className="text-[11px] text-slate-400">{e.duracionMin} min</p>
+                          <p className="text-[11px] text-slate-600">{e.duracionMin} min</p>
                         </div>
                         <div className="min-w-0 flex-1 space-y-1">
                           <Link href={`/postulantes/${e.postulanteId}`} className="text-sm font-semibold text-slate-800 hover:text-primary-600 hover:underline">
@@ -170,7 +170,7 @@ export function EntrevistasView() {
                             )}
                             <span>· Entrevista: {e.entrevistador}</span>
                           </p>
-                          {e.notas && <p className="text-xs italic text-slate-400">{e.notas}</p>}
+                          {e.notas && <p className="text-xs italic text-slate-600">{e.notas}</p>}
                         </div>
                         <div className="flex flex-col items-end gap-2">
                           <div className="flex items-center gap-2">

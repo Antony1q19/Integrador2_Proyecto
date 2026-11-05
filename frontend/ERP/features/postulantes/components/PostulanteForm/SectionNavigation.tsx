@@ -26,7 +26,11 @@ export function SectionNavigation({
   return (
     <div className="flex flex-col gap-4 pt-6 border-t border-slate-200">
       {/* Indicador de progreso */}
-      <div className="flex items-center justify-center gap-2">
+      <div className="flex flex-col items-center justify-center gap-1.5">
+        <span className="text-xs font-semibold text-slate-600">
+          Paso {currentSection + 1} de {totalSections} ({Math.round(((currentSection + 1) / totalSections) * 100)}% completado)
+        </span>
+        <div className="flex items-center justify-center gap-2">
         {Array.from({ length: totalSections }).map((_, index) => (
           <div
             key={index}
@@ -39,6 +43,7 @@ export function SectionNavigation({
             }`}
           />
         ))}
+        </div>
       </div>
 
       {/* Botones de navegación */}

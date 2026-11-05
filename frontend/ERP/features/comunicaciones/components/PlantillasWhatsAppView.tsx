@@ -214,7 +214,7 @@ export function PlantillasWhatsAppView() {
                   </span>
                 </div>
                 <p className="flex-1 whitespace-pre-wrap rounded-lg bg-slate-50 p-3 text-sm text-slate-700">
-                  {p.cuerpo || <span className="italic text-slate-400">(sin texto: usa imagen o botones)</span>}
+                  {p.cuerpo || <span className="italic text-slate-600">(sin texto: usa imagen o botones)</span>}
                 </p>
                 {p.motivo_rechazo && (
                   <p className="mt-2 text-xs text-red-600">Motivo del rechazo: {p.motivo_rechazo}</p>
@@ -223,7 +223,7 @@ export function PlantillasWhatsAppView() {
                   <div className="mt-3 flex justify-end">
                     <button
                       onClick={() => setAEliminar(p)}
-                      className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-slate-400 hover:bg-red-50 hover:text-red-600"
+                      className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-slate-600 hover:bg-red-50 hover:text-red-600"
                     >
                       <Trash2 className="h-3.5 w-3.5" /> Eliminar
                     </button>

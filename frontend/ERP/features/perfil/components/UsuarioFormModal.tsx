@@ -83,7 +83,7 @@ export function UsuarioFormModal({ usuarioExistente, onGuardado, onCerrar }: Usu
           <button
             type="button"
             onClick={onCerrar}
-            className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-1 rounded-lg transition-colors"
+            className="text-slate-600 hover:text-red-500 hover:bg-red-50 p-1 rounded-lg transition-colors"
           >
             <X size={20} />
           </button>
@@ -111,10 +111,10 @@ export function UsuarioFormModal({ usuarioExistente, onGuardado, onCerrar }: Usu
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="juan@test.com"
-              className="w-full p-3 rounded-xl text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 disabled:bg-slate-100 disabled:text-slate-400"
+              className="w-full p-3 rounded-xl text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 disabled:bg-slate-100 disabled:text-slate-600"
             />
             {esEdicion && (
-              <p className="mt-1 text-[11px] text-slate-400">El correo no se puede cambiar una vez creada la cuenta.</p>
+              <p className="mt-1 text-[11px] text-slate-600">El correo no se puede cambiar una vez creada la cuenta.</p>
             )}
           </div>
 
@@ -140,10 +140,10 @@ export function UsuarioFormModal({ usuarioExistente, onGuardado, onCerrar }: Usu
                 Empresas que puede ver
               </label>
               <div className="space-y-1.5 max-h-40 overflow-y-auto rounded-xl border border-slate-200 p-3">
-                {cargandoEmpresas && <p className="text-xs text-slate-400">Cargando empresas…</p>}
+                {cargandoEmpresas && <p className="text-xs text-slate-600">Cargando empresas…</p>}
                 {errorEmpresas && <p className="text-xs text-red-600">{errorEmpresas}</p>}
                 {!cargandoEmpresas && !errorEmpresas && empresas.length === 0 && (
-                  <p className="text-xs text-slate-400">Todavía no hay empresas registradas.</p>
+                  <p className="text-xs text-slate-600">Todavía no hay empresas registradas.</p>
                 )}
                 {empresas.map((empresa) => (
                   <label key={empresa.id} className="flex items-center gap-2 text-sm text-slate-700">
@@ -157,7 +157,7 @@ export function UsuarioFormModal({ usuarioExistente, onGuardado, onCerrar }: Usu
                   </label>
                 ))}
               </div>
-              <p className="mt-1 text-[11px] text-slate-400">
+              <p className="mt-1 text-[11px] text-slate-600">
                 Si no marcas ninguna, este trabajador no verá ninguna empresa todavía.
               </p>
             </div>

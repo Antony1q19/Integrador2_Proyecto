@@ -56,11 +56,11 @@ export function ChatInput({
             placeholder="Escribe un mensaje..."
             rows={1}
             disabled={enviando}
-            className="max-h-32 min-h-[24px] flex-1 resize-none bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none disabled:opacity-60"
+            className="max-h-32 min-h-[24px] flex-1 resize-none bg-transparent text-sm text-slate-900 placeholder:text-slate-600 focus:outline-none disabled:opacity-60"
           />
           <button
             type="button"
-            className="ml-2 text-slate-400 hover:text-slate-600 transition-colors"
+            className="ml-2 text-slate-600 hover:text-slate-600 transition-colors"
           >
             <Smile className="h-5 w-5" />
           </button>

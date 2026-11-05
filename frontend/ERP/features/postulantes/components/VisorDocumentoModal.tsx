@@ -89,7 +89,7 @@ export function VisorDocumentoModal({ documento, onCerrar }: VisorDocumentoModal
               type="button"
               onClick={onCerrar}
               aria-label="Cerrar"
-              className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+              className="rounded-lg p-1 text-slate-600 hover:bg-slate-100 hover:text-slate-600"
             >
               <X size={20} />
             </button>
@@ -100,7 +100,7 @@ export function VisorDocumentoModal({ documento, onCerrar }: VisorDocumentoModal
           {error ? (
             <p className="px-6 text-center text-sm text-red-600">{error}</p>
           ) : !archivo ? (
-            <p className="text-sm text-slate-400">Cargando documento…</p>
+            <p className="text-sm text-slate-600">Cargando documento…</p>
           ) : esImagen ? (
             // eslint-disable-next-line @next/next/no-img-element -- es una imagen local (blob:), no aplica next/image
             <img src={archivo.urlLocal} alt={documento.nombreArchivo} className="max-h-full max-w-full object-contain" />

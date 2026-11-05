@@ -131,7 +131,7 @@ export function NuevaPlantillaModal({ onCerrar, onCreada }: Props) {
             placeholder="Hola {{1}}, te confirmamos tu entrevista para el puesto de {{2}} el día {{3}}."
             className={ESTILO_CAMPO}
           />
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs text-slate-600">
             Las variables ({"{{1}}"}, {"{{2}}"}...) se completan al enviar: nombre, puesto, fecha...
           </p>
         </div>

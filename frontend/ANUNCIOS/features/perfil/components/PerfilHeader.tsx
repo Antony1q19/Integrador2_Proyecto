@@ -57,7 +57,7 @@ export function PerfilHeader({ perfil, guardando, onCambiarFoto }: PerfilHeaderP
           {d.nombres} {d.apellidos}
         </h1>
         <p className="text-sm text-gray-500">{d.email}</p>
-        <p className="mt-0.5 font-mono text-xs text-gray-400">
+        <p className="mt-0.5 font-mono text-xs text-gray-600">
           {d.documentoTipo} {d.documentoNumero}
         </p>
       </div>

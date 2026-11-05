@@ -33,7 +33,7 @@ export function KpiCard({ titulo, valor, detalle, icono: Icono, color, progreso,
           <div className={`h-1.5 rounded-full bg-gradient-to-r ${color}`} style={{ width: `${Math.min(100, Math.max(0, progreso))}%` }} />
         </div>
       )}
-      {detalle && <p className="mt-auto text-xs font-medium text-slate-400">{detalle}</p>}
+      {detalle && <p className="mt-auto text-xs font-medium text-slate-600">{detalle}</p>}
     </div>
   );
 }

@@ -32,7 +32,7 @@ export function ConfirmarEliminacionModal({
           <button
             type="button"
             onClick={onCancelar}
-            className="text-slate-400 hover:text-red-500 hover:bg-red-100 p-1 rounded-lg transition-colors"
+            className="text-slate-600 hover:text-red-500 hover:bg-red-100 p-1 rounded-lg transition-colors"
           >
             <X size={20} />
           </button>

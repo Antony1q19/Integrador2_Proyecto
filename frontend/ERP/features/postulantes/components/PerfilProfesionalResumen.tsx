@@ -46,14 +46,14 @@ export function PerfilProfesionalResumen({
     <div className="space-y-4">
       <Bloque titulo="Formación académica">
         {formacionAcademica.length === 0 ? (
-          <p className="text-sm text-gray-400">No registra formación académica.</p>
+          <p className="text-sm text-gray-600">No registra formación académica.</p>
         ) : (
           <ul className="space-y-2">
             {formacionAcademica.map((f) => (
               <li key={f.id}>
                 <p className="text-sm font-medium text-gray-800">{f.titulo}</p>
                 <p className="text-sm text-gray-500">{f.institucion}</p>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-gray-600">
                   {ETIQUETAS_NIVEL_FORMACION[f.nivel]} · {f.fechaInicio} —{" "}
                   {f.enCurso ? "Actualidad" : f.fechaFin || "—"}
                 </p>
@@ -65,7 +65,7 @@ export function PerfilProfesionalResumen({
 
       <Bloque titulo="Idiomas">
         {idiomas.length === 0 ? (
-          <p className="text-sm text-gray-400">No registra idiomas.</p>
+          <p className="text-sm text-gray-600">No registra idiomas.</p>
         ) : (
           <div className="flex flex-wrap gap-2">
             {idiomas.map((i) => (
@@ -82,14 +82,14 @@ export function PerfilProfesionalResumen({
 
       <Bloque titulo="Experiencia laboral">
         {experiencia.length === 0 ? (
-          <p className="text-sm text-gray-400">No registra experiencia laboral.</p>
+          <p className="text-sm text-gray-600">No registra experiencia laboral.</p>
         ) : (
           <ul className="space-y-2">
             {experiencia.map((e) => (
               <li key={e.id}>
                 <p className="text-sm font-medium text-gray-800">{e.cargo}</p>
                 <p className="text-sm text-gray-500">{e.empresa}</p>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-gray-600">
                   {e.fechaInicio} — {e.actualidad ? "Actualidad" : e.fechaFin || "—"}
                 </p>
                 {e.descripcion && <p className="mt-1 text-sm text-gray-600">{e.descripcion}</p>}

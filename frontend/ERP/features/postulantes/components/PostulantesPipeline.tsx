@@ -232,7 +232,7 @@ export function PostulantesPipeline() {
         {hayFiltrosActivos && (
           <button
             onClick={limpiarFiltros}
-            className="rounded-lg px-2 py-1.5 text-xs font-medium text-gray-400 hover:bg-gray-50 hover:text-gray-600"
+            className="rounded-lg px-2 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-600"
           >
             Limpiar filtros
           </button>
@@ -265,7 +265,7 @@ export function PostulantesPipeline() {
             >
               <div className="flex items-center justify-between px-1">
                 <span className="text-sm font-semibold text-gray-700">{op.label}</span>
-                <span className="rounded-full bg-white px-2 py-0.5 text-xs font-medium text-gray-400">
+                <span className="rounded-full bg-white px-2 py-0.5 text-xs font-medium text-gray-600">
                   {tarjetasColumna.length}
                 </span>
               </div>
@@ -296,7 +296,7 @@ export function PostulantesPipeline() {
                           <p className="truncate text-xs text-gray-500">{t.anuncio.cargo}</p>
                         </div>
                       </div>
-                      <p className="mt-2 truncate text-[11px] text-gray-400">{t.anuncio.empresaRazonSocial}</p>
+                      <p className="mt-2 truncate text-[11px] text-gray-600">{t.anuncio.empresaRazonSocial}</p>
                     </Link>
                   </div>
                 ))}

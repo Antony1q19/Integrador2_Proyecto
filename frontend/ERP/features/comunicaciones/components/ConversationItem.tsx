@@ -61,7 +61,7 @@ export function ConversationItem({
             {nombreCompleto}
           </p>
           {contacto.ultimaActividad && (
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-slate-600">
               {formatDistanceToNow(new Date(contacto.ultimaActividad), {
                 addSuffix: true,
                 locale: es,
@@ -74,7 +74,7 @@ export function ConversationItem({
             {contacto.ultimoMensaje}
           </p>
         )}
-        <p className="mt-0.5 flex items-center gap-2 text-xs text-slate-400">
+        <p className="mt-0.5 flex items-center gap-2 text-xs text-slate-600">
           {formatearTelefono(contacto.telefono)}
           {contacto.registrado === false && (
             <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">

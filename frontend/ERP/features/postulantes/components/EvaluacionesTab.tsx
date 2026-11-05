@@ -86,7 +86,7 @@ export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: Evalua
           onSubmit={handleSubmit}
           className="space-y-4 rounded-lg border border-gray-100 bg-slate-50/60 p-4"
         >
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-gray-600">
             El evaluador es tu cuenta y la fecha es la de hoy: se registran automáticamente al guardar.
           </p>
 
@@ -153,7 +153,7 @@ export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: Evalua
       )}
 
       {evaluaciones.length === 0 ? (
-        <p className="py-6 text-center text-sm text-gray-400">
+        <p className="py-6 text-center text-sm text-gray-600">
           Este postulante aún no tiene evaluaciones registradas.
         </p>
       ) : (
@@ -162,7 +162,7 @@ export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: Evalua
             <li key={ev.id} className="rounded-lg border border-gray-100 p-4">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="font-mono text-[11px] text-gray-400">
+                  <p className="font-mono text-[11px] text-gray-600">
                     {ev.evaluador} · {new Date(`${ev.fecha}T00:00:00`).toLocaleDateString("es-PE")}
                   </p>
                   <p className="mt-0.5 text-sm font-medium text-gray-800">{ev.puntajeTotal}/100</p>
@@ -180,7 +180,7 @@ export function EvaluacionesTab({ evaluaciones, guardando, onRegistrar }: Evalua
                         style={{ width: `${(ev.competencias[clave] / 5) * 100}%` }}
                       />
                     </div>
-                    <span className="w-4 shrink-0 text-right text-xs text-gray-400">
+                    <span className="w-4 shrink-0 text-right text-xs text-gray-600">
                       {ev.competencias[clave]}
                     </span>
                   </div>

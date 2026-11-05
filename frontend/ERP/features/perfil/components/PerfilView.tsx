@@ -176,7 +176,7 @@ export function PerfilView() {
               <div>
                 <label className="block text-xs font-medium text-slate-500 mb-1">Correo Electrónico</label>
                 <div className="p-3 bg-slate-50 rounded-lg text-sm text-slate-800 border border-slate-200 flex items-center gap-2">
-                  <Mail size={16} className="text-slate-400" /> {misDatos.email}
+                  <Mail size={16} className="text-slate-600" /> {misDatos.email}
                 </div>
               </div>
               <div>

@@ -51,7 +51,7 @@ export function EstadoSelector({ estadoActual, disabled, onSeleccionar }: Estado
         className="flex items-center gap-1.5 rounded-full transition-opacity hover:opacity-80 disabled:opacity-50"
       >
         <EstadoBadge estado={estadoActual} />
-        <span className="text-xs text-gray-400">▾</span>
+        <span className="text-xs text-gray-600">▾</span>
       </button>
 
       {abierto && (

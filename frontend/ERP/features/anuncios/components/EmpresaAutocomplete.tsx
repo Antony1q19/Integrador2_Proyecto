@@ -87,7 +87,7 @@ export default function EmpresaAutocomplete({
       {dropdownAbierto && (
         <ul className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-lg border border-slate-200 bg-white shadow-lg">
           {empresasFiltradas.length === 0 && (
-            <li className="px-3 py-2 text-sm text-slate-400">
+            <li className="px-3 py-2 text-sm text-slate-600">
               No se encontraron empresas
             </li>
           )}
@@ -104,7 +104,7 @@ export default function EmpresaAutocomplete({
                 <div className="font-medium text-slate-800">
                   {empresa.razonSocial}
                 </div>
-                <div className="text-xs text-slate-400">
+                <div className="text-xs text-slate-600">
                   RUC: {empresa.ruc}
                 </div>
               </button>

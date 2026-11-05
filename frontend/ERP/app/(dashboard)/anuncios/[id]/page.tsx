@@ -22,7 +22,7 @@ export default function AnuncioDetallePage({
     return (
       <div className="min-h-screen bg-slate-50 p-8">
         <div className="mx-auto max-w-4xl">
-          <p className="text-sm text-slate-400">Cargando anuncio...</p>
+          <p className="text-sm text-slate-600">Cargando anuncio...</p>
         </div>
       </div>
     );

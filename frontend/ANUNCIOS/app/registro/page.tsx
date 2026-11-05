@@ -256,7 +256,7 @@ function RegistroFormulario() {
             </div>
             <div>
               <label htmlFor="telefono" className={labelClass}>
-                Teléfono <span className="text-gray-400 font-normal">(Opcional)</span>
+                Teléfono <span className="text-gray-600 font-normal">(Opcional)</span>
               </label>
               <input
                 id="telefono"
@@ -268,7 +268,7 @@ function RegistroFormulario() {
             </div>
             <div className="sm:col-span-2">
               <label htmlFor="fechaNacimiento" className={labelClass}>
-                Fecha de nacimiento <span className="text-gray-400 font-normal">(Opcional)</span>
+                Fecha de nacimiento <span className="text-gray-600 font-normal">(Opcional)</span>
               </label>
               <input
                 id="fechaNacimiento"
@@ -361,7 +361,7 @@ function RegistroFormulario() {
               />
               <span>
                 Acepto recibir comunicaciones sobre nuevas convocatorias y ofertas laborales.{' '}
-                <span className="text-gray-400">(Opcional)</span>
+                <span className="text-gray-600">(Opcional)</span>
               </span>
             </label>
           </div>

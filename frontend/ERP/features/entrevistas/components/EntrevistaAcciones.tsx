@@ -45,7 +45,7 @@ export function EntrevistaAcciones({ entrevista, onCambio }: EntrevistaAccionesP
         <button onClick={() => setVentana("reprogramar")} className={`${estiloBoton} text-slate-500 hover:bg-slate-100`}>
           Reprogramar
         </button>
-        <button onClick={() => setVentana("cancelar")} disabled={cancelando} className={`${estiloBoton} text-slate-400 hover:bg-red-50 hover:text-red-600`}>
+        <button onClick={() => setVentana("cancelar")} disabled={cancelando} className={`${estiloBoton} text-slate-600 hover:bg-red-50 hover:text-red-600`}>
           {cancelando ? "Cancelando…" : "Cancelar"}
         </button>
       </div>

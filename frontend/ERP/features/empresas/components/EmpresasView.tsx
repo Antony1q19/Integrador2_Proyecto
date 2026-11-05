@@ -103,7 +103,7 @@ export function EmpresasView({ empresas, onEliminar, puedeEliminar = true }: Emp
                       type="button"
                       onClick={() => setEmpresaAEliminar(empresa)}
                       title="Eliminar empresa"
-                      className="inline-flex items-center justify-center rounded-lg p-2 text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex items-center justify-center rounded-lg p-2 text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"

@@ -50,7 +50,7 @@ export function ContratacionTab({ postulanteId, onCambio }: ContratacionTabProps
   const contrataciones = datos ?? [];
   if (contrataciones.length === 0) {
     return (
-      <p className="py-8 text-center text-sm text-gray-400">
+      <p className="py-8 text-center text-sm text-gray-600">
         <BadgeCheck className="mx-auto mb-2 text-gray-300" size={28} />
         Aún no hay contrataciones. Se registra desde la pestaña &quot;Dónde ha postulado&quot;, con el botón <strong>Contratado</strong>.
       </p>

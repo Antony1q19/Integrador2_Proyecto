@@ -128,7 +128,7 @@ export function DocumentosTab({
       {errorDescarga && <p className="text-xs text-red-600">{errorDescarga}</p>}
 
       {documentos.length === 0 ? (
-        <p className="py-6 text-center text-sm text-gray-400">
+        <p className="py-6 text-center text-sm text-gray-600">
           Aún no se han cargado documentos para este postulante.
         </p>
       ) : (
@@ -149,7 +149,7 @@ export function DocumentosTab({
                           {ETIQUETAS_TIPO[doc.tipo]}
                         </span>
                       </div>
-                      <p className="font-mono text-[11px] text-gray-400">
+                      <p className="font-mono text-[11px] text-gray-600">
                         {doc.tamanioKb} KB · {new Date(doc.fechaCarga).toLocaleDateString("es-PE")}
                       </p>
                     </div>
@@ -182,7 +182,7 @@ export function DocumentosTab({
                     <button
                       onClick={() => onEliminar(doc.id)}
                       disabled={activo || guardando}
-                      className="rounded-lg px-2 py-1 text-xs font-medium text-gray-400 hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-30"
+                      className="rounded-lg px-2 py-1 text-xs font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-30"
                     >
                       Eliminar
                     </button>
@@ -197,7 +197,7 @@ export function DocumentosTab({
                         style={{ width: `${progreso}%` }}
                       />
                     </div>
-                    <p className="mt-1 text-right text-[11px] text-gray-400">
+                    <p className="mt-1 text-right text-[11px] text-gray-600">
                       Reemplazando… {progreso}%
                     </p>
                   </div>

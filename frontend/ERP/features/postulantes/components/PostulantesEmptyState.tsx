@@ -17,9 +17,9 @@ export function PostulantesEmptyState({
     <div className="flex flex-col items-center justify-center py-16 text-center">
       <div className="rounded-full bg-slate-100 p-4">
         {hasFilters ? (
-          <FilterX className="h-8 w-8 text-slate-400" />
+          <FilterX className="h-8 w-8 text-slate-600" />
         ) : (
-          <Users className="h-8 w-8 text-slate-400" />
+          <Users className="h-8 w-8 text-slate-600" />
         )}
       </div>
       <h3 className="mt-4 text-lg font-semibold text-slate-900">

@@ -10,7 +10,7 @@ export default function AnunciosPorEmpresa({
 }: AnunciosPorEmpresaProps) {
   if (anuncios.length === 0) {
     return (
-      <p className="text-sm text-slate-400">
+      <p className="text-sm text-slate-600">
         Esta empresa aún no tiene anuncios publicados.
       </p>
     );
@@ -27,7 +27,7 @@ export default function AnunciosPorEmpresa({
             <p className="text-sm font-medium text-slate-800">
               {anuncio.cargo}
             </p>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-600">
               {anuncio.numeroVacantes} vacante(s) · Vence{" "}
               {anuncio.fechaLimite}
             </p>

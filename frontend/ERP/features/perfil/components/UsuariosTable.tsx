@@ -79,14 +79,14 @@ export function UsuariosTable({
   }
 
   if (usuarios.length === 0) {
-    return <p className="p-6 text-center text-sm text-slate-400">No hay trabajadores registrados.</p>;
+    return <p className="p-6 text-center text-sm text-slate-600">No hay trabajadores registrados.</p>;
   }
 
   return (
     <div className="overflow-x-auto p-6">
       <table className="w-full text-left">
         <thead>
-          <tr className="border-b border-slate-200 text-xs uppercase text-slate-400">
+          <tr className="border-b border-slate-200 text-xs uppercase text-slate-600">
             <th className="pb-3 font-semibold">Usuario</th>
             <th className="pb-3 font-semibold">Correo</th>
             <th className="pb-3 font-semibold">Rol</th>
@@ -102,7 +102,7 @@ export function UsuariosTable({
               <tr key={usuario.id} className="hover:bg-slate-50 transition-colors">
                 <td className="py-4 font-medium text-sm text-slate-800">
                   {usuario.nombre}
-                  {esUnoMismo && <span className="ml-2 text-[10px] text-slate-400">(tú)</span>}
+                  {esUnoMismo && <span className="ml-2 text-[10px] text-slate-600">(tú)</span>}
                   {usuario.debeCambiarPassword && (
                     <span
                       className="ml-2 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700"
@@ -140,7 +140,7 @@ export function UsuariosTable({
                       type="button"
                       onClick={() => onEditar(usuario)}
                       title="Editar datos"
-                      className="p-2 rounded-lg text-slate-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
+                      className="p-2 rounded-lg text-slate-600 hover:text-primary-600 hover:bg-primary-50 transition-colors"
                     >
                       <Pencil size={16} />
                     </button>
@@ -148,7 +148,7 @@ export function UsuariosTable({
                       type="button"
                       onClick={() => onRestablecerPassword(usuario)}
                       title="Generar una nueva contraseña temporal"
-                      className="p-2 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"
+                      className="p-2 rounded-lg text-slate-600 hover:text-amber-600 hover:bg-amber-50 transition-colors"
                     >
                       <KeyRound size={16} />
                     </button>

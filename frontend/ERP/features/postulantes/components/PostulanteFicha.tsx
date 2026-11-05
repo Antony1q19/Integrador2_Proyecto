@@ -167,7 +167,7 @@ export function PostulanteFicha({ id }: { id: string }) {
               onClick={() => setTabActivo(tab.id)}
               className={[
                 "relative whitespace-nowrap px-4 py-3 text-sm font-medium transition-colors",
-                tabActivo === tab.id ? "text-primary-600" : "text-gray-400 hover:text-gray-600",
+                tabActivo === tab.id ? "text-primary-600" : "text-gray-600 hover:text-gray-600",
               ].join(" ")}
             >
               {tab.label}

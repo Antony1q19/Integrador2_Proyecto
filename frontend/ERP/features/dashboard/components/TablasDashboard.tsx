@@ -5,11 +5,11 @@
 import { ESTILOS_ESTADO } from "@/features/postulantes/components/EstadoBadge";
 import { ActividadReciente, DashboardDatos, FilaAnuncio, FilaEmpresa } from "../types/dashboard";
 
-const encabezado = "px-3 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-400";
+const encabezado = "px-3 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-600";
 const celda = "px-3 py-3 text-sm text-slate-700";
 
 function SinDatos({ texto }: { texto: string }) {
-  return <p className="py-8 text-center text-sm text-slate-400">{texto}</p>;
+  return <p className="py-8 text-center text-sm text-slate-600">{texto}</p>;
 }
 
 // Barra de avance con su porcentaje.
@@ -177,10 +177,10 @@ export function ListaActividad({ actividad, nombres }: { actividad: ActividadRec
           <li key={`${a.postulanteId}-${a.fecha}-${i}`} className="flex items-start justify-between gap-3 py-3">
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-slate-800">{nombres[a.postulanteId] ?? "Postulante"}</p>
-              <p className="truncate text-xs text-slate-400">
+              <p className="truncate text-xs text-slate-600">
                 {a.cargo} · {a.empresa}
               </p>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-slate-600">
                 {new Date(a.fecha).toLocaleString("es-PE", { dateStyle: "short", timeStyle: "short" })} · {a.usuario}
               </p>
             </div>

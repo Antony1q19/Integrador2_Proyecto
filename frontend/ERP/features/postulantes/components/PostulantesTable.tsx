@@ -185,7 +185,7 @@ export const PostulantesTable = memo(function PostulantesTable({
                         <p className="text-sm font-medium text-slate-900">
                           {nombreCompleto}
                         </p>
-                        <p className="text-xs text-slate-400">
+                        <p className="text-xs text-slate-600">
                           {postulante.datosPersonales.documentoTipo}: {postulante.datosPersonales.documentoNumero}
                         </p>
                       </div>

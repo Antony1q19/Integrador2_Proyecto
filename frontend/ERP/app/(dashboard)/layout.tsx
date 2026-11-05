@@ -4,6 +4,7 @@ import { useState, useSyncExternalStore } from "react";
 import { Menu } from "lucide-react";
 import Sidebar from "@/features/portada/components/sidebar";
 import { AvisosWhatsApp } from "@/features/comunicaciones/components/AvisosWhatsApp";
+import { BannerAccesoRestringido } from "@/components/shared/BannerAccesoRestringido";
 import { Role } from "@/features/portada/types/menu"; // Asegúrate de tener este import
 
 function getCookie(name: string): string | null {
@@ -111,7 +112,7 @@ export default function DashboardLayout({
                 {userName}
               </p>
               {/* <-- ROL DINÁMICO AQUÍ --> */}
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-600">
                 {displayRole}
               </p>
             </div>
@@ -138,6 +139,9 @@ export default function DashboardLayout({
             </div>
           </div>
         </header>
+
+        {/* AVISO DE ACCESO RESTRINGIDO */}
+        <BannerAccesoRestringido />
 
         {/* CONTENIDO DE LAS PÁGINAS */}
         <main className="min-h-[calc(100vh-5rem)]">

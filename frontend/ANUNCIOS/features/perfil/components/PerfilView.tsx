@@ -3,6 +3,7 @@
 
 import { usePerfil } from '../hooks/usePerfil';
 import { PerfilHeader } from './PerfilHeader';
+import { PerfilCompletenessBar } from './PerfilCompletenessBar';
 import { DatosPersonalesSection } from './DatosPersonalesSection';
 import { CvSection } from './CvSection';
 import { ResumenProfesionalSection } from './ResumenProfesionalSection';
@@ -50,6 +51,8 @@ export function PerfilView() {
   return (
     <div className="mx-auto max-w-3xl space-y-4 p-6">
       <PerfilHeader perfil={perfil} guardando={guardando} onCambiarFoto={actualizarFoto} />
+
+      <PerfilCompletenessBar perfil={perfil} />
 
       <DatosPersonalesSection
         datos={perfil.datosPersonales}

@@ -35,7 +35,7 @@ export function PostulanteSuccessModal({
         {/* Botón cerrar */}
         <button
           onClick={() => router.push("/postulantes")}
-          className="absolute right-4 top-4 text-slate-400 hover:text-slate-600 transition-colors"
+          className="absolute right-4 top-4 text-slate-600 hover:text-slate-600 transition-colors"
         >
           <X className="h-5 w-5" />
         </button>
@@ -52,7 +52,7 @@ export function PostulanteSuccessModal({
         <p className="mt-2 text-sm text-slate-500">
           El postulante ha sido incorporado al sistema correctamente.
           {postulanteId && (
-            <span className="block mt-1 text-xs text-slate-400">
+            <span className="block mt-1 text-xs text-slate-600">
               ID: {postulanteId}
             </span>
           )}

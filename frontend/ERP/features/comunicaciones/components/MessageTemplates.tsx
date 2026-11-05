@@ -68,7 +68,7 @@ export function MessageTemplates({ onSelectTemplate, disabled = false }: Message
           <div className="absolute bottom-full left-0 z-20 mb-2 w-80 rounded-xl border border-slate-200 bg-white p-2 shadow-lg">
             <div className="mb-2 flex items-center justify-between px-2 py-1">
               <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Plantillas</span>
-              <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-slate-600" aria-label="Cerrar">
+              <button onClick={() => setIsOpen(false)} className="text-slate-600 hover:text-slate-600" aria-label="Cerrar">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -95,7 +95,7 @@ export function MessageTemplates({ onSelectTemplate, disabled = false }: Message
                       onClick={() => setEditando(plantilla)}
                       title="Editar plantilla"
                       aria-label={`Editar ${plantilla.nombre}`}
-                      className="absolute right-2 top-2 rounded-md p-1.5 text-slate-400 opacity-0 transition hover:bg-white hover:text-primary-600 group-hover:opacity-100 focus:opacity-100"
+                      className="absolute right-2 top-2 rounded-md p-1.5 text-slate-600 opacity-0 transition hover:bg-white hover:text-primary-600 group-hover:opacity-100 focus:opacity-100"
                     >
                       <Pencil className="h-3.5 w-3.5" />
                     </button>

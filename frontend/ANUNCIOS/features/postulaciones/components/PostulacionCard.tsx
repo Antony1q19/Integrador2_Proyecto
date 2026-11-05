@@ -54,7 +54,7 @@ export function PostulacionCard({ postulacion }: PostulacionCardProps) {
       )}
 
       {postulacion.fechaPostulacion && (
-        <p className="text-gray-400 text-xs font-medium mb-6">
+        <p className="text-gray-600 text-xs font-medium mb-6">
           Postulado el {formatDate(postulacion.fechaPostulacion)}
         </p>
       )}

@@ -92,7 +92,7 @@ export function EntrevistasTab({ postulanteId, onCambio }: EntrevistasTabProps) 
       ) : error ? (
         <p className="py-6 text-center text-sm text-red-500">{error}</p>
       ) : ordenadas.length === 0 ? (
-        <p className="py-8 text-center text-sm text-gray-400">
+        <p className="py-8 text-center text-sm text-gray-600">
           <CalendarClock className="mx-auto mb-2 text-gray-300" size={28} />
           Aún no hay entrevistas para este postulante.
         </p>

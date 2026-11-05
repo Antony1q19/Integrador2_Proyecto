@@ -86,7 +86,7 @@ export function IdiomasSection({ idiomas, guardando, onAgregar, onEliminar }: Id
       )}
 
       {idiomas.length === 0 ? (
-        <p className="py-4 text-center text-sm text-gray-400">Aún no agregas idiomas.</p>
+        <p className="py-4 text-center text-sm text-gray-600">Aún no agregas idiomas.</p>
       ) : (
         <div className="flex flex-wrap gap-2">
           {idiomas.map((i) => (

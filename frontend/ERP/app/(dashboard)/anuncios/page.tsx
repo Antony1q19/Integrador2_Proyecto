@@ -128,7 +128,7 @@ export default function AnunciosPage() {
 
         {cargando && (
           <div className="rounded-xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-            <p className="text-sm text-slate-400">Cargando anuncios...</p>
+            <p className="text-sm text-slate-600">Cargando anuncios...</p>
           </div>
         )}
 

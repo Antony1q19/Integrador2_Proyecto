@@ -62,18 +62,18 @@ export function middleware(request: NextRequest) {
     const inicio = role === 'RRHH' ? '/postulantes' : '/dashboard';
     // RRHH (reclutamiento) no ve el Dashboard.
     if (pathname.startsWith('/dashboard') && !permisos.puedeVerDashboard) {
-      return NextResponse.redirect(new URL(inicio, request.url));
+      return NextResponse.redirect(new URL(`${inicio}?acceso_denegado=dashboard`, request.url));
     }
     // Crear/editar anuncios: Admin y Supervisor. (Ver la lista y el detalle: todos.)
     if (/^\/anuncios\/(nuevo|[^/]+\/editar)(\/|$)/.test(pathname) && !permisos.puedeGestionarAnuncios) {
-      return NextResponse.redirect(new URL('/anuncios', request.url));
+      return NextResponse.redirect(new URL('/anuncios?acceso_denegado=anuncios', request.url));
     }
     // Crear empresas: solo Admin. Editar: Admin y Supervisor.
     if (/^\/empresas\/nueva(\/|$)/.test(pathname) && !permisos.puedeCrearEliminarEmpresas) {
-      return NextResponse.redirect(new URL('/empresas', request.url));
+      return NextResponse.redirect(new URL('/empresas?acceso_denegado=empresas', request.url));
     }
     if (/^\/empresas\/[^/]+\/editar(\/|$)/.test(pathname) && !permisos.puedeEditarEmpresas) {
-      return NextResponse.redirect(new URL('/empresas', request.url));
+      return NextResponse.redirect(new URL('/empresas?acceso_denegado=empresas', request.url));
     }
   }
  

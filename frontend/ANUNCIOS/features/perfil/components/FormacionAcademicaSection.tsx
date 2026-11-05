@@ -151,7 +151,7 @@ export function FormacionAcademicaSection({
       )}
 
       {formacion.length === 0 ? (
-        <p className="py-4 text-center text-sm text-gray-400">
+        <p className="py-4 text-center text-sm text-gray-600">
           Aún no agregas formación académica.
         </p>
       ) : (
@@ -165,14 +165,14 @@ export function FormacionAcademicaSection({
                 <div>
                   <p className="text-sm font-medium text-gray-800">{f.titulo}</p>
                   <p className="text-sm text-gray-500">{f.institucion}</p>
-                  <p className="mt-0.5 text-xs text-gray-400">
+                  <p className="mt-0.5 text-xs text-gray-600">
                     {ETIQUETAS_NIVEL[f.nivel]} · {f.fechaInicio} — {f.enCurso ? 'Actualidad' : f.fechaFin || '—'}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => onEliminar(f.id)}
-                className="rounded-lg p-1.5 text-gray-400 transition-colors duration-150 hover:bg-red-50 hover:text-red-600 active:scale-[0.97]"
+                className="rounded-lg p-1.5 text-gray-600 transition-colors duration-150 hover:bg-red-50 hover:text-red-600 active:scale-[0.97]"
               >
                 <Trash2 size={14} />
               </button>

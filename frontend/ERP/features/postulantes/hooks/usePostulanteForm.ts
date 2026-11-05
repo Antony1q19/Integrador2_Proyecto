@@ -272,6 +272,31 @@ export function usePostulanteForm() {
   }, [isSuccess, createdPostulanteId, router]);
 
   // ============================================================
+  // PREVENCIÓN DE PÉRDIDA DE DATOS (DIRTY FORM)
+  // ============================================================
+  const isDirty = useMemo(() => {
+    return Object.entries(formData).some(([key, val]) => {
+      if (key === "documentoTipo") return val !== "DNI";
+      return typeof val === "string" && val.trim().length > 0;
+    });
+  }, [formData]);
+
+  useEffect(() => {
+    if (!isDirty || isSuccess) return;
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "Hay información no guardada en el formulario de postulante. ¿Seguro que deseas salir?";
+      return e.returnValue;
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [isDirty, isSuccess]);
+
+  // ============================================================
   // RETORNO
   // ============================================================
 
@@ -291,5 +316,6 @@ export function usePostulanteForm() {
     irASiguienteSeccion,
     irASeccionAnterior,
     validarSeccion,
+    isDirty,
   };
 }

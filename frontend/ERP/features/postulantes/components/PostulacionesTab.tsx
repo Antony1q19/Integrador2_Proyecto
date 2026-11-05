@@ -52,11 +52,11 @@ function HistorialPostulacion({ historial }: { historial: HistorialEstado[] }) {
       {[...historial].reverse().map((h) => (
         <li key={h.id} className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
           <EstadoBadge estado={h.estado} />
-          <span className="font-mono text-[11px] text-gray-400">
+          <span className="font-mono text-[11px] text-gray-600">
             {new Date(h.fecha).toLocaleString("es-PE")}
           </span>
           <span>· {h.usuarioResponsable}</span>
-          {h.comentario && <span className="text-gray-400">— &quot;{h.comentario}&quot;</span>}
+          {h.comentario && <span className="text-gray-600">— &quot;{h.comentario}&quot;</span>}
         </li>
       ))}
     </ul>
@@ -190,7 +190,7 @@ export function PostulacionesTab({
     return (
       <div className="space-y-2">
         {botonAgregar}
-        <p className="py-6 text-center text-sm text-gray-400">
+        <p className="py-6 text-center text-sm text-gray-600">
           Este postulante aún no está asociado a ningún anuncio.
         </p>
         {modalAgregar}
@@ -219,7 +219,7 @@ export function PostulacionesTab({
                     {anuncio.cargo}
                   </Link>
                   <p className="text-sm text-gray-500">{anuncio.empresaRazonSocial}</p>
-                  <p className="mt-1 font-mono text-[11px] text-gray-400">
+                  <p className="mt-1 font-mono text-[11px] text-gray-600">
                     Publicado {new Date(anuncio.fechaCreacion).toLocaleDateString("es-PE")} · Cierra{" "}
                     {new Date(anuncio.fechaLimite).toLocaleDateString("es-PE")}
                   </p>
@@ -256,7 +256,7 @@ export function PostulacionesTab({
                   <button
                     onClick={() => handleRevertir(anuncioId, anuncio.cargo)}
                     disabled={guardando}
-                    className="shrink-0 text-xs text-gray-400 underline hover:text-gray-600 disabled:opacity-50"
+                    className="shrink-0 text-xs text-gray-600 underline hover:text-gray-600 disabled:opacity-50"
                   >
                     Revertir decisión
                   </button>

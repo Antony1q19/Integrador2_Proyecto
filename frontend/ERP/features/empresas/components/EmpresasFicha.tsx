@@ -63,29 +63,29 @@ export default async function EmpresasFicha({
           </h2>
           <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <dt className="text-xs text-slate-400">Persona de Contacto</dt>
+              <dt className="text-xs text-slate-600">Persona de Contacto</dt>
               <dd className="text-sm text-slate-800">
                 {empresa.contactoNombre}
               </dd>
             </div>
             <div>
-              <dt className="text-xs text-slate-400">Sector</dt>
+              <dt className="text-xs text-slate-600">Sector</dt>
               <dd className="text-sm text-slate-800">{empresa.sector}</dd>
             </div>
             <div>
-              <dt className="text-xs text-slate-400">Email</dt>
+              <dt className="text-xs text-slate-600">Email</dt>
               <dd className="text-sm text-slate-800">
                 {empresa.contactoEmail}
               </dd>
             </div>
             <div>
-              <dt className="text-xs text-slate-400">Teléfono</dt>
+              <dt className="text-xs text-slate-600">Teléfono</dt>
               <dd className="text-sm text-slate-800">
                 {empresa.contactoTelefono}
               </dd>
             </div>
             <div>
-              <dt className="text-xs text-slate-400">Fecha de Registro</dt>
+              <dt className="text-xs text-slate-600">Fecha de Registro</dt>
               <dd className="text-sm text-slate-800">
                 {empresa.fechaRegistro}
               </dd>

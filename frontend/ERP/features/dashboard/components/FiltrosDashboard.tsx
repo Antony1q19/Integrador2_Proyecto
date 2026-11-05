@@ -105,7 +105,7 @@ export function FiltrosDashboard({
 
       {/* Rangos rápidos */}
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs font-semibold text-slate-400">Rango rápido:</span>
+        <span className="text-xs font-semibold text-slate-600">Rango rápido:</span>
         {ATAJOS_RANGO.map((atajo) => {
           const rango = atajo.calcular(hoy);
           const activo = rango.desde === filtros.desde && rango.hasta === filtros.hasta;

@@ -97,13 +97,13 @@ export default function AnuncioFicha({ anuncio, onCambiarEstado }: AnuncioFichaP
                 <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
                     <dl className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                         <div>
-                            <dt className="text-xs text-slate-400">Vacantes</dt>
+                            <dt className="text-xs text-slate-600">Vacantes</dt>
                             <dd className="text-sm text-slate-800">
                                 {anuncio.numeroVacantes}
                             </dd>
                         </div>
                         <div>
-                            <dt className="text-xs text-slate-400">Salario Referencial</dt>
+                            <dt className="text-xs text-slate-600">Salario Referencial</dt>
                             <dd className="text-sm text-slate-800">
                                 {anuncio.salarioMin != null && anuncio.salarioMax != null
                                 ? `S/ ${anuncio.salarioMin.toLocaleString()} - S/ ${anuncio.salarioMax.toLocaleString()}`
@@ -111,7 +111,7 @@ export default function AnuncioFicha({ anuncio, onCambiarEstado }: AnuncioFichaP
                             </dd>
                         </div>
                         <div>
-                            <dt className="text-xs text-slate-400">Fecha Límite</dt>
+                            <dt className="text-xs text-slate-600">Fecha Límite</dt>
                             <dd className="text-sm text-slate-800">
                                 {anuncio.fechaLimite}
                             </dd>

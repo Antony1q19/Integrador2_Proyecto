@@ -21,7 +21,7 @@ export function EmbudoSeleccion({ embudo }: EmbudoSeleccionProps) {
   const total = embudo.reduce((suma, etapa) => suma + etapa.cantidad, 0);
 
   if (total === 0) {
-    return <p className="py-10 text-center text-sm text-slate-400">No hay postulaciones en este periodo.</p>;
+    return <p className="py-10 text-center text-sm text-slate-600">No hay postulaciones en este periodo.</p>;
   }
 
   return (

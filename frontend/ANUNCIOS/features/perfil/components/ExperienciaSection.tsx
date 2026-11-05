@@ -141,7 +141,7 @@ export function ExperienciaSection({
       )}
 
       {experiencia.length === 0 ? (
-        <p className="py-4 text-center text-sm text-gray-400">
+        <p className="py-4 text-center text-sm text-gray-600">
           Aún no agregas experiencia laboral.
         </p>
       ) : (
@@ -155,7 +155,7 @@ export function ExperienciaSection({
                 <div>
                   <p className="text-sm font-medium text-gray-800">{e.cargo}</p>
                   <p className="text-sm text-gray-500">{e.empresa}</p>
-                  <p className="mt-0.5 text-xs text-gray-400">
+                  <p className="mt-0.5 text-xs text-gray-600">
                     {e.fechaInicio} — {e.actualidad ? 'Actualidad' : e.fechaFin || '—'}
                   </p>
                   {e.descripcion && (
@@ -165,7 +165,7 @@ export function ExperienciaSection({
               </div>
               <button
                 onClick={() => onEliminar(e.id)}
-                className="rounded-lg p-1.5 text-gray-400 transition-colors duration-150 hover:bg-red-50 hover:text-red-600 active:scale-[0.97]"
+                className="rounded-lg p-1.5 text-gray-600 transition-colors duration-150 hover:bg-red-50 hover:text-red-600 active:scale-[0.97]"
               >
                 <Trash2 size={14} />
               </button>
