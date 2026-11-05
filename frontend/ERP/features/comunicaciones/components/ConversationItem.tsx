@@ -12,6 +12,12 @@ interface ConversationItemProps {
   onSelect: () => void;
 }
 
+// "51947757081" → "+51 947 757 081" (los demás países se muestran solo con el +).
+const formatearTelefono = (telefono: string) =>
+  /^51\d{9}$/.test(telefono)
+    ? `+51 ${telefono.slice(2, 5)} ${telefono.slice(5, 8)} ${telefono.slice(8)}`
+    : `+${telefono}`;
+
 const getEstadoColor = (estado: Contacto["estado"]) => {
   const colors = {
     en_linea: "bg-green-500",
@@ -51,7 +57,7 @@ export function ConversationItem({
       {/* Información */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between">
-          <p className="truncate text-sm font-medium text-slate-900">
+          <p className={`truncate text-sm text-slate-900 ${contacto.noLeidos > 0 ? "font-semibold" : "font-medium"}`}>
             {nombreCompleto}
           </p>
           {contacto.ultimaActividad && (
@@ -68,8 +74,13 @@ export function ConversationItem({
             {contacto.ultimoMensaje}
           </p>
         )}
-        <p className="mt-0.5 text-xs text-slate-400">
-          {contacto.telefono}
+        <p className="mt-0.5 flex items-center gap-2 text-xs text-slate-400">
+          {formatearTelefono(contacto.telefono)}
+          {contacto.registrado === false && (
+            <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
+              No registrado
+            </span>
+          )}
         </p>
       </div>
 

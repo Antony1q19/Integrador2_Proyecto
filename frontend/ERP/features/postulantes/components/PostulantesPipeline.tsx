@@ -49,16 +49,12 @@ export function PostulantesPipeline() {
 
   // Una tarjeta por cada postulación (postulante + anuncio al que se
   // presentó), no una por postulante. Una postulación existe si figura en
-  // `procesosPostulacion` (datos reales) o, en modo mock, en `postulantesAsociadosIds`.
+  // `procesosPostulacion`.
   const tarjetas: Tarjeta[] = useMemo(
     () =>
       postulantes.flatMap((postulante) =>
         anuncios
-          .filter(
-            (anuncio) =>
-              anuncio.postulantesAsociadosIds?.includes(postulante.id) ||
-              String(anuncio.id) in postulante.procesosPostulacion
-          )
+          .filter((anuncio) => String(anuncio.id) in postulante.procesosPostulacion)
           .map((anuncio) => ({
             id: `${postulante.id}:${anuncio.id}`,
             postulante,

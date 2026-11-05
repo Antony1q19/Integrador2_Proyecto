@@ -5,16 +5,15 @@
 // respuesta ni en JavaScript -se lo asigna acá mismo como cookie httpOnly,
 // así un XSS en el front no puede robarlo con `document.cookie`-.
 //
-// Corre server-side (dentro del contenedor "erp-service"), por eso usa
-// GATEWAY_INTERNAL_URL (nombre del contenedor en la red de Docker), no
-// NEXT_PUBLIC_API_URL (esa es para el navegador, que no está en esa red).
+// Corre server-side (en la tarea "erp" de ECS), por eso usa
+// GATEWAY_INTERNAL_URL (nombre del Gateway en Service Connect, dentro de AWS).
 import { NextRequest, NextResponse } from "next/server";
 import { cabecerasIpCliente } from "@/lib/ipCliente";
 
 const GATEWAY_URL = process.env.GATEWAY_INTERNAL_URL;
 const ROLES_VALIDOS_ERP = ["Admin", "RRHH", "Supervisor"];
 
-// Debe coincidir con JWT_MINUTOS_EXPIRACION del Gateway (backend/gateway/.env).
+// Debe coincidir con JWT_MINUTOS_EXPIRACION del Gateway (backend/gateway/app/core/config.py).
 // Si el JWT expira antes, el Gateway igual lo rechaza (401) aunque la
 // cookie siga viva; esto solo evita mandar una cookie "vencida" de más.
 const DURACION_COOKIE_SEGUNDOS = 60 * 60;

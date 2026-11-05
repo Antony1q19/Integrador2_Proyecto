@@ -1,0 +1,17 @@
+# Dependencias de las pruebas de compatibilidad (tests/). Incluye las de cada servicio, porque las
+# pruebas importan su código, más las herramientas que simulan a Meta, AWS y validan contratos.
+#     pip install -r tests/requirements.txt
+-r ../backend/gateway/requirements.txt
+-r ../backend/servicio-postulantes/requirements.txt
+-r ../backend/servicio-empresas-vacantes/requirements.txt
+-r ../backend/servicio-procesos-seleccion/requirements.txt
+-r ../backend/servicio-comunicaciones/requirements.txt
+
+# respx: simula las respuestas HTTP de Meta (Graph API) para el cliente httpx del sistema.
+respx>=0.21,<0.23
+# moto: simula Amazon SES y S3 dentro de la prueba (nunca toca la cuenta real de AWS).
+moto[s3,sesv2]>=5,<6
+# Valida que cada contrato OpenAPI sea un documento OpenAPI 3 correcto.
+openapi-spec-validator>=0.7,<0.8
+# Lee las plantillas de CloudFormation (pruebas de co-existencia).
+pyyaml>=6,<7

@@ -1,5 +1,6 @@
 import {
     BadgeCheck,
+    CircleHelp,
     CalendarClock,
     LayoutDashboard,
     MessageCircle,
@@ -60,6 +61,10 @@ export const menuItems: MenuItem[] = [
         href: "/comunicaciones",
         icon: MessageCircle,
         roles: ["Admin", "RRHH", "Supervisor"],
+        subItems: [
+            { name: "Chats", href: "/comunicaciones" },
+            { name: "Plantillas", href: "/comunicaciones/plantillas" },
+        ],
     },
     {
         name: "Anuncios",
@@ -77,6 +82,12 @@ export const menuItems: MenuItem[] = [
         name: "Perfil",
         href: "/perfil",
         icon: UserCircle,
+        roles: ["Admin", "RRHH", "Supervisor"],
+    },
+    {
+        name: "Ayuda",
+        href: "/ayuda",
+        icon: CircleHelp,
         roles: ["Admin", "RRHH", "Supervisor"],
     },
 ];

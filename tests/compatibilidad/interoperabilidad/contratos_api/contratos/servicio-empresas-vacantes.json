@@ -1,0 +1,1576 @@
+{
+  "components": {
+    "schemas": {
+      "AnuncioActualizar": {
+        "description": "Datos que llegan al hacer PUT /anuncios/{id} (editar uno existente).\nEl estado NO se edita aquí — se maneja aparte (ver Paso 6).",
+        "properties": {
+          "cargo": {
+            "title": "Cargo",
+            "type": "string"
+          },
+          "descripcion": {
+            "title": "Descripcion",
+            "type": "string"
+          },
+          "empresaId": {
+            "title": "Empresaid",
+            "type": "integer"
+          },
+          "fechaLimite": {
+            "format": "date",
+            "title": "Fechalimite",
+            "type": "string"
+          },
+          "numeroVacantes": {
+            "title": "Numerovacantes",
+            "type": "integer"
+          },
+          "requisitos": {
+            "title": "Requisitos",
+            "type": "string"
+          },
+          "salarioMax": {
+            "title": "Salariomax",
+            "type": "number"
+          },
+          "salarioMin": {
+            "title": "Salariomin",
+            "type": "number"
+          }
+        },
+        "required": [
+          "empresaId",
+          "cargo",
+          "descripcion",
+          "requisitos",
+          "numeroVacantes",
+          "salarioMin",
+          "salarioMax",
+          "fechaLimite"
+        ],
+        "title": "AnuncioActualizar",
+        "type": "object"
+      },
+      "AnuncioCambiarEstado": {
+        "description": "Datos que llegan al hacer PATCH /anuncios/{id}/estado.",
+        "properties": {
+          "estado": {
+            "enum": [
+              "Abierto",
+              "En proceso",
+              "Cerrado"
+            ],
+            "title": "Estado",
+            "type": "string"
+          }
+        },
+        "required": [
+          "estado"
+        ],
+        "title": "AnuncioCambiarEstado",
+        "type": "object"
+      },
+      "AnuncioCrear": {
+        "description": "Datos que llegan al hacer POST /anuncios (publicar uno nuevo).\nNo incluye `estado`: siempre nace como 'Abierto' (lo asigna el backend,\nno el formulario).",
+        "properties": {
+          "cargo": {
+            "title": "Cargo",
+            "type": "string"
+          },
+          "descripcion": {
+            "title": "Descripcion",
+            "type": "string"
+          },
+          "empresaId": {
+            "title": "Empresaid",
+            "type": "integer"
+          },
+          "fechaLimite": {
+            "format": "date",
+            "title": "Fechalimite",
+            "type": "string"
+          },
+          "numeroVacantes": {
+            "title": "Numerovacantes",
+            "type": "integer"
+          },
+          "requisitos": {
+            "title": "Requisitos",
+            "type": "string"
+          },
+          "salarioMax": {
+            "title": "Salariomax",
+            "type": "number"
+          },
+          "salarioMin": {
+            "title": "Salariomin",
+            "type": "number"
+          }
+        },
+        "required": [
+          "empresaId",
+          "cargo",
+          "descripcion",
+          "requisitos",
+          "numeroVacantes",
+          "salarioMin",
+          "salarioMax",
+          "fechaLimite"
+        ],
+        "title": "AnuncioCrear",
+        "type": "object"
+      },
+      "AnuncioPublico": {
+        "description": "Un anuncio tal como lo ve CUALQUIER persona en la app ANUNCIOS (sin iniciar sesión).\n\nEs una lista blanca: solo lleva lo que se puede publicar. NO incluye el RUC ni los datos\nde contacto de la empresa, ni el estado interno, ni ids de empresa. Si mañana se agrega\nuna columna nueva a la tabla, NO aparece aquí sola: hay que añadirla a propósito.",
+        "properties": {
+          "cargo": {
+            "title": "Cargo",
+            "type": "string"
+          },
+          "descripcion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Descripcion"
+          },
+          "empresaNombre": {
+            "title": "Empresanombre",
+            "type": "string"
+          },
+          "empresaSector": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Empresasector"
+          },
+          "fechaLimite": {
+            "format": "date",
+            "title": "Fechalimite",
+            "type": "string"
+          },
+          "fechaPublicacion": {
+            "format": "date-time",
+            "title": "Fechapublicacion",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "numeroVacantes": {
+            "title": "Numerovacantes",
+            "type": "integer"
+          },
+          "requisitos": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requisitos"
+          },
+          "salarioMax": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Salariomax"
+          },
+          "salarioMin": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Salariomin"
+          }
+        },
+        "required": [
+          "id",
+          "cargo",
+          "empresaNombre",
+          "numeroVacantes",
+          "fechaLimite",
+          "fechaPublicacion"
+        ],
+        "title": "AnuncioPublico",
+        "type": "object"
+      },
+      "AnuncioRespuesta": {
+        "description": "Un anuncio de trabajo, con el nombre de su empresa ya incluido.",
+        "properties": {
+          "cargo": {
+            "title": "Cargo",
+            "type": "string"
+          },
+          "descripcion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Descripcion"
+          },
+          "empresaId": {
+            "title": "Empresaid",
+            "type": "integer"
+          },
+          "empresaRazonSocial": {
+            "title": "Empresarazonsocial",
+            "type": "string"
+          },
+          "estado": {
+            "title": "Estado",
+            "type": "string"
+          },
+          "fechaCreacion": {
+            "format": "date-time",
+            "title": "Fechacreacion",
+            "type": "string"
+          },
+          "fechaLimite": {
+            "format": "date",
+            "title": "Fechalimite",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "numeroVacantes": {
+            "title": "Numerovacantes",
+            "type": "integer"
+          },
+          "requisitos": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requisitos"
+          },
+          "salarioMax": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Salariomax"
+          },
+          "salarioMin": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Salariomin"
+          }
+        },
+        "required": [
+          "id",
+          "empresaId",
+          "empresaRazonSocial",
+          "cargo",
+          "numeroVacantes",
+          "fechaLimite",
+          "estado",
+          "fechaCreacion"
+        ],
+        "title": "AnuncioRespuesta",
+        "type": "object"
+      },
+      "EmpresaActualizar": {
+        "description": "Datos que llegan al hacer PUT /empresas/{id} (editar una existente).\nMismas reglas que al crear; el formulario de edición del frontend envía\nel formulario completo, no solo los campos que cambiaron.",
+        "properties": {
+          "contactoEmail": {
+            "title": "Contactoemail",
+            "type": "string"
+          },
+          "contactoNombre": {
+            "title": "Contactonombre",
+            "type": "string"
+          },
+          "contactoTelefono": {
+            "title": "Contactotelefono",
+            "type": "string"
+          },
+          "razonSocial": {
+            "title": "Razonsocial",
+            "type": "string"
+          },
+          "ruc": {
+            "title": "Ruc",
+            "type": "string"
+          },
+          "sector": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sector"
+          }
+        },
+        "required": [
+          "razonSocial",
+          "ruc",
+          "contactoNombre",
+          "contactoEmail",
+          "contactoTelefono"
+        ],
+        "title": "EmpresaActualizar",
+        "type": "object"
+      },
+      "EmpresaCrear": {
+        "description": "Datos que llegan al hacer POST /empresas (registrar una nueva).",
+        "properties": {
+          "contactoEmail": {
+            "title": "Contactoemail",
+            "type": "string"
+          },
+          "contactoNombre": {
+            "title": "Contactonombre",
+            "type": "string"
+          },
+          "contactoTelefono": {
+            "title": "Contactotelefono",
+            "type": "string"
+          },
+          "razonSocial": {
+            "title": "Razonsocial",
+            "type": "string"
+          },
+          "ruc": {
+            "title": "Ruc",
+            "type": "string"
+          },
+          "sector": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sector"
+          }
+        },
+        "required": [
+          "razonSocial",
+          "ruc",
+          "contactoNombre",
+          "contactoEmail",
+          "contactoTelefono"
+        ],
+        "title": "EmpresaCrear",
+        "type": "object"
+      },
+      "EmpresaRespuesta": {
+        "description": "Una empresa cliente.",
+        "properties": {
+          "anunciosActivos": {
+            "title": "Anunciosactivos",
+            "type": "integer"
+          },
+          "contactoEmail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contactoemail"
+          },
+          "contactoNombre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contactonombre"
+          },
+          "contactoTelefono": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contactotelefono"
+          },
+          "fechaRegistro": {
+            "format": "date",
+            "title": "Fecharegistro",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "razonSocial": {
+            "title": "Razonsocial",
+            "type": "string"
+          },
+          "ruc": {
+            "title": "Ruc",
+            "type": "string"
+          },
+          "sector": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sector"
+          }
+        },
+        "required": [
+          "id",
+          "razonSocial",
+          "ruc",
+          "fechaRegistro",
+          "anunciosActivos"
+        ],
+        "title": "EmpresaRespuesta",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Empresas cliente y sus anuncios (vacantes). Por ahora solo lectura de anuncios.",
+    "title": "Servicio de Empresas y Vacantes",
+    "version": "0.2.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/anuncios": {
+      "get": {
+        "operationId": "listar_anuncios_anuncios_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AnuncioRespuesta"
+                  },
+                  "title": "Response Listar Anuncios Anuncios Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Listar Anuncios",
+        "tags": [
+          "anuncios"
+        ]
+      },
+      "post": {
+        "operationId": "crear_anuncio_anuncios_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnuncioCrear"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnuncioRespuesta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Crear Anuncio",
+        "tags": [
+          "anuncios"
+        ]
+      }
+    },
+    "/anuncios/{anuncio_id}": {
+      "delete": {
+        "operationId": "eliminar_anuncio_anuncios__anuncio_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "anuncio_id",
+            "required": true,
+            "schema": {
+              "title": "Anuncio Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Eliminar Anuncio",
+        "tags": [
+          "anuncios"
+        ]
+      },
+      "get": {
+        "operationId": "obtener_anuncio_anuncios__anuncio_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "anuncio_id",
+            "required": true,
+            "schema": {
+              "title": "Anuncio Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnuncioRespuesta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Obtener Anuncio",
+        "tags": [
+          "anuncios"
+        ]
+      },
+      "put": {
+        "operationId": "actualizar_anuncio_anuncios__anuncio_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "anuncio_id",
+            "required": true,
+            "schema": {
+              "title": "Anuncio Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnuncioActualizar"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnuncioRespuesta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Actualizar Anuncio",
+        "tags": [
+          "anuncios"
+        ]
+      }
+    },
+    "/anuncios/{anuncio_id}/estado": {
+      "patch": {
+        "operationId": "cambiar_estado_anuncio_anuncios__anuncio_id__estado_patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "anuncio_id",
+            "required": true,
+            "schema": {
+              "title": "Anuncio Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnuncioCambiarEstado"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnuncioRespuesta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Cambiar Estado Anuncio",
+        "tags": [
+          "anuncios"
+        ]
+      }
+    },
+    "/empresas": {
+      "get": {
+        "operationId": "listar_empresas_empresas_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EmpresaRespuesta"
+                  },
+                  "title": "Response Listar Empresas Empresas Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Listar Empresas",
+        "tags": [
+          "empresas"
+        ]
+      },
+      "post": {
+        "operationId": "crear_empresa_empresas_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmpresaCrear"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmpresaRespuesta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Crear Empresa",
+        "tags": [
+          "empresas"
+        ]
+      }
+    },
+    "/empresas/{empresa_id}": {
+      "delete": {
+        "operationId": "eliminar_empresa_empresas__empresa_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "empresa_id",
+            "required": true,
+            "schema": {
+              "title": "Empresa Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Eliminar Empresa",
+        "tags": [
+          "empresas"
+        ]
+      },
+      "get": {
+        "operationId": "obtener_empresa_empresas__empresa_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "empresa_id",
+            "required": true,
+            "schema": {
+              "title": "Empresa Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmpresaRespuesta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Obtener Empresa",
+        "tags": [
+          "empresas"
+        ]
+      },
+      "put": {
+        "operationId": "actualizar_empresa_empresas__empresa_id__put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "empresa_id",
+            "required": true,
+            "schema": {
+              "title": "Empresa Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmpresaActualizar"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmpresaRespuesta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Actualizar Empresa",
+        "tags": [
+          "empresas"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "description": "Sirve para comprobar rápido que el servicio está vivo.",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Health Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/internos/anuncios/{anuncio_id}/cerrar-por-vacantes": {
+      "post": {
+        "operationId": "cerrar_por_vacantes_internos_anuncios__anuncio_id__cerrar_por_vacantes_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "anuncio_id",
+            "required": true,
+            "schema": {
+              "title": "Anuncio Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-id",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-rol",
+            "required": true,
+            "schema": {
+              "title": "X-Usuario-Rol",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-usuario-empresas",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Usuario-Empresas"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Cerrar Por Vacantes Internos Anuncios  Anuncio Id  Cerrar Por Vacantes Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Cerrar Por Vacantes",
+        "tags": [
+          "internos"
+        ]
+      }
+    },
+    "/publico/anuncios": {
+      "get": {
+        "description": "Los más recientes primero, de a `limite` (máx. 100), saltando los primeros `desde`.",
+        "operationId": "listar_anuncios_publicos_publico_anuncios_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limite",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limite",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "desde",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Desde",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AnuncioPublico"
+                  },
+                  "title": "Response Listar Anuncios Publicos Publico Anuncios Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Listar Anuncios Publicos",
+        "tags": [
+          "publico"
+        ]
+      }
+    },
+    "/publico/anuncios/{anuncio_id}": {
+      "get": {
+        "operationId": "obtener_anuncio_publico_publico_anuncios__anuncio_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "anuncio_id",
+            "required": true,
+            "schema": {
+              "title": "Anuncio Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnuncioPublico"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Obtener Anuncio Publico",
+        "tags": [
+          "publico"
+        ]
+      }
+    }
+  }
+}

@@ -22,6 +22,8 @@ export interface Permisos {
   puedeEditarEmpresas: boolean;
   puedeCrearEliminarEmpresas: boolean;
   puedeGestionarSeleccion: boolean;
+  puedeGestionarPlantillasWhatsApp: boolean;
+  puedeEscribirWhatsApp: boolean;
 }
 
 export function permisosDe(rol: string | undefined): Permisos {
@@ -35,5 +37,9 @@ export function permisosDe(rol: string | undefined): Permisos {
     puedeEditarEmpresas: esAdmin || esSupervisor,
     puedeCrearEliminarEmpresas: esAdmin,
     puedeGestionarSeleccion: esAdmin || esSupervisor || r === "RRHH",
+    // Crear/eliminar plantillas de WhatsApp: Admin y RRHH (el Supervisor solo las ve).
+    puedeGestionarPlantillasWhatsApp: esAdmin || r === "RRHH",
+    // Enviar mensajes por WhatsApp: Admin y RRHH. El Supervisor solo lee (igual que el backend).
+    puedeEscribirWhatsApp: esAdmin || r === "RRHH",
   };
 }

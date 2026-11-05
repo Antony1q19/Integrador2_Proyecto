@@ -159,10 +159,8 @@ export interface Postulante {
   // PostulacionesTab.tsx).
   procesosPostulacion: Record<string, ProcesoPostulacion>;
   consentimientos: ConsentimientosPostulante;
-  // ¿Ya tiene cuenta de acceso a ANUNCIOS? Lo informa el backend. En el modo mock
-  // (sin backend) no viene: ahí se usa `consentimientos.tratamientoDatos`, que solo
-  // es true cuando el postulante creó su propia cuenta (ver `postulanteTieneCuenta`).
-  tieneCuenta?: boolean;
+  // ¿Ya tiene cuenta de acceso a ANUNCIOS? Lo informa el backend.
+  tieneCuenta: boolean;
 }
 
 // ============================================================

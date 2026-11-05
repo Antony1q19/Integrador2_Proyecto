@@ -1,8 +1,8 @@
 # Receta para construir la imagen (la "caja") del Gateway.
-# Se construye desde la carpeta backend/ (ver docker-compose.yml: context: ./backend).
+# Imagen de PRODUCCIÓN (AWS ECS Fargate). Se construye desde la carpeta backend/ (ver infra/aws/publicar.ps1).
 
 # Punto de partida: una imagen ligera con Python 3.12 ya instalado.
-FROM python:3.12-slim
+FROM public.ecr.aws/docker/library/python:3.12-slim
 
 WORKDIR /app
 
@@ -21,11 +21,10 @@ COPY gateway/app ./app
 # Evitar que Python cree carpetas __pycache__ (archivos .pyc de caché) dentro del
 # proyecto: no aportan nada y ensucian las carpetas. Se pone después de instalar
 # las librerías a propósito, para no invalidar la caché de Docker de ese paso.
-# PYTHONUNBUFFERED hace que los logs salgan al instante en `docker logs`.
+# PYTHONUNBUFFERED hace que los logs salgan al instante en CloudWatch Logs.
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 EXPOSE 8000
 
-# --reload: reinicia solo cuando cambias el código (cómodo para desarrollar).
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--timeout-keep-alive", "60"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--timeout-keep-alive", "60"]

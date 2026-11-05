@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
 
     const usuario = await respuestaGateway.json();
     return NextResponse.json({ usuario });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'No se pudo verificar la sesión con el servidor' },
       { status: 503 }

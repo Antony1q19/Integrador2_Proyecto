@@ -16,7 +16,6 @@ import {
   replaceDocumento,
   deleteDocumento,
   addEvaluacion,
-  updateEstado,
   actualizarEstadoPostulacion,
 } from "../services/postulantesService";
 import { marcarVencido } from "@/lib/cacheCliente";
@@ -30,7 +29,6 @@ interface UsePostulanteDetalleResult {
   reemplazarDocumento: (documentoId: string, archivo: File) => Promise<void>;
   eliminarDocumento: (documentoId: string) => Promise<void>;
   registrarEvaluacion: (evaluacion: NuevaEvaluacion) => Promise<void>;
-  cambiarEstado: (estado: EstadoProceso, comentario?: string) => Promise<void>;
   actualizarEstadoPostulacion: (
     anuncioId: string,
     estado: EstadoProceso,
@@ -41,9 +39,6 @@ interface UsePostulanteDetalleResult {
   // ej. al programar una entrevista o registrar una contratación, que mueven la etapa del postulante).
   refrescar: () => Promise<void>;
 }
-
-// TODO: reemplazar por el usuario real de la sesión (features/auth/hooks/useAuth)
-const USUARIO_ACTUAL = "Usuario RRHH";
 
 export function usePostulanteDetalle(id: string): UsePostulanteDetalleResult {
   const [postulante, setPostulante] = useState<Postulante | null>(null);
@@ -133,20 +128,6 @@ export function usePostulanteDetalle(id: string): UsePostulanteDetalleResult {
     }
   };
 
-  const cambiarEstado = async (estado: EstadoProceso, comentario?: string) => {
-    setGuardando(true);
-    try {
-      const registro = await updateEstado(id, estado, USUARIO_ACTUAL, comentario);
-      setPostulante((prev) =>
-        prev
-          ? { ...prev, estadoActual: estado, historialEstados: [...prev.historialEstados, registro] }
-          : prev
-      );
-    } finally {
-      setGuardando(false);
-    }
-  };
-
   const handleActualizarEstadoPostulacion = async (
     anuncioId: string,
     estado: EstadoProceso,
@@ -154,7 +135,7 @@ export function usePostulanteDetalle(id: string): UsePostulanteDetalleResult {
   ) => {
     setGuardando(true);
     try {
-      const registro = await actualizarEstadoPostulacion(id, anuncioId, estado, USUARIO_ACTUAL, comentario);
+      const registro = await actualizarEstadoPostulacion(id, anuncioId, estado, comentario);
       setPostulante((prev) => {
         if (!prev) return prev;
         const historialPrevio = prev.procesosPostulacion[anuncioId]?.historialEstados ?? [];
@@ -183,7 +164,6 @@ export function usePostulanteDetalle(id: string): UsePostulanteDetalleResult {
     reemplazarDocumento,
     eliminarDocumento,
     registrarEvaluacion,
-    cambiarEstado,
     actualizarEstadoPostulacion: handleActualizarEstadoPostulacion,
     guardando,
     refrescar,

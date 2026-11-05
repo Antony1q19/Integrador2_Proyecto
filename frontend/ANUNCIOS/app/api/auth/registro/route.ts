@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     });
 
     return respuesta;
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'No se pudo conectar con el servidor de autenticación' },
       { status: 503 }

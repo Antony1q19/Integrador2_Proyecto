@@ -74,7 +74,9 @@ next-env.d.ts
 Thumbs.db
 ehthumbs.db
 
-# --- Docker ---
-# (Ignora datos de volúmenes locales persistidos si los llegas a mapear a disco)
-.docker/
 
+# Reportes que genera tests/ejecutar.py (se guardan como artefacto del CI)
+tests/evidencias/
+
+# Sesión del ERP que guarda Playwright (contiene la cookie de inicio de sesión)
+tests/compatibilidad/navegadores/.auth/

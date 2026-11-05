@@ -3,7 +3,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { usePostulanteDetalle } from "../hooks/usePostulanteDetalle";
+import { abrirConversacion } from "@/features/comunicaciones/services/comunicacionesService";
+import { usePermisos } from "@/lib/usePermisos";
 import { EstadoBadge } from "./EstadoBadge";
 import { Skeleton } from "@/components/shared/Skeleton";
 import { DatosPersonalesTab } from "./DatosPersonalesTab";
@@ -30,6 +33,10 @@ function iniciales(nombres: string, apellidos: string) {
 
 export function PostulanteFicha({ id }: { id: string }) {
   const [tabActivo, setTabActivo] = useState<TabId>("datos");
+  const router = useRouter();
+  const [abriendoChat, setAbriendoChat] = useState(false);
+  const [errorChat, setErrorChat] = useState<string | null>(null);
+  const { puedeEscribirWhatsApp } = usePermisos();
   const {
     postulante,
     loading,
@@ -94,6 +101,23 @@ export function PostulanteFicha({ id }: { id: string }) {
 
   const { datosPersonales: d } = postulante;
 
+  // Abre (o crea) el chat de WhatsApp con este postulante y lleva a Comunicaciones.
+  const enviarWhatsApp = async () => {
+    setAbriendoChat(true);
+    setErrorChat(null);
+    try {
+      const conversacionId = await abrirConversacion({
+        id: postulante.id,
+        nombre: `${d.nombres} ${d.apellidos}`.trim(),
+        telefono: d.telefono,
+      });
+      router.push(`/comunicaciones?c=${conversacionId}`);
+    } catch (err) {
+      setErrorChat(err instanceof Error ? err.message : "No se pudo abrir el chat");
+      setAbriendoChat(false);
+    }
+  };
+
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-6">
       <Link
@@ -119,9 +143,17 @@ export function PostulanteFicha({ id }: { id: string }) {
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <EstadoBadge estado={postulante.estadoActual} />
-            <button className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50">
-              Enviar WhatsApp
+            {puedeEscribirWhatsApp && (
+            <button
+              onClick={enviarWhatsApp}
+              disabled={!d.telefono || abriendoChat}
+              title={d.telefono ? undefined : "El postulante no tiene teléfono registrado"}
+              className="rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {abriendoChat ? "Abriendo chat..." : "Enviar WhatsApp"}
             </button>
+            )}
+            {errorChat && <p className="w-full text-xs text-red-600">{errorChat}</p>}
           </div>
         </div>
       </div>

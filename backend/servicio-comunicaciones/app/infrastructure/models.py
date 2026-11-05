@@ -1,8 +1,9 @@
 """Tablas de la base de datos de comunicaciones (schema "comunicaciones").
 
-Dos tablas:
-  - conversaciones → un hilo de chat con un postulante.
-  - mensajes       → cada mensaje enviado/recibido en esa conversación.
+Tres tablas:
+  - conversaciones     → un hilo de chat con un postulante.
+  - mensajes           → cada mensaje enviado/recibido en esa conversación.
+  - plantillas_rapidas → los textos del botón "Plantillas" del chat (editables desde el ERP).
 
 Solo el ERP maneja las conversaciones: se crean cuando un RRHH inicia el chat
 con un postulante ya existente.
@@ -30,7 +31,7 @@ class Conversacion(Base):
     # Nombre y teléfono del postulante (copiados al crear la conversación).
     # Se guardan aquí para no tener que llamar al servicio-postulantes en cada listado.
     nombre: Mapped[str] = mapped_column(String(300), nullable=False)
-    telefono: Mapped[str] = mapped_column(String(30), nullable=False)
+    telefono: Mapped[str] = mapped_column(String(30), index=True, nullable=False)
     # Última actividad (para ordenar la lista de conversaciones por más reciente).
     ultima_actividad: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -72,7 +73,27 @@ class Mensaje(Base):
     # enviado | entregado | leido | fallido
     estado: Mapped[str] = mapped_column(String(20), default="enviado", nullable=False)
 
-    # wamid que devuelve Meta/kapso al aceptar el envío (para cruzar estados después).
+    # wamid que devuelve Meta al aceptar el envío (para cruzar estados después).
     wamid: Mapped[str | None] = mapped_column(String(255), nullable=True, unique=True)
 
+    # Si WhatsApp no lo entregó, por qué (ej. "Pasaron más de 24 horas..."): se muestra en el chat.
+    error: Mapped[str | None] = mapped_column(String(300), nullable=True)
+
     conversacion: Mapped[Conversacion] = relationship(back_populates="mensajes")
+
+class PlantillaRapida(Base):
+    """Texto listo para insertar en el chat (botón "Plantillas"). No es una plantilla de Meta: se
+    envía como mensaje normal, así que solo llega si el postulante escribió en las últimas 24 h.
+    Variables: {nombre} se completa solo; {puesto}, {fecha}... los escribe quien envía."""
+
+    __tablename__ = "plantillas_rapidas"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_nuevo_id)
+    titulo: Mapped[str] = mapped_column(String(100), nullable=False)
+    descripcion: Mapped[str] = mapped_column(String(200), nullable=False, default="")
+    categoria: Mapped[str] = mapped_column(String(30), nullable=False, default="general")
+    contenido: Mapped[str] = mapped_column(Text, nullable=False)
+    orden: Mapped[int] = mapped_column(default=0, nullable=False)
+    actualizada_en: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )

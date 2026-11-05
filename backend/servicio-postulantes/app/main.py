@@ -8,9 +8,6 @@ su cuenta de acceso a la app ANUNCIOS. Guarda todo en su propia base de datos
 Regla importante: a este servicio NUNCA le habla directamente el navegador.
 Solo le habla el Gateway (ver api/deps.py, que rechaza cualquier llamada que no
 traiga la firma del Gateway).
-
-Para ver las rutas, con el backend encendido abre:
-    http://localhost:8001/docs   (solo para depurar; en el uso normal se pasa por el Gateway)
 """
 import asyncio
 import logging
@@ -23,7 +20,6 @@ from app.api.v1.router import router as router_v1
 from app.core.config import settings
 from app.core.database import engine
 from app.infrastructure.models import InvitacionCuenta
-from app.infrastructure.seed import sembrar_datos_de_prueba
 from app.domain.postulantes import TAMANO_MAXIMO_BYTES, TIPOS_DE_ARCHIVO_PERMITIDOS
 from app.infrastructure.storage import asegurar_bucket, cerrar_cliente
 from shared_kernel.database import calentar_conexiones, crear_tablas
@@ -34,7 +30,7 @@ configurar_logging("servicio-postulantes", settings.log_level)
 
 
 async def _asegurar_columnas_nuevas() -> None:
-    """Añade columnas a tablas existentes si la base de datos ya existía en Supabase."""
+    """Añade columnas a tablas que ya existían (bases creadas antes de esas columnas)."""
     esquema = settings.db_schema
     prefijo = f'"{esquema}".' if esquema else ""
     consultas = [
@@ -52,7 +48,7 @@ async def _asegurar_columnas_nuevas() -> None:
 
 
 async def _asegurar_tablas_nuevas() -> None:
-    """Crea (solo si faltan) las tablas agregadas después, en CUALQUIER entorno: hoy la de
+    """Crea (solo si faltan) las tablas agregadas después, siempre: hoy la de
     invitaciones de un solo uso (ver InvitacionCuenta). Si falla, avisa en el log y sigue."""
     try:
         async with engine.begin() as conn:
@@ -65,18 +61,16 @@ async def _asegurar_tablas_nuevas() -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # AL ENCENDER: en modo "desarrollo" crea las tablas que falten (leyendo las
-    # clases de infrastructure/models.py) y siembra los datos de prueba
-    # (infrastructure/seed.py).
-    if settings.entorno == "desarrollo":
+    # AL ENCENDER: con INICIALIZAR_BD (base nueva en RDS) crea las tablas que falten (leyendo las
+    # clases de infrastructure/models.py).
+    if settings.inicializar_bd:
         await crear_tablas(engine)
         await _asegurar_columnas_nuevas()
-        await sembrar_datos_de_prueba()
-    # En cualquier entorno: las tablas agregadas después (ej. invitaciones de un solo uso).
+    # Siempre: las tablas agregadas después (ej. invitaciones de un solo uso).
     await _asegurar_tablas_nuevas()
     # Abre las conexiones a la base ahora (en segundo plano) y no cuando llegue la primera petición.
     tarea_calentamiento = asyncio.create_task(calentar_conexiones(engine))
-    # Crea el bucket privado de Supabase Storage si todavía no existe.
+    # Comprueba que el bucket de S3 de los documentos esté disponible.
     tarea_bucket = asyncio.create_task(asegurar_bucket(TAMANO_MAXIMO_BYTES, TIPOS_DE_ARCHIVO_PERMITIDOS))
     yield  # <- aquí el servidor queda funcionando
     await asyncio.gather(tarea_calentamiento, tarea_bucket)
@@ -88,10 +82,10 @@ app = FastAPI(
     description="Datos personales, documentos, consentimientos y cuentas de los postulantes.",
     version="1.0.0",
     lifespan=lifespan,
-    # La documentación interactiva (/docs) describe TODAS las rutas: solo se publica en desarrollo.
-    docs_url="/docs" if settings.entorno == "desarrollo" else None,
-    redoc_url="/redoc" if settings.entorno == "desarrollo" else None,
-    openapi_url="/openapi.json" if settings.entorno == "desarrollo" else None,
+    # La documentación interactiva (/docs) describe TODAS las rutas: no se publica.
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
 )
 
 registrar_manejadores_excepciones(app)  # convierte errores de negocio en respuestas HTTP

@@ -1,0 +1,12 @@
+{
+  "name": "talenterp-pruebas-navegadores",
+  "private": true,
+  "description": "Pruebas de compatibilidad en navegadores y dispositivos (ISO/IEC 25010, caso D) con Playwright.",
+  "scripts": {
+    "pruebas": "playwright test",
+    "reporte": "playwright show-report ../../evidencias/playwright-reporte"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1"
+  }
+}

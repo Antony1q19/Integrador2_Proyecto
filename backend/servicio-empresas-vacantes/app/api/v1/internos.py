@@ -9,7 +9,7 @@ una decisión de esa persona.
 
 Seguridad: el Gateway NO reenvía nada que empiece con "/internos" (no está en su tabla de servicios,
 ver gateway/app/api/v1/proxy.py → responde 404), así que solo se llega aquí con la firma del Gateway
-desde dentro de la red de Docker. Igual se respeta la visibilidad del usuario en cuyo nombre se llama.
+desde dentro de la red interna de ECS. Igual se respeta la visibilidad del usuario en cuyo nombre se llama.
 """
 from fastapi import APIRouter, Depends
 from sqlalchemy import select

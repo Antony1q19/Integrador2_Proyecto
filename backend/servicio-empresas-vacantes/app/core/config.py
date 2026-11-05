@@ -1,4 +1,4 @@
-"""Configuración de este microservicio (valores del archivo .env).
+"""Configuración de este microservicio (variables de entorno de la tarea de ECS).
 
 Por ahora no necesita nada extra: usa lo común (base de datos, claves secretas,
 logs) tal como viene de `BaseServiceSettings`. Se deja como clase propia para

@@ -8,6 +8,10 @@ import AnunciosBuscador from '@/features/anuncios/components/AnunciosBuscador';
 import { obtenerAnunciosPublicos } from '@/features/anuncios/services/anunciosService';
 import { Anuncio } from '@/features/anuncios/types';
 
+// Se arma en cada visita (no al compilar): al compilar no hay backend y la portada quedaría
+// congelada con el aviso de error. Los anuncios igual se guardan 60 s en caché (anunciosService.ts).
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Encuentra empleo',
   description: 'Explora las ofertas de empleo de nuestras empresas clientes y postula en minutos.',

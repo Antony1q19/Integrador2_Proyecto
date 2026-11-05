@@ -1,0 +1,46 @@
+name: Pruebas de compatibilidad (ISO 25010)
+
+# Interoperabilidad (Meta, SES, S3, contratos de API) y co-existencia. No usan internet ni la cuenta
+# de AWS: Meta y AWS se simulan (respx, moto). El reporte queda como artefacto descargable (evidencia).
+on:
+  pull_request:
+    branches: [main]
+    paths: ["backend/**", "frontend/**/app/api/**", "frontend/**/lib/**", "infra/aws/*.yaml", "tests/**", ".github/workflows/ci-compatibilidad.yml"]
+  push:
+    branches: [main]
+    paths: ["backend/**", "frontend/**/app/api/**", "frontend/**/lib/**", "infra/aws/*.yaml", "tests/**", ".github/workflows/ci-compatibilidad.yml"]
+  workflow_dispatch: {}
+
+jobs:
+  compatibilidad:
+    name: Interoperabilidad y co-existencia
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.12 (la misma versión de las imágenes)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: |
+            tests/requirements.txt
+            backend/*/requirements.txt
+
+      - name: Instalar dependencias
+        run: pip install -r tests/requirements.txt
+
+      - name: Ejecutar las pruebas de compatibilidad
+        run: python tests/ejecutar.py
+
+      - name: Resumen en la ejecución
+        if: always()
+        run: cat tests/evidencias/resumen.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Guardar la evidencia (reportes JUnit y resumen)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidencia-compatibilidad
+          path: tests/evidencias/

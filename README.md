@@ -28,8 +28,9 @@ de selección) detrás de un API Gateway/BFF — ver [ADR-002](./docs/decisiones
 |---|---|
 | **Frontend** | Next.js  |
 | **Backend** | Python (FastAPI) — microservicios + API Gateway |
-| **Base de datos** | *PostgreSQL* |
-| **Comunicación** | WhatsApp Business API |
+| **Base de datos** | PostgreSQL (Amazon RDS en producción) |
+| **Comunicación** | WhatsApp Business (Meta Cloud API) |
+| **Infraestructura** | AWS con CloudFormation: ECS Fargate, RDS, S3, SES, CloudFront — ver [infra/aws](./infra/aws/README.md) |
 
 ## 📄 Licencia
  

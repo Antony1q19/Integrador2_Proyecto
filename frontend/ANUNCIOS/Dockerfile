@@ -1,12 +1,27 @@
-FROM node:20-alpine
+# Imagen de PRODUCCIÓN (AWS ECS Fargate). La construye infra/aws/publicar.ps1.
+# Tres etapas: instalar dependencias → compilar (next build) → imagen final mínima con el
+# servidor "standalone" de Next.js (sin código fuente ni dependencias de desarrollo).
 
+FROM public.ecr.aws/docker/library/node:20-alpine AS dependencias
 WORKDIR /app
-
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
+FROM public.ecr.aws/docker/library/node:20-alpine AS build
+WORKDIR /app
+COPY --from=dependencias /app/node_modules ./node_modules
 COPY . .
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN npm run build
 
+FROM public.ecr.aws/docker/library/node:20-alpine
+WORKDIR /app
+ENV NODE_ENV=production     NEXT_TELEMETRY_DISABLED=1     PORT=3001     HOSTNAME=0.0.0.0
+# Sin privilegios de administrador dentro del contenedor.
+RUN addgroup -S app && adduser -S app -G app
+COPY --from=build --chown=app:app /app/.next/standalone ./
+COPY --from=build --chown=app:app /app/.next/static ./.next/static
+COPY --from=build /app/public ./public
+USER app
 EXPOSE 3001
-
-CMD ["npm", "run", "dev"]
+CMD ["node", "server.js"]

@@ -586,7 +586,7 @@ async def subir_cv_me(
         sesion.add(documento)
 
     documento.nombre_archivo = archivo.filename or "cv"
-    documento.referencia_almacenamiento = f"{settings.supabase_bucket}/{subido.ruta}"
+    documento.referencia_almacenamiento = f"{settings.contenedor_archivos}/{subido.ruta}"
     documento.ruta_archivo = subido.ruta
     documento.tipo_contenido = subido.tipo_contenido
     documento.tamano_bytes = subido.bytes

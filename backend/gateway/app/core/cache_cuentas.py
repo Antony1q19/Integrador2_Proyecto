@@ -3,7 +3,7 @@
 En CADA petición con sesión el Gateway comprueba que la cuenta siga valiendo: que no esté
 suspendida, que su rol no haya cambiado, que su contraseña no haya cambiado después de iniciar
 sesión y (RRHH/Supervisor) qué empresas puede ver (ver api/deps.py). Preguntarlo a la base de datos
-en cada petición cuesta un viaje a Supabase (~200 ms), así que el resultado se recuerda unos segundos.
+en cada petición cuesta un viaje a la base de datos, así que el resultado se recuerda unos segundos.
 
 ¿Se pierde el "cambio al instante"? No: cuando un Admin edita a un trabajador, cambia su estado o
 su contraseña, esa ruta llama a `olvidar` y el cambio vale de inmediato. El tiempo máximo

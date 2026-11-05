@@ -13,11 +13,8 @@ El Gateway hace tres cosas:
      (api/v1/proxy.py).
   4. PÚBLICO: unas pocas rutas de solo lectura SIN token, para que cualquiera vea
      los anuncios en la app ANUNCIOS (api/v1/publico.py).
-Además configura CORS: el permiso para que los frontends (puertos 3000 y 3001)
+Además configura CORS: el permiso para que los frontends (ERP y ANUNCIOS)
 puedan llamar a este servidor desde el navegador.
-
-Para ver todas las rutas disponibles, con el backend encendido abre:
-    http://localhost:8000/docs
 """
 import asyncio
 from contextlib import asynccontextmanager
@@ -31,7 +28,6 @@ from app.core.config import settings
 from app.core.database import engine
 from app.core.http_client import cerrar_cliente
 from app.infrastructure.migraciones import aplicar_migraciones
-from app.infrastructure.seed import sembrar_datos_de_prueba
 from shared_kernel.database import calentar_conexiones, crear_tablas
 from shared_kernel.exceptions import registrar_manejadores_excepciones
 from shared_kernel.logging import configurar_logging
@@ -44,15 +40,11 @@ configurar_logging("gateway", settings.log_level)
 # ---------------------------------------------------------------------------
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # AL ENCENDER: en modo "desarrollo" crea las tablas que falten y siembra
-    # los datos de prueba (infrastructure/seed.py). Solo crea lo que falta: no modifica
-    # tablas que ya existen (un cambio de columnas se hace a mano en Supabase).
-    if settings.entorno == "desarrollo":
+    # AL ENCENDER: con INICIALIZAR_BD (base nueva en RDS) crea las tablas que falten. Solo crea
+    # lo que falta: no modifica tablas que ya existen (las columnas nuevas las agrega aplicar_migraciones).
+    if settings.inicializar_bd:
         await crear_tablas(engine)
-    # En cualquier entorno: agrega las columnas nuevas que falten en tablas ya existentes.
     await aplicar_migraciones(engine)
-    if settings.entorno == "desarrollo":
-        await sembrar_datos_de_prueba()
 
     # Abre las conexiones a la base ahora (en segundo plano) y no cuando llegue la primera petición.
     tarea_calentamiento = asyncio.create_task(calentar_conexiones(engine))
@@ -73,14 +65,14 @@ app = FastAPI(
     description="Puerta de entrada: login, usuarios del ERP y reenvío hacia los microservicios.",
     version="1.0.0",
     lifespan=lifespan,
-    # La documentación interactiva (/docs) describe TODAS las rutas: solo se publica en desarrollo.
-    docs_url="/docs" if settings.entorno == "desarrollo" else None,
-    redoc_url="/redoc" if settings.entorno == "desarrollo" else None,
-    openapi_url="/openapi.json" if settings.entorno == "desarrollo" else None,
+    # La documentación interactiva (/docs) describe TODAS las rutas: no se publica.
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
 )
 
 # CORS: sin esto, el navegador bloquearía las llamadas desde los frontends.
-# Solo se permiten los orígenes escritos en CORS_ORIGINS (archivo .env).
+# Solo se permiten los orígenes escritos en CORS_ORIGINS (las URLs de CloudFront).
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.lista_cors_origins,

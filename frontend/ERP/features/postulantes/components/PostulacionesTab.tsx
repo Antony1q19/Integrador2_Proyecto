@@ -6,8 +6,7 @@
 // tiempo, cada uno con su propia línea de tiempo e historial.
 //
 // Un anuncio se muestra si el postulante tiene una postulación a él (clave en
-// `procesosPostulacion`, que en modo API viene de servicio-procesos-seleccion)
-// o, en modo mock, si figura en `Anuncio.postulantesAsociadosIds`. Los datos del
+// `procesosPostulacion`, que viene de servicio-procesos-seleccion). Los datos del
 // anuncio (cargo, empresa, fechas) se piden con `fetchAnuncios()`.
 "use client";
 
@@ -88,9 +87,7 @@ export function PostulacionesTab({
   );
   const anuncios = anunciosCargados ?? [];
 
-  const anunciosPostulados = anuncios.filter(
-    (a) => a.postulantesAsociadosIds?.includes(postulanteId) || String(a.id) in procesosPostulacion
-  );
+  const anunciosPostulados = anuncios.filter((a) => String(a.id) in procesosPostulacion);
 
   // Anuncios a los que se le puede agregar: no cerrados y a los que aún no postuló.
   // `anuncios` ya viene filtrado por el backend: RRHH y Supervisor solo reciben los

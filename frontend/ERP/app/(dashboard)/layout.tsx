@@ -3,6 +3,7 @@
 import { useState, useSyncExternalStore } from "react";
 import { Menu } from "lucide-react";
 import Sidebar from "@/features/portada/components/sidebar";
+import { AvisosWhatsApp } from "@/features/comunicaciones/components/AvisosWhatsApp";
 import { Role } from "@/features/portada/types/menu"; // Asegúrate de tener este import
 
 function getCookie(name: string): string | null {
@@ -143,6 +144,9 @@ export default function DashboardLayout({
           {children}
         </main>
       </div>
+
+      {/* Avisos de mensajes de WhatsApp nuevos, en cualquier pantalla del ERP */}
+      <AvisosWhatsApp />
     </div>
   );
 }

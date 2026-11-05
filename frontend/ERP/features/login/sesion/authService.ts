@@ -4,8 +4,7 @@
 // maneja el JWT: llama a las rutas propias del servidor de Next.js
 // (app/api/auth/login, app/api/auth/logout), que son las que hablan con
 // el Gateway y guardan el token en una cookie httpOnly (ver esos archivos
-// para el detalle). No existe modo mock: si el backend no responde, esto
-// falla con un error real, no hay fallback simulado.
+// para el detalle). Si el backend no responde, esto falla con un error real.
 
 import { vaciarCache } from '@/lib/cacheCliente';
 

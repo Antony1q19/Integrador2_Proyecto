@@ -28,7 +28,7 @@ router = APIRouter()
 # Tabla de direcciones: primera palabra de la ruta → dirección interna del
 # microservicio que la atiende. Para agregar un servicio nuevo, se añade una
 # línea aquí y su URL en core/config.py. (Si la URL no está configurada en el
-# .env, vale None y esa ruta responde 404 "Servicio no encontrado".)
+# configuración, vale None y esa ruta responde 404 "Servicio no encontrado".)
 _URL_POR_SERVICIO = {
     "postulantes": settings.url_servicio_postulantes,                   # servicio-postulantes
     "empresas": settings.url_servicio_empresas_vacantes,                # servicio-empresas-vacantes
@@ -44,13 +44,6 @@ _URL_POR_SERVICIO = {
 }
 
 
-@router.api_route(
-    # Ruta "comodín": atrapa /api/v1/<servicio> y todo lo que venga después.
-    # Se escribe SIN "/" entre las dos partes a propósito, para que también
-    # coincida la ruta pelada  /api/v1/postulantes  (sin nada más detrás).
-    "/{servicio}{ruta:path}",
-    methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
-)
 async def reenviar(
     servicio: str,  # ej. "postulantes"
     ruta: str,      # el resto de la dirección, ej. "/123/documentos" (o "" si no hay más)
@@ -105,6 +98,16 @@ async def reenviar(
         content=respuesta.content,
         status_code=respuesta.status_code,
         headers=_cabeceras_de_respuesta(respuesta.headers),
+    )
+
+
+# Ruta "comodín": atrapa /api/v1/<servicio> y todo lo que venga después. Se escribe SIN "/" entre
+# las dos partes a propósito, para que también coincida la ruta pelada  /api/v1/postulantes.
+# Se registra una vez POR MÉTODO, cada una con su propio operationId: con un solo registro para los
+# cinco métodos, FastAPI repite el operationId y el contrato OpenAPI deja de ser válido.
+for _metodo in ("GET", "POST", "PUT", "PATCH", "DELETE"):
+    router.add_api_route(
+        "/{servicio}{ruta:path}", reenviar, methods=[_metodo], operation_id=f"reenviar_{_metodo.lower()}"
     )
 
 

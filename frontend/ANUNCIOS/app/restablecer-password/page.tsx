@@ -34,7 +34,8 @@ function RestablecerPasswordFormulario() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [token, setToken] = useState<string | null>(null);
+  // El token llega en la URL (?token=...): se lee una sola vez al montar.
+  const [token] = useState<string | null>(() => searchParams.get('token'));
   const [nuevaPassword, setNuevaPassword] = useState('');
   const [confirmarPassword, setConfirmarPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -43,15 +44,11 @@ function RestablecerPasswordFormulario() {
   const passwordRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const rawToken = searchParams.get('token');
-    if (rawToken) {
-      setToken(rawToken);
-      // Quitar el token sensible de la barra de direcciones y del historial del navegador
-      if (typeof window !== 'undefined') {
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
+    // Quitar el token sensible de la barra de direcciones y del historial del navegador
+    if (token) {
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
-  }, [searchParams]);
+  }, [token]);
 
   const fortaleza = calcularFortalezaPassword(nuevaPassword);
 
