@@ -1,0 +1,57 @@
+{
+  "version": "1.0.0",
+  "project": "ERP Reclutamiento y Portal ANUNCIOS",
+  "standard": "ISO/IEC 25010:2023 - Adecuacion Funcional",
+  "requirements": [
+    {
+      "id": "RF-01",
+      "subcharacteristic": "Completitud funcional",
+      "description": "El portal ANUNCIOS expone el catálogo de vacantes vigentes con filtrado y paginación sin requerir autenticación.",
+      "critical": true,
+      "acceptance_criteria": "Petición GET a vacantes activas devuelve listado estructurado con paginación consistente.",
+      "oracle": "HTTP 200, array 'items' con longitud > 0, campos 'id', 'cargo', 'estado' presentes y totalizado correcto.",
+      "test_artifact": "tests/test_functional_suitability.py::test_rf01_catalogo_vacantes_publicas",
+      "evidence_target": "evidence/week10/pytest-integration.txt"
+    },
+    {
+      "id": "RF-02",
+      "subcharacteristic": "Corrección funcional",
+      "description": "El sistema valida los campos obligatorios del postulante (DNI, email) y rechaza el registro si no se acepta la Ley N.º 29733.",
+      "critical": true,
+      "acceptance_criteria": "Registro sin consentimiento legal o con DNI inválido es rechazado sin persistir filas.",
+      "oracle": "HTTP 422 Unprocessable Entity, detalle de validación explícito y count de postulantes en BD sin cambios.",
+      "test_artifact": "tests/test_functional_suitability.py::test_rf02_registro_postulante_validaciones_ley",
+      "evidence_target": "evidence/week10/pytest-integration.txt"
+    },
+    {
+      "id": "RF-03",
+      "subcharacteristic": "Corrección funcional",
+      "description": "Aislamiento de acceso por rol y audiencia: un token emitido para 'Postulante' en ANUNCIOS no puede consumir endpoints ERP.",
+      "critical": true,
+      "acceptance_criteria": "Solicitud a endpoint administrativo con credenciales de Postulante es bloqueada por el Gateway/BFF.",
+      "oracle": "HTTP 403 Forbidden estricto, sin exposición de datos internos ni procesamiento de la acción.",
+      "test_artifact": "tests/test_functional_suitability.py::test_rf03_aislamiento_token_postulante_hacia_erp",
+      "evidence_target": "evidence/week10/pytest-integration.txt"
+    },
+    {
+      "id": "RF-04",
+      "subcharacteristic": "Corrección funcional",
+      "description": "El sistema impide que un postulante se registre más de una vez en la misma vacante (regla de unicidad y concurrencia).",
+      "critical": true,
+      "acceptance_criteria": "Dos solicitudes de postulación al mismo anuncio producen una respuesta exitosa y una de conflicto.",
+      "oracle": "Primera petición produce HTTP 201; segunda petición (o concurrente) produce HTTP 409 Conflict y exactamente 1 fila en BD.",
+      "test_artifact": "tests/test_functional_suitability.py::test_rf04_prevencion_doble_postulacion_concurrente",
+      "evidence_target": "evidence/week10/pytest-integration.txt"
+    },
+    {
+      "id": "RF-05",
+      "subcharacteristic": "Idoneidad funcional",
+      "description": "Un postulante puede ingresar a una vacante, postular con su sesión activa y comprobar su confirmación en su historial sin pasos ajenos.",
+      "critical": true,
+      "acceptance_criteria": "Recorrido de navegador completo desde la visualización de la vacante hasta el historial sin bloqueos ni workarounds.",
+      "oracle": "Flujo Playwright finaliza en /his_postulaciones con fila visible en estado 'Postulado' y aserción de DOM verificada.",
+      "test_artifact": "tests/e2e/postulacion_idoneidad.spec.ts",
+      "evidence_target": "evidence/week10/playwright-report.txt"
+    }
+  ]
+}
