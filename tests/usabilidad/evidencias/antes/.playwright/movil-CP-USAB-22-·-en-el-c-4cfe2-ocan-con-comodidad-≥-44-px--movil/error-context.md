@@ -1,0 +1,41 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "Postula Ya" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - img [ref=e6]
+        - generic [ref=e9]: Postula Ya
+      - link "Iniciar sesión" [ref=e10] [cursor=pointer]:
+        - /url: /login
+  - main [ref=e11]:
+    - generic [ref=e13]:
+      - heading "Encuentra tu próximo empleo" [level=1] [ref=e14]
+      - paragraph [ref=e15]: Explora las ofertas de nuestras empresas clientes y postula en minutos.
+    - generic [ref=e18]:
+      - img
+      - generic [ref=e19]: Buscar empleo
+      - searchbox "Buscar empleo" [ref=e20]
+    - generic [ref=e23]:
+      - button "Jefe de Tienda Inversiones Pacífico Retail S.A.C. S/ 3,500 - S/ 4,500 2 vacantes Publicado hace 1 mes" [pressed] [ref=e24]:
+        - heading "Jefe de Tienda" [level=3] [ref=e25]
+        - paragraph [ref=e26]: Inversiones Pacífico Retail S.A.C.
+        - generic [ref=e27]:
+          - generic [ref=e28]: S/ 3,500 - S/ 4,500
+          - generic [ref=e29]:
+            - img [ref=e30]
+            - text: 2 vacantes
+        - paragraph [ref=e35]: Publicado hace 1 mes
+      - button "Analista de Pruebas QA Empresa de Prueba Nueva S/ 3,000 - S/ 5,000 1 vacante Publicado hace 1 mes" [ref=e36]:
+        - heading "Analista de Pruebas QA" [level=3] [ref=e37]
+        - paragraph [ref=e38]: Empresa de Prueba Nueva
+        - generic [ref=e39]:
+          - generic [ref=e40]: S/ 3,000 - S/ 5,000
+          - generic [ref=e41]:
+            - img [ref=e42]
+            - text: 1 vacante
+        - paragraph [ref=e47]: Publicado hace 1 mes
+  - alert [ref=e48]
+```

@@ -1,0 +1,116 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e6]:
+        - generic [ref=e7]:
+          - img [ref=e9]
+          - generic [ref=e11]:
+            - heading "TalentERP" [level=1] [ref=e12]
+            - paragraph [ref=e13]: Recursos Humanos
+        - navigation [ref=e14]:
+          - paragraph [ref=e15]: Menú principal
+          - generic [ref=e16]:
+            - link "Dashboard" [ref=e19] [cursor=pointer]:
+              - /url: /dashboard
+              - img [ref=e21]
+              - generic [ref=e26]: Dashboard
+            - generic [ref=e27]:
+              - generic [ref=e28]:
+                - link "Postulantes" [ref=e30] [cursor=pointer]:
+                  - /url: /postulantes
+                  - img [ref=e32]
+                  - generic [ref=e37]: Postulantes
+                - button "Contraer Postulantes" [ref=e39]:
+                  - img [ref=e40]
+              - generic [ref=e42]:
+                - link "Listado" [ref=e43] [cursor=pointer]:
+                  - /url: /postulantes
+                - link "Pipeline" [ref=e44] [cursor=pointer]:
+                  - /url: /postulantes/pipeline
+            - link "Entrevistas" [ref=e47] [cursor=pointer]:
+              - /url: /entrevistas
+              - img [ref=e49]
+              - generic [ref=e53]: Entrevistas
+            - link "Contrataciones" [ref=e56] [cursor=pointer]:
+              - /url: /contrataciones
+              - img [ref=e58]
+              - generic [ref=e61]: Contrataciones
+            - generic [ref=e63]:
+              - link "Comunicaciones" [ref=e64] [cursor=pointer]:
+                - /url: /comunicaciones
+                - img [ref=e66]
+                - generic [ref=e68]: Comunicaciones
+              - button "Expandir Comunicaciones" [ref=e69]:
+                - img [ref=e70]
+            - link "Anuncios" [ref=e74] [cursor=pointer]:
+              - /url: /anuncios
+              - img [ref=e76]
+              - generic [ref=e79]: Anuncios
+            - link "Empresas" [ref=e82] [cursor=pointer]:
+              - /url: /empresas
+              - img [ref=e84]
+              - generic [ref=e88]: Empresas
+            - link "Perfil" [ref=e91] [cursor=pointer]:
+              - /url: /perfil
+              - img [ref=e93]
+              - generic [ref=e97]: Perfil
+            - link "Ayuda" [ref=e100] [cursor=pointer]:
+              - /url: /ayuda
+              - img [ref=e102]
+              - generic [ref=e105]: Ayuda
+        - generic [ref=e106]:
+          - button "Cerrar sesión" [ref=e108]:
+            - img [ref=e110]
+            - generic [ref=e113]: Cerrar sesión
+          - paragraph [ref=e114]: TalentERP v1.0.0
+    - generic [ref=e115]:
+      - banner [ref=e116]:
+        - generic [ref=e118]:
+          - heading "TalentERP" [level=2] [ref=e119]
+          - paragraph [ref=e120]: Sistema de Recursos Humanos
+        - generic [ref=e121]:
+          - generic [ref=e122]:
+            - paragraph [ref=e123]: Leonardo Morales
+            - paragraph [ref=e124]: Administrador
+          - generic [ref=e125]: LM
+      - main [ref=e126]:
+        - generic [ref=e128]:
+          - generic [ref=e129]:
+            - heading "Nuevo Postulante" [level=1] [ref=e130]
+            - paragraph [ref=e131]: Completa los datos del nuevo candidato
+          - generic [ref=e132]:
+            - generic [ref=e133]:
+              - heading "Datos Personales" [level=2] [ref=e134]
+              - paragraph [ref=e135]: Sección 1 de 3
+            - generic [ref=e136]:
+              - generic [ref=e138]:
+                - generic [ref=e139]:
+                  - generic [ref=e140]: Nombres *
+                  - 'textbox "Ej: Juan Carlos" [ref=e141]'
+                - generic [ref=e142]:
+                  - generic [ref=e143]: Apellidos *
+                  - 'textbox "Ej: Pérez González" [ref=e144]'
+                - generic [ref=e145]:
+                  - generic [ref=e146]: Tipo de Documento *
+                  - combobox [ref=e147]:
+                    - option "DNI" [selected]
+                    - option "CE"
+                    - option "PASAPORTE"
+                - generic [ref=e148]:
+                  - generic [ref=e149]: Número de Documento *
+                  - textbox "12345678" [ref=e150]
+                - generic [ref=e151]:
+                  - generic [ref=e152]: Fecha de Nacimiento *
+                  - textbox [ref=e153]
+              - generic [ref=e159]:
+                - button "Anterior" [disabled] [ref=e160]:
+                  - img [ref=e161]
+                  - text: Anterior
+                - button "Siguiente" [ref=e163]:
+                  - text: Siguiente
+                  - img [ref=e164]
+  - alert [ref=e166]
+```

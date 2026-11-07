@@ -1,0 +1,55 @@
+{
+  "cookies": [
+    {
+      "name": "authToken",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3NDcwYjM1OC0zM2YxLTQ4NWUtODcwYy0xMDMwNzY0NjM4YzQiLCJlbWFpbCI6InJyaGhAdGVzdC5jb20iLCJyb2wiOiJSUkhIIiwibm9tYnJlIjoiWGF2aWVyIEliYXJyYSIsImF1ZCI6ImVycCIsImNhbWJpYXJQYXNzd29yZCI6ZmFsc2UsImlhdCI6MTc5MzkxMzkyMywiaWF0X21zIjoxNzkzOTEzOTIzMDczLCJleHAiOjE3OTM5MTc1MjN9.8gT93e2-OJXPc5a6ooSLarG5M6SCQCT4cz74Yi4Pkps",
+      "domain": "d31inue0zw9dve.cloudfront.net",
+      "path": "/",
+      "expires": 1793917532.765333,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "userRole",
+      "value": "RRHH",
+      "domain": "d31inue0zw9dve.cloudfront.net",
+      "path": "/",
+      "expires": 1793917532.766622,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "userName",
+      "value": "Xavier Ibarra",
+      "domain": "d31inue0zw9dve.cloudfront.net",
+      "path": "/",
+      "expires": 1793917532.766775,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "userEmail",
+      "value": "rrhh@test.com",
+      "domain": "d31inue0zw9dve.cloudfront.net",
+      "path": "/",
+      "expires": 1793917532.766827,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "userEmpresas",
+      "value": "%5B6%5D",
+      "domain": "d31inue0zw9dve.cloudfront.net",
+      "path": "/",
+      "expires": 1793917532.766883,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": []
+}

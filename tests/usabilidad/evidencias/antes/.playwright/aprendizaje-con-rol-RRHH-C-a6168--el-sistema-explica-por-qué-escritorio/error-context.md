@@ -1,0 +1,249 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e6]:
+        - generic [ref=e7]:
+          - img [ref=e9]
+          - generic [ref=e11]:
+            - heading "TalentERP" [level=1] [ref=e12]
+            - paragraph [ref=e13]: Recursos Humanos
+        - navigation [ref=e14]:
+          - paragraph [ref=e15]: Menú principal
+          - generic [ref=e16]:
+            - generic [ref=e17]:
+              - generic [ref=e18]:
+                - link "Postulantes" [ref=e20] [cursor=pointer]:
+                  - /url: /postulantes
+                  - img [ref=e22]
+                  - generic [ref=e27]: Postulantes
+                - button "Contraer Postulantes" [ref=e29]:
+                  - img [ref=e30]
+              - generic [ref=e32]:
+                - link "Listado" [ref=e33] [cursor=pointer]:
+                  - /url: /postulantes
+                - link "Pipeline" [ref=e34] [cursor=pointer]:
+                  - /url: /postulantes/pipeline
+            - link "Entrevistas" [ref=e37] [cursor=pointer]:
+              - /url: /entrevistas
+              - img [ref=e39]
+              - generic [ref=e43]: Entrevistas
+            - link "Contrataciones" [ref=e46] [cursor=pointer]:
+              - /url: /contrataciones
+              - img [ref=e48]
+              - generic [ref=e51]: Contrataciones
+            - generic [ref=e53]:
+              - link "Comunicaciones" [ref=e54] [cursor=pointer]:
+                - /url: /comunicaciones
+                - img [ref=e56]
+                - generic [ref=e58]: Comunicaciones
+              - button "Expandir Comunicaciones" [ref=e59]:
+                - img [ref=e60]
+            - link "Anuncios" [ref=e64] [cursor=pointer]:
+              - /url: /anuncios
+              - img [ref=e66]
+              - generic [ref=e69]: Anuncios
+            - link "Empresas" [ref=e72] [cursor=pointer]:
+              - /url: /empresas
+              - img [ref=e74]
+              - generic [ref=e78]: Empresas
+            - link "Perfil" [ref=e81] [cursor=pointer]:
+              - /url: /perfil
+              - img [ref=e83]
+              - generic [ref=e87]: Perfil
+            - link "Ayuda" [ref=e90] [cursor=pointer]:
+              - /url: /ayuda
+              - img [ref=e92]
+              - generic [ref=e95]: Ayuda
+        - generic [ref=e96]:
+          - button "Cerrar sesión" [ref=e98]:
+            - img [ref=e100]
+            - generic [ref=e103]: Cerrar sesión
+          - paragraph [ref=e104]: TalentERP v1.0.0
+    - generic [ref=e105]:
+      - banner [ref=e106]:
+        - generic [ref=e108]:
+          - heading "TalentERP" [level=2] [ref=e109]
+          - paragraph [ref=e110]: Sistema de Recursos Humanos
+        - generic [ref=e111]:
+          - generic [ref=e112]:
+            - paragraph [ref=e113]: Xavier Ibarra
+            - paragraph [ref=e114]: Recursos Humanos
+          - generic [ref=e115]: XI
+      - main [ref=e116]:
+        - generic [ref=e117]:
+          - generic [ref=e118]:
+            - generic [ref=e119]:
+              - heading "Postulantes" [level=1] [ref=e120]
+              - paragraph [ref=e121]: Gestiona todos los candidatos registrados en el sistema
+            - button "Nuevo Postulante" [ref=e122]:
+              - img [ref=e123]
+              - text: Nuevo Postulante
+          - generic [ref=e124]:
+            - generic [ref=e126]:
+              - img [ref=e127]
+              - textbox "Buscar por nombre, apellido o documento..." [ref=e130]
+            - button "Mostrar filtros" [ref=e133]:
+              - img [ref=e134]
+              - text: Mostrar filtros
+          - generic [ref=e136]:
+            - table [ref=e138]:
+              - rowgroup [ref=e139]:
+                - row "Postulante Correo Postulaciones Estado Cuenta Términos 1 Términos 2 Acciones" [ref=e140]:
+                  - cell "Postulante" [ref=e141] [cursor=pointer]:
+                    - generic [ref=e142]:
+                      - text: Postulante
+                      - img [ref=e143]
+                  - cell "Correo" [ref=e145]
+                  - cell "Postulaciones" [ref=e146]
+                  - cell "Estado" [ref=e147]
+                  - cell "Cuenta" [ref=e148]
+                  - cell "Términos 1" [ref=e149]
+                  - cell "Términos 2" [ref=e150]
+                  - cell "Acciones" [ref=e151]
+              - rowgroup [ref=e152]:
+                - 'row "DC Denis Chavez DNI: 71147555 deniseadeya@gmail.com 1 anuncio Postulado Solicitar No aceptado No aceptado Ver" [ref=e153]':
+                  - 'cell "DC Denis Chavez DNI: 71147555" [ref=e154]':
+                    - generic [ref=e155]:
+                      - generic [ref=e156]: DC
+                      - generic [ref=e157]:
+                        - paragraph [ref=e158]: Denis Chavez
+                        - paragraph [ref=e159]: "DNI: 71147555"
+                  - cell "deniseadeya@gmail.com" [ref=e160]:
+                    - paragraph [ref=e161]: deniseadeya@gmail.com
+                  - cell "1 anuncio" [ref=e162]:
+                    - paragraph [ref=e163]: 1 anuncio
+                  - cell "Postulado" [ref=e164]:
+                    - generic [ref=e165]: Postulado
+                  - cell "Solicitar" [ref=e167]:
+                    - button "Solicitar" [ref=e169]:
+                      - img [ref=e170]
+                      - text: Solicitar
+                  - cell "No aceptado" [ref=e173]:
+                    - img "No aceptado" [ref=e174]
+                  - cell "No aceptado" [ref=e177]:
+                    - img "No aceptado" [ref=e178]
+                  - cell "Ver" [ref=e181]:
+                    - link "Ver" [ref=e183] [cursor=pointer]:
+                      - /url: /postulantes/0d83c4cd-fd10-4760-ba44-4566bfaaccc5
+                      - img [ref=e184]
+                      - text: Ver
+                - 'row "TU Test API Usuario DNI: 12345102 test_script_1791142102@example.com 0 anuncios Nuevo Tiene cuenta Aceptado No aceptado Ver" [ref=e187]':
+                  - 'cell "TU Test API Usuario DNI: 12345102" [ref=e188]':
+                    - generic [ref=e189]:
+                      - generic [ref=e190]: TU
+                      - generic [ref=e191]:
+                        - paragraph [ref=e192]: Test API Usuario
+                        - paragraph [ref=e193]: "DNI: 12345102"
+                  - cell "test_script_1791142102@example.com" [ref=e194]:
+                    - paragraph [ref=e195]: test_script_1791142102@example.com
+                  - cell "0 anuncios" [ref=e196]:
+                    - paragraph [ref=e197]: 0 anuncios
+                  - cell "Nuevo" [ref=e198]:
+                    - generic [ref=e199]: Nuevo
+                  - cell "Tiene cuenta" [ref=e201]:
+                    - img "Tiene cuenta" [ref=e202]
+                  - cell "Aceptado" [ref=e204]:
+                    - img "Aceptado" [ref=e205]
+                  - cell "No aceptado" [ref=e207]:
+                    - img "No aceptado" [ref=e208]
+                  - cell "Ver" [ref=e211]:
+                    - link "Ver" [ref=e213] [cursor=pointer]:
+                      - /url: /postulantes/71b0292c-b543-44b1-a72c-fab3ede08e0b
+                      - img [ref=e214]
+                      - text: Ver
+                - 'row "TU Test API Usuario DNI: 12345144 test_script_1791142144@example.com 0 anuncios Nuevo Tiene cuenta Aceptado No aceptado Ver" [ref=e217]':
+                  - 'cell "TU Test API Usuario DNI: 12345144" [ref=e218]':
+                    - generic [ref=e219]:
+                      - generic [ref=e220]: TU
+                      - generic [ref=e221]:
+                        - paragraph [ref=e222]: Test API Usuario
+                        - paragraph [ref=e223]: "DNI: 12345144"
+                  - cell "test_script_1791142144@example.com" [ref=e224]:
+                    - paragraph [ref=e225]: test_script_1791142144@example.com
+                  - cell "0 anuncios" [ref=e226]:
+                    - paragraph [ref=e227]: 0 anuncios
+                  - cell "Nuevo" [ref=e228]:
+                    - generic [ref=e229]: Nuevo
+                  - cell "Tiene cuenta" [ref=e231]:
+                    - img "Tiene cuenta" [ref=e232]
+                  - cell "Aceptado" [ref=e234]:
+                    - img "Aceptado" [ref=e235]
+                  - cell "No aceptado" [ref=e237]:
+                    - img "No aceptado" [ref=e238]
+                  - cell "Ver" [ref=e241]:
+                    - link "Ver" [ref=e243] [cursor=pointer]:
+                      - /url: /postulantes/c5aaf34c-d0b8-46c4-ad6e-e39eed9f9976
+                      - img [ref=e244]
+                      - text: Ver
+                - 'row "LM Leonardo Morales DNI: 72305434 leonardomorales12354@gmail.com 0 anuncios Nuevo Tiene cuenta Aceptado Aceptado Ver" [ref=e247]':
+                  - 'cell "LM Leonardo Morales DNI: 72305434" [ref=e248]':
+                    - generic [ref=e249]:
+                      - generic [ref=e250]: LM
+                      - generic [ref=e251]:
+                        - paragraph [ref=e252]: Leonardo Morales
+                        - paragraph [ref=e253]: "DNI: 72305434"
+                  - cell "leonardomorales12354@gmail.com" [ref=e254]:
+                    - paragraph [ref=e255]: leonardomorales12354@gmail.com
+                  - cell "0 anuncios" [ref=e256]:
+                    - paragraph [ref=e257]: 0 anuncios
+                  - cell "Nuevo" [ref=e258]:
+                    - generic [ref=e259]: Nuevo
+                  - cell "Tiene cuenta" [ref=e261]:
+                    - img "Tiene cuenta" [ref=e262]
+                  - cell "Aceptado" [ref=e264]:
+                    - img "Aceptado" [ref=e265]
+                  - cell "Aceptado" [ref=e267]:
+                    - img "Aceptado" [ref=e268]
+                  - cell "Ver" [ref=e270]:
+                    - link "Ver" [ref=e272] [cursor=pointer]:
+                      - /url: /postulantes/b5cb958e-b006-4de7-9a09-e4ff02dfe19e
+                      - img [ref=e273]
+                      - text: Ver
+                - 'row "XI Xavier Ibarra DNI: 72030901 xibarraprieto2003@gmail.com 1 anuncio Postulado Tiene cuenta Aceptado Aceptado Ver" [ref=e276]':
+                  - 'cell "XI Xavier Ibarra DNI: 72030901" [ref=e277]':
+                    - generic [ref=e278]:
+                      - generic [ref=e279]: XI
+                      - generic [ref=e280]:
+                        - paragraph [ref=e281]: Xavier Ibarra
+                        - paragraph [ref=e282]: "DNI: 72030901"
+                  - cell "xibarraprieto2003@gmail.com" [ref=e283]:
+                    - paragraph [ref=e284]: xibarraprieto2003@gmail.com
+                  - cell "1 anuncio" [ref=e285]:
+                    - paragraph [ref=e286]: 1 anuncio
+                  - cell "Postulado" [ref=e287]:
+                    - generic [ref=e288]: Postulado
+                  - cell "Tiene cuenta" [ref=e290]:
+                    - img "Tiene cuenta" [ref=e291]
+                  - cell "Aceptado" [ref=e293]:
+                    - img "Aceptado" [ref=e294]
+                  - cell "Aceptado" [ref=e296]:
+                    - img "Aceptado" [ref=e297]
+                  - cell "Ver" [ref=e299]:
+                    - link "Ver" [ref=e301] [cursor=pointer]:
+                      - /url: /postulantes/8508fcc3-a046-47b2-be97-46de46e35a78
+                      - img [ref=e302]
+                      - text: Ver
+            - generic [ref=e305]:
+              - generic [ref=e306]:
+                - generic [ref=e307]: Mostrando 5 de 6 postulantes
+                - generic [ref=e308]:
+                  - generic [ref=e309]: "Filas por página:"
+                  - combobox "Filas por página:" [ref=e310]:
+                    - option "5" [selected]
+                    - option "10"
+                    - option "15"
+                    - option "25"
+                    - option "50"
+              - generic [ref=e311]:
+                - button [disabled] [ref=e312]:
+                  - img [ref=e313]
+                - generic [ref=e315]:
+                  - button "1" [ref=e316]
+                  - button "2" [ref=e317]
+                - button [ref=e318]:
+                  - img [ref=e319]
+  - alert [ref=e321]
+```

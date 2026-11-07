@@ -1,0 +1,55 @@
+{
+  "cookies": [
+    {
+      "name": "authToken",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjM4ZDYxYy1lMmQzLTRkMGMtYThmMi1kYTU4ODg3NzA0NzYiLCJlbWFpbCI6ImFkbWluQHRlc3QuY29tIiwicm9sIjoiQWRtaW4iLCJub21icmUiOiJMZW9uYXJkbyBNb3JhbGVzIiwiYXVkIjoiZXJwIiwiY2FtYmlhclBhc3N3b3JkIjpmYWxzZSwiaWF0IjoxNzkzOTEzOTIwLCJpYXRfbXMiOjE3OTM5MTM5MjA1NjMsImV4cCI6MTc5MzkxNzUyMH0.AXrbNHXEKZ3V6ifwE8dSbTS9x7BNGXWyodqAhU8Y74k",
+      "domain": "d31inue0zw9dve.cloudfront.net",
+      "path": "/",
+      "expires": 1793917530.178301,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "userRole",
+      "value": "Admin",
+      "domain": "d31inue0zw9dve.cloudfront.net",
+      "path": "/",
+      "expires": 1793917530.179925,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "userName",
+      "value": "Leonardo Morales",
+      "domain": "d31inue0zw9dve.cloudfront.net",
+      "path": "/",
+      "expires": 1793917530.180015,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "userEmail",
+      "value": "admin@test.com",
+      "domain": "d31inue0zw9dve.cloudfront.net",
+      "path": "/",
+      "expires": 1793917530.180052,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "userEmpresas",
+      "value": "%5B%5D",
+      "domain": "d31inue0zw9dve.cloudfront.net",
+      "path": "/",
+      "expires": 1793917530.180093,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": []
+}

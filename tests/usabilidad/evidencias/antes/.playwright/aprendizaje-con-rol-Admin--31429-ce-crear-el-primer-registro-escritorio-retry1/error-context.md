@@ -1,0 +1,124 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e6]:
+        - generic [ref=e7]:
+          - img [ref=e9]
+          - generic [ref=e11]:
+            - heading "TalentERP" [level=1] [ref=e12]
+            - paragraph [ref=e13]: Recursos Humanos
+        - navigation [ref=e14]:
+          - paragraph [ref=e15]: Menú principal
+          - generic [ref=e16]:
+            - link "Dashboard" [ref=e19] [cursor=pointer]:
+              - /url: /dashboard
+              - img [ref=e21]
+              - generic [ref=e26]: Dashboard
+            - generic [ref=e28]:
+              - link "Postulantes" [ref=e29] [cursor=pointer]:
+                - /url: /postulantes
+                - img [ref=e31]
+                - generic [ref=e36]: Postulantes
+              - button "Expandir Postulantes" [ref=e37]:
+                - img [ref=e38]
+            - link "Entrevistas" [ref=e42] [cursor=pointer]:
+              - /url: /entrevistas
+              - img [ref=e44]
+              - generic [ref=e48]: Entrevistas
+            - link "Contrataciones" [ref=e51] [cursor=pointer]:
+              - /url: /contrataciones
+              - img [ref=e53]
+              - generic [ref=e56]: Contrataciones
+            - generic [ref=e58]:
+              - link "Comunicaciones" [ref=e59] [cursor=pointer]:
+                - /url: /comunicaciones
+                - img [ref=e61]
+                - generic [ref=e63]: Comunicaciones
+              - button "Expandir Comunicaciones" [ref=e64]:
+                - img [ref=e65]
+            - link "Anuncios" [ref=e70] [cursor=pointer]:
+              - /url: /anuncios
+              - img [ref=e72]
+              - generic [ref=e75]: Anuncios
+            - link "Empresas" [ref=e79] [cursor=pointer]:
+              - /url: /empresas
+              - img [ref=e81]
+              - generic [ref=e85]: Empresas
+            - link "Perfil" [ref=e88] [cursor=pointer]:
+              - /url: /perfil
+              - img [ref=e90]
+              - generic [ref=e94]: Perfil
+            - link "Ayuda" [ref=e97] [cursor=pointer]:
+              - /url: /ayuda
+              - img [ref=e99]
+              - generic [ref=e102]: Ayuda
+        - generic [ref=e103]:
+          - button "Cerrar sesión" [ref=e105]:
+            - img [ref=e107]
+            - generic [ref=e110]: Cerrar sesión
+          - paragraph [ref=e111]: TalentERP v1.0.0
+    - generic [ref=e112]:
+      - banner [ref=e113]:
+        - generic [ref=e115]:
+          - heading "TalentERP" [level=2] [ref=e116]
+          - paragraph [ref=e117]: Sistema de Recursos Humanos
+        - generic [ref=e118]:
+          - generic [ref=e119]:
+            - paragraph [ref=e120]: Leonardo Morales
+            - paragraph [ref=e121]: Administrador
+          - generic [ref=e122]: LM
+      - main [ref=e123]:
+        - generic [ref=e125]:
+          - generic [ref=e126]:
+            - generic [ref=e127]:
+              - heading "Anuncios" [level=1] [ref=e128]
+              - paragraph [ref=e129]: 0 de 14 anuncios
+            - link "+ Nuevo Anuncio" [ref=e130] [cursor=pointer]:
+              - /url: /anuncios/nuevo
+          - generic [ref=e131]:
+            - textbox "Buscar por cargo o empresa..." [active] [ref=e132]: zzzz-sin-resultados
+            - generic [ref=e133]:
+              - combobox [ref=e134]:
+                - option "Todas las empresas" [selected]
+                - option "Consultora Andina S.A.C."
+                - option "Empresa de Prueba Nueva"
+                - option "Tech Solutions Perú S.A."
+                - option "Inversiones Pacífico Retail S.A.C."
+                - option "Constructora Los Andes S.A."
+                - option "Clínica San Gabriel S.A.C."
+                - option "Agroexportadora Valle Verde S.A."
+                - option "FinTech Andina Pagos S.A.C."
+              - combobox [ref=e135]:
+                - option "Todos los cargos" [selected]
+                - option "Analista de Pruebas QA"
+                - option "Python Backend Senior"
+                - option "Jefe de Tienda"
+                - option "Asistente de Almacén"
+                - option "Ingeniero Residente de Obra"
+                - option "Prevencionista de Riesgos (SSOMA)"
+                - option "Enfermera(o) Asistencial"
+                - option "Técnico en Farmacia"
+                - option "Recepcionista de Admisión"
+                - option "Supervisor de Campo"
+                - option "Jefe de Calidad"
+                - option "Desarrollador Backend (Python)"
+                - option "Analista de Riesgos"
+                - option "Ejecutivo de Atención al Cliente"
+              - combobox [ref=e136]:
+                - option "Todos los estados" [selected]
+                - option "Abierto"
+                - option "En proceso"
+                - option "Cerrado"
+              - generic [ref=e137]:
+                - generic [ref=e138]: Desde
+                - textbox [ref=e139]
+              - generic [ref=e140]:
+                - generic [ref=e141]: Hasta
+                - textbox [ref=e142]
+              - button "Limpiar filtros" [ref=e143]
+          - paragraph [ref=e145]: No se encontraron anuncios con los filtros seleccionados.
+  - alert [ref=e146]
+```
